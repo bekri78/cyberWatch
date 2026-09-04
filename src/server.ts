@@ -4,7 +4,7 @@ import { pool, pingDatabase } from './database/client';
 import { runMigrations } from './database/migrate';
 import { runInitialCollection, startScheduler } from './jobs/scheduler';
 
-const app = buildApp();
+const app = buildApp(pool);
 
 async function prepareDatabase(): Promise<void> {
   const { applied, skipped } = await runMigrations(pool);

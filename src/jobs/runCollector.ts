@@ -2,6 +2,7 @@ import type { Pool } from 'pg';
 import type { Collector } from '../collectors/types';
 import { finishRun, startRun } from '../database/repositories/collectorRuns';
 import { getSourceIdByName, saveRawItems } from '../database/repositories/rawItems';
+import { promoteRawItems } from '../pipeline/promoteRawItems';
 
 interface Logger {
   info: (obj: unknown, msg?: string) => void;
@@ -32,6 +33,21 @@ export async function runCollector(pool: Pool, collector: Collector, log: Logger
       { collector: collector.name, collected: items.length, inserted, duplicates },
       'Collecte terminee',
     );
+
+    // Promotion deterministe raw_items -> cyber_events (Phase 4, pas
+    // d'IA -- cf. classifyEvent). Volontairement hors du "success" de la
+    // collecte : un souci de promotion ne doit jamais faire passer un
+    // collector_run reussi en echec, et se rattrape au prochain passage
+    // (la requete reprend tous les raw_items non promus, pas seulement
+    // ceux de ce run).
+    try {
+      const { promoted } = await promoteRawItems(pool);
+      if (promoted > 0) {
+        log.info({ collector: collector.name, promoted }, 'Evenements promus (raw_items -> cyber_events)');
+      }
+    } catch (promotionErr) {
+      log.error({ collector: collector.name, err: promotionErr }, 'Promotion cyber_events echouee');
+    }
   } catch (err) {
     await finishRun(pool, runId, {
       status: 'failed',
