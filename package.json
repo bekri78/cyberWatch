@@ -23,11 +23,14 @@
   },
   "homepage": "https://github.com/bekri78/cyberWatch#readme",
   "dependencies": {
+    "dotenv": "^17.4.2",
     "fastify": "^5.12.3",
+    "pg": "^8.23.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",
+    "@types/pg": "^8.23.1",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
     "vitest": "^5.0.0"
