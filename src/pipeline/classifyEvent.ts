@@ -30,6 +30,7 @@ function classifyCategory(sourceName: string, url: string): string {
   if (sourceName === 'certfr') {
     if (url.includes('/avis/')) return 'vulnerability';
     if (url.includes('/alerte/')) return 'alert';
+    if (url.includes('/cti/')) return 'threat_intel';
   }
   return 'other';
 }
@@ -40,6 +41,13 @@ function classifyCategory(sourceName: string, url: string): string {
  * IA"). Ce n'est pas la severite finale du systeme -- Phase 5 (DeepSeek)
  * l'affinera avec un vrai raisonnement, mais un evenement doit toujours
  * avoir une valeur exploitable des sa creation.
+ *
+ * Cas 'threat_intel' (cti) : ces rapports n'ont generalement ni CVE ni
+ * formule "activement exploitee" (vocabulaire specifique aux bulletins de
+ * vulnerabilites) -- ils retombent donc sur 'low' par defaut. Distinguer
+ * un panorama annuel d'une campagne de compromission en cours demande une
+ * vraie lecture du contenu : volontairement laisse a l'IA (Phase 5)
+ * plutot que d'ajouter des heuristiques texte fragiles ici.
  */
 function classifySeverity(category: string, hasCve: boolean, activeExploitation: boolean): string {
   if (activeExploitation) return 'critical';

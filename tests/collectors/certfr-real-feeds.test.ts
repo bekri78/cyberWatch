@@ -113,3 +113,49 @@ describe('certfr collector -- flux alerte reel (cert.ssi.gouv.fr/alerte/feed/)',
     expect(result.publishedAt?.toISOString()).toBe('2023-10-02T00:00:00.000Z');
   });
 });
+
+describe('certfr collector -- flux cti reel (cert.ssi.gouv.fr/cti/feed/)', () => {
+  it('parse et normalise les 40 vraies entrees sans erreur', async () => {
+    const xml = loadFixture('cti-feed-real.xml');
+    const feed = await parser.parseString(xml);
+
+    expect(feed.items).toHaveLength(40);
+
+    const items = feed.items.map((entry) => normalizeEntry(entry));
+
+    for (const item of items) {
+      expect(item.title).not.toBe('(sans titre)');
+      expect(item.url).toMatch(/^https:\/\/www\.cert\.ssi\.gouv\.fr\/cti\/CERTFR-\d{4}-CTI-\d+\/$/);
+      expect(item.externalId).toMatch(/^CERTFR-\d{4}-CTI-\d+$/);
+      expect(item.publishedAt).toBeInstanceOf(Date);
+      expect(item.publishedAt?.getTime()).not.toBeNaN();
+    }
+  });
+
+  it('normalise correctement le rapport le plus recent (Turla, 13/07/2026)', async () => {
+    const xml = loadFixture('cti-feed-real.xml');
+    const feed = await parser.parseString(xml);
+    const entry = feed.items.find((item) => item.link?.includes('CERTFR-2026-CTI-004'));
+
+    expect(entry).toBeDefined();
+    const result = normalizeEntry(entry!);
+
+    expect(result.externalId).toBe('CERTFR-2026-CTI-004');
+    expect(result.title).toBe(
+      "Ciblage et compromission d'entités françaises au moyen du mode opératoire d'attaque Turla (13 juillet 2026)",
+    );
+    expect(result.contentExcerpt).toContain('Turla');
+  });
+
+  it('normalise le rapport le plus ancien du jeu (Integration of Untrusted Software, 2022)', async () => {
+    const xml = loadFixture('cti-feed-real.xml');
+    const feed = await parser.parseString(xml);
+    const entry = feed.items.find((item) => item.link?.includes('CERTFR-2022-CTI-007'));
+
+    expect(entry).toBeDefined();
+    const result = normalizeEntry(entry!);
+
+    expect(result.externalId).toBe('CERTFR-2022-CTI-007');
+    expect(result.publishedAt?.toISOString()).toBe('2022-12-07T00:00:00.000Z');
+  });
+});

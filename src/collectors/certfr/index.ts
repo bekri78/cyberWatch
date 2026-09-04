@@ -3,12 +3,17 @@ import { withRetry } from '../../lib/http/retry';
 import type { Collector, CollectorItem } from '../types';
 import { normalizeEntry } from './normalize';
 
-// Avis + alertes : les deux flux officiels retenus (cf. document
-// d'architecture, section 09). Le flux "actualite" est volontairement
-// laisse de cote pour l'instant (bruit plus general, moins actionnable).
+// Avis + alertes + cti : les trois flux CERT-FR retenus (cf. document
+// d'architecture, section 09). cti apporte un contenu reellement distinct
+// (rapports de menace / campagnes d'attaquants nommes), contrairement a
+// ioc (annonces sans les indicateurs bruts, redondant avec cti), dur
+// (guides generiques, tres faible volume) et actualite (resume
+// hebdomadaire de ce qui est deja collecte) -- volontairement laisses de
+// cote.
 const FEED_URLS = [
   'https://cert.ssi.gouv.fr/avis/feed/',
   'https://cert.ssi.gouv.fr/alerte/feed/',
+  'https://cert.ssi.gouv.fr/cti/feed/',
 ] as const;
 
 const parser = new Parser({

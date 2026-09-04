@@ -73,6 +73,23 @@ describe('classifyEvent -- alerte CERT-FR (CERTFR-2026-ALE-002, Cisco Catalyst S
   });
 });
 
+describe('classifyEvent -- cti CERT-FR (CERTFR-2026-CTI-004, campagne Turla)', () => {
+  it('categorise "threat_intel", severite "low" par defaut (pas de CVE, pas de formule "activement exploitee")', () => {
+    const result = classifyEvent({
+      sourceName: 'certfr',
+      url: 'https://www.cert.ssi.gouv.fr/cti/CERTFR-2026-CTI-004/',
+      title: "Ciblage et compromission d'entités françaises au moyen du mode opératoire d'attaque Turla (13 juillet 2026)",
+      contentExcerpt:
+        "Les membres du Centre de Coordination des Crises Cyber (C4) ont observé le ciblage et la compromission d'entités françaises au moyen du mode opératoire d'attaque (MOA) Turla, opéré par le 16ème Centre du service fédéral de sécurité de la fédération de Russie (FSB).",
+    });
+
+    expect(result.category).toBe('threat_intel');
+    expect(result.severity).toBe('low');
+    expect(result.cves).toEqual([]);
+    expect(result.tags).toEqual(['certfr', 'threat_intel']);
+  });
+});
+
 describe('classifyEvent -- source inconnue', () => {
   it('retombe sur la categorie "other" et la severite "low" sans planter', () => {
     const result = classifyEvent({
