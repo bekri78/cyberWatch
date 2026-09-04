@@ -2,6 +2,7 @@ import { buildApp } from './app';
 import { env } from './config/env';
 import { pool, pingDatabase } from './database/client';
 import { runMigrations } from './database/migrate';
+import { runInitialCollection, startScheduler } from './jobs/scheduler';
 
 const app = buildApp();
 
@@ -24,6 +25,12 @@ async function start(): Promise<void> {
     app.log.error({ err }, 'Echec de connexion/migration PostgreSQL au demarrage');
     process.exit(1);
   }
+
+  // La collecte tourne independamment du cycle de requetes HTTP (cf. §20) :
+  // lancee en arriere-plan, elle ne retarde jamais le demarrage du serveur,
+  // et une source indisponible n'empeche jamais /health de repondre.
+  runInitialCollection(pool, app.log);
+  startScheduler(pool, app.log);
 
   try {
     await app.listen({ host: '0.0.0.0', port: env.PORT });

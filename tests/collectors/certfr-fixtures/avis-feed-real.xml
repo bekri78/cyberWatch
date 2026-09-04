@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+<channel>
+<title>CERT-FR</title>
+<link>https://www.cert.ssi.gouv.fr/feed/</link>
+<description>Centre gouvernemental de veille, d'alerte et de réponse aux attaques informatiques.</description>
+<atom:link href="https://www.cert.ssi.gouv.fr/feed/" rel="self"/>
+<docs>http://www.rssboard.org/rss-specification</docs>
+<generator>CERT-FR</generator>
+<language>fr-FR</language>
+<lastBuildDate>Thu, 03 Sep 2026 13:14:05 +0000</lastBuildDate>
+<item>
+<title>Multiples vulnérabilités dans SPIP (11 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0995/</link>
+<description>De multiples vulnérabilités ont été découvertes dans SPIP. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une injection SQL (SQLi) et une falsification de requêtes côté serveur (SSRF).</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0995/</guid>
+<pubDate>Tue, 11 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans SPIP (21 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1063/</link>
+<description>Une vulnérabilité a été découverte dans SPIP. Elle permet à un attaquant de provoquer une exécution de code arbitraire à distance. L'éditeur indique que cette vulnérabilité est activement exploitée.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1063/</guid>
+<pubDate>Fri, 21 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans Microsoft Entra ID (21 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1074/</link>
+<description>**[Mise à jour du 24 août 2026]** Microsoft a modifié son bulletin de sécurité pour préciser que la vulnérabilité CVE-2026-69836 n'est pas activement exploitée. **[Publication initiale]** Une vulnérabilité a été découverte dans Microsoft Entra ID. Elle permet à un attaquant de provoquer une...</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1074/</guid>
+<pubDate>Fri, 21 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Metabase (24 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1075/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Metabase. Elles permettent à un attaquant de provoquer une atteinte à la confidentialité des données, une injection SQL (SQLi) et un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1075/</guid>
+<pubDate>Mon, 24 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans LibreNMS (24 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1076/</link>
+<description>De multiples vulnérabilités ont été découvertes dans LibreNMS. Elles permettent à un attaquant de provoquer une atteinte à la confidentialité des données et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1076/</guid>
+<pubDate>Mon, 24 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Cisco IOS XE (25 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1077/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Cisco IOS XE. Elles permettent à un attaquant de provoquer un contournement de la politique de sécurité et un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1077/</guid>
+<pubDate>Tue, 25 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Keycloak (25 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1078/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Keycloak. Elles permettent à un attaquant de provoquer un contournement de la politique de sécurité et un problème de sécurité non spécifié par l'éditeur. Le CERT-FR a connaissance d'une preuve de concept publique pour la vulnérabilité...</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1078/</guid>
+<pubDate>Tue, 25 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans OpenSSL (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1079/</link>
+<description>De multiples vulnérabilités ont été découvertes dans OpenSSL. Elles permettent à un attaquant de provoquer un déni de service à distance et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1079/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Veeam (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1080/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Veeam. Elles permettent à un attaquant de provoquer une atteinte à la confidentialité des données et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1080/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Google Chrome (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1081/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Google Chrome. Elles permettent à un attaquant de provoquer un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1081/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans Apereo CAS (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1082/</link>
+<description>Une vulnérabilité a été découverte dans Apereo CAS. Elle permet à un attaquant de provoquer un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1082/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Apache Tomcat (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1083/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Apache Tomcat. Elles permettent à un attaquant de provoquer un déni de service à distance et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1083/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans SonicWall NetExtender (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1084/</link>
+<description>De multiples vulnérabilités ont été découvertes dans SonicWall NetExtender. Elles permettent à un attaquant de provoquer un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1084/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Redmine (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1085/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Redmine. Elles permettent à un attaquant de provoquer une injection de code indirecte à distance (XSS) et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1085/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans GitLab (26 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1086/</link>
+<description>De multiples vulnérabilités ont été découvertes dans GitLab. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, un déni de service à distance et une atteinte à la confidentialité des données.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1086/</guid>
+<pubDate>Wed, 26 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans CPython (27 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1087/</link>
+<description>Une vulnérabilité a été découverte dans CPython. Elle permet à un attaquant de provoquer un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1087/</guid>
+<pubDate>Thu, 27 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Traefik (27 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1088/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Traefik. Elles permettent à un attaquant de provoquer un déni de service à distance et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1088/</guid>
+<pubDate>Thu, 27 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Tenable Enclave Security (28 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1089/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Tenable Enclave Security. Elles permettent à un attaquant de provoquer un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1089/</guid>
+<pubDate>Fri, 28 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans le noyau Linux de Debian (28 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1090/</link>
+<description>De multiples vulnérabilités ont été découvertes dans le noyau Linux de Debian. Elles permettent à un attaquant de provoquer une élévation de privilèges, une atteinte à la confidentialité des données et un déni de service.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1090/</guid>
+<pubDate>Fri, 28 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans le noyau Linux de SUSE (28 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1091/</link>
+<description>De multiples vulnérabilités ont été découvertes dans le noyau Linux de SUSE. Certaines d'entre elles permettent à un attaquant de provoquer une atteinte à la confidentialité des données, une atteinte à l'intégrité des données et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1091/</guid>
+<pubDate>Fri, 28 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans le noyau Linux de Red Hat (28 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1092/</link>
+<description>De multiples vulnérabilités ont été découvertes dans le noyau Linux de Red Hat. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire, une élévation de privilèges et un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1092/</guid>
+<pubDate>Fri, 28 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans le noyau Linux d'Ubuntu (28 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1093/</link>
+<description>De multiples vulnérabilités ont été découvertes dans le noyau Linux d'Ubuntu. Certaines d'entre elles permettent à un attaquant de provoquer une élévation de privilèges, une atteinte à la confidentialité des données et une atteinte à l'intégrité des données.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1093/</guid>
+<pubDate>Fri, 28 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits IBM (28 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1094/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits IBM. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une élévation de privilèges et un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1094/</guid>
+<pubDate>Fri, 28 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Papercut (28 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1095/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Papercut. Elles permettent à un attaquant de contourner l'authentification et d'exécuter du code arbitraire à distance. Papercut indique que ces vulnérabilités sont activement exploitées. L'éditeur explique que le correctif bloque les requêtes...</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1095/</guid>
+<pubDate>Fri, 28 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Microsoft Edge (31 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1096/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Microsoft Edge. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une atteinte à la confidentialité des données et une atteinte à l'intégrité des données.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1096/</guid>
+<pubDate>Mon, 31 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Tenable (31 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1097/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Tenable. Elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance et une élévation de privilèges.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1097/</guid>
+<pubDate>Mon, 31 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Mattermost Server (01 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1098/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Mattermost Server. Elles permettent à un attaquant de provoquer un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1098/</guid>
+<pubDate>Tue, 01 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans Mozilla Firefox pour iOS (01 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1099/</link>
+<description>Une vulnérabilité a été découverte dans Mozilla Firefox pour iOS. Elle permet à un attaquant de provoquer un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1099/</guid>
+<pubDate>Tue, 01 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans JFrog Artifactory (01 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1100/</link>
+<description>De multiples vulnérabilités ont été découvertes dans JFrog Artifactory. Elles permettent à un attaquant de provoquer une atteinte à la confidentialité des données, une falsification de requêtes côté serveur (SSRF) et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1100/</guid>
+<pubDate>Tue, 01 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans Kaspersky Endpoint Security Windows (01 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1101/</link>
+<description>Une vulnérabilité a été découverte dans Kaspersky Endpoint Security Windows. Elle permet à un attaquant de provoquer un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1101/</guid>
+<pubDate>Tue, 01 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans SPIP (01 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1102/</link>
+<description>De multiples vulnérabilités ont été découvertes dans SPIP. Elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance et un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1102/</guid>
+<pubDate>Tue, 01 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits SonicWall (02 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1103/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits SonicWall. Elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance et une falsification de requêtes côté serveur (SSRF). L'éditeur indique que les vulnérabilités CVE-2026-83548 et CVE-2026-83549...</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1103/</guid>
+<pubDate>Wed, 02 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits HPE Aruba Networking (02 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1104/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits HPE Aruba Networking. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une élévation de privilèges et un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1104/</guid>
+<pubDate>Wed, 02 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Google Chrome (02 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1105/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Google Chrome. Elles permettent à un attaquant de provoquer un problème de sécurité non spécifié par l'éditeur.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1105/</guid>
+<pubDate>Wed, 02 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Mozilla (02 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1106/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Mozilla. Certaines d'entre elles permettent à un attaquant de provoquer une élévation de privilèges, une atteinte à la confidentialité des données et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1106/</guid>
+<pubDate>Wed, 02 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Elastic (02 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1107/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Elastic. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une élévation de privilèges et une atteinte à la confidentialité des données.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1107/</guid>
+<pubDate>Wed, 02 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans Curl (02 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1108/</link>
+<description>De multiples vulnérabilités ont été découvertes dans Curl. Certaines d'entre elles permettent à un attaquant de provoquer une atteinte à la confidentialité des données, une atteinte à l'intégrité des données et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1108/</guid>
+<pubDate>Wed, 02 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans SPIP (03 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1109/</link>
+<description>De multiples vulnérabilités ont été découvertes dans SPIP. Elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance et une élévation de privilèges.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1109/</guid>
+<pubDate>Thu, 03 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Cisco (03 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1110/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Cisco. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, un déni de service à distance et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1110/</guid>
+<pubDate>Thu, 03 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits F5 (03 septembre 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1111/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits F5. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une élévation de privilèges et un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1111/</guid>
+<pubDate>Thu, 03 Sep 2026 00:00:00 +0000</pubDate>
+</item>
+</channel>
+</rss>
