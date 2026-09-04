@@ -1,13 +1,35 @@
 {
   "name": "cyberwatch",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Backend de veille cyber automatisee : collecte OSINT, structuration via DeepSeek, stockage PostgreSQL, API REST.",
   "license": "UNLICENSED",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "echo \"not implemented yet (Phase 1)\" && exit 1",
-    "build": "echo \"not implemented yet (Phase 1)\" && exit 1",
-    "start": "echo \"not implemented yet (Phase 1)\" && exit 1",
-    "test": "echo \"not implemented yet (Phase 1)\" && exit 1"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bekri78/cyberWatch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bekri78/cyberWatch/issues"
+  },
+  "homepage": "https://github.com/bekri78/cyberWatch#readme",
+  "dependencies": {
+    "fastify": "^5.12.3",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
   }
 }
