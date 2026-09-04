@@ -1,0 +1,13 @@
+{
+  "name": "cyberwatch",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Backend de veille cyber automatisee : collecte OSINT, structuration via DeepSeek, stockage PostgreSQL, API REST.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "echo \"not implemented yet (Phase 1)\" && exit 1",
+    "build": "echo \"not implemented yet (Phase 1)\" && exit 1",
+    "start": "echo \"not implemented yet (Phase 1)\" && exit 1",
+    "test": "echo \"not implemented yet (Phase 1)\" && exit 1"
+  }
+}
