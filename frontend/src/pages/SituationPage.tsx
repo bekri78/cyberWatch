@@ -4,11 +4,12 @@ import { Icon } from '../components/Icon';
 import { Layout } from '../components/Layout';
 import { ErrorState, LoadingState } from '../components/RequestState';
 import { SourceBreakdown } from '../components/SourceBreakdown';
-import { SummaryPlaceholder } from '../components/SummaryPlaceholder';
+import { SituationReportPanel } from '../components/SituationReportPanel';
 import { PostureBanner } from '../components/PostureBanner';
 import { SOURCE_META } from '../domain';
 import { useDiversifiedEvents } from '../hooks/useDiversifiedEvents';
 import { useRecentEvents } from '../hooks/useRecentEvents';
+import { useSituationReport } from '../hooks/useSituationReport';
 import { buildIndicators, derivePosture } from '../posture';
 
 export function SituationPage() {
@@ -20,6 +21,11 @@ export function SituationPage() {
   // Echantillon equilibre par source (cf. useDiversifiedEvents) : evite que
   // le volume GDELT ne masque CERT-FR/CISA KEV/MSRC dans la liste affichee.
   const diversified = useDiversifiedEvents(15);
+
+  // Compte rendu redige par DeepSeek (Phase 6) -- charge independamment du
+  // reste : son absence/erreur ne doit jamais bloquer l'affichage des
+  // evenements reels, qui restent la donnee principale de la page.
+  const situationReport = useSituationReport();
 
   // Filtre optionnel sur une seule source, pilote par les chips SourceBreakdown.
   const [sourceFilter, setSourceFilter] = useState<string | null>(null);
@@ -41,7 +47,7 @@ export function SituationPage() {
       {!loading && !error && (
         <>
           <PostureBanner posture={posture} indicators={indicators} />
-          <SummaryPlaceholder />
+          <SituationReportPanel loading={situationReport.loading} report={situationReport.report} />
           <section>
             <div className="cw-section-head">
               <div>

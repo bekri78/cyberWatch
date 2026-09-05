@@ -1,4 +1,4 @@
-import type { EventsPage } from './types';
+import type { EventsPage, SituationReport } from './types';
 
 /**
  * URL du vrai backend Railway. Surchageable via VITE_API_BASE_URL (fichier
@@ -54,4 +54,22 @@ export async function fetchEventsBySource(sourceTag: string, limit = 20): Promis
   }
 
   return (await response.json()) as EventsPage;
+}
+
+/**
+ * Recupere le dernier compte rendu de situation redige par DeepSeek
+ * (Phase 6, cf. GET /api/v1/situation-report cote backend). `report` peut
+ * etre null (DEEPSEEK_API_KEY absente cote serveur, ou aucun passage
+ * planifie n'a encore eu lieu) -- ce n'est pas une erreur, juste l'absence
+ * honnete de contenu genere pour l'instant.
+ */
+export async function fetchSituationReport(): Promise<SituationReport | null> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/situation-report`);
+
+  if (!response.ok) {
+    throw new ApiError(`L'API a repondu ${response.status} ${response.statusText}`, response.status);
+  }
+
+  const body = (await response.json()) as { report: SituationReport | null };
+  return body.report;
 }

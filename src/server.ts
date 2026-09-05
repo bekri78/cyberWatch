@@ -4,6 +4,7 @@ import { pool, pingDatabase } from './database/client';
 import { runMigrations } from './database/migrate';
 import { runInitialAiReview, startAiReviewScheduler } from './jobs/aiReviewScheduler';
 import { runInitialCollection, startScheduler } from './jobs/scheduler';
+import { runInitialSituationReport, startSituationReportScheduler } from './jobs/situationReportScheduler';
 
 const app = buildApp(pool);
 
@@ -40,9 +41,14 @@ async function start(): Promise<void> {
   if (env.DEEPSEEK_API_KEY) {
     runInitialAiReview(pool, env.DEEPSEEK_API_KEY, app.log);
     startAiReviewScheduler(pool, env.DEEPSEEK_API_KEY, app.log);
+
+    // Phase 6 : compte rendu de situation redige -- meme garde optionnelle
+    // que Phase 5, aucun texte n'est genere sans cle DeepSeek configuree.
+    runInitialSituationReport(pool, env.DEEPSEEK_API_KEY, app.log);
+    startSituationReportScheduler(pool, env.DEEPSEEK_API_KEY, app.log);
   } else {
     app.log.warn(
-      'DEEPSEEK_API_KEY absent : relecture IA (Phase 5) desactivee, les evenements gdelt restent non filtres',
+      'DEEPSEEK_API_KEY absent : relecture IA (Phase 5) et compte rendu de situation (Phase 6) desactives',
     );
   }
 

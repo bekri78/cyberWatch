@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { reviewEventWithDeepseek } from '../../src/lib/ai/deepseekClient';
+import { requestSituationReport, reviewEventWithDeepseek } from '../../src/lib/ai/deepseekClient';
 
 /**
  * Les 3 cas ci-dessous sont les vrais faux positifs gdelt confirmes en
@@ -117,5 +117,79 @@ describe('reviewEventWithDeepseek', () => {
   it("rejette si le contenu n'est pas du JSON valide", async () => {
     mockFetchOnce(200, deepseekBody('ceci n\'est pas du JSON'));
     await expect(reviewEventWithDeepseek({ title: 't', excerpt: 'e' }, 'key')).rejects.toThrow(/JSON/);
+  });
+});
+
+describe('requestSituationReport', () => {
+  const sampleEvents = [
+    {
+      title: 'Fuite de donnees chez un operateur telecom francais',
+      category: 'threat_intel',
+      severity: 'high',
+      source: 'certfr',
+      countries: ['France'],
+      publishedAt: '2026-09-05T10:00:00.000Z',
+    },
+  ];
+
+  it('renvoie summary + keyPoints a partir d\'une reponse DeepSeek valide', async () => {
+    mockFetchOnce(
+      200,
+      deepseekBody(
+        JSON.stringify({
+          summary: "Une fuite de donnees a ete signalee chez un operateur telecom francais.",
+          key_points: ['Fuite de donnees chez un operateur telecom francais (France, severite elevee).'],
+        }),
+      ),
+    );
+
+    const report = await requestSituationReport(sampleEvents, 'fake-api-key');
+
+    expect(report.summary).toContain('operateur telecom');
+    expect(report.keyPoints).toEqual([
+      'Fuite de donnees chez un operateur telecom francais (France, severite elevee).',
+    ]);
+  });
+
+  it('envoie le titre/categorie/severite/source/pays reels de chaque evenement dans le message utilisateur', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify({ summary: 'x', key_points: [] })));
+
+    await requestSituationReport(sampleEvents, 'ma-cle');
+
+    const call = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    const [, requestInit] = call as [string, RequestInit];
+    const parsedBody = JSON.parse(requestInit.body as string);
+    expect(parsedBody.messages[1].content).toContain('Fuite de donnees chez un operateur telecom francais');
+    expect(parsedBody.messages[1].content).toContain('France');
+    // Contrairement a reviewEventWithDeepseek, le thinking n'est PAS
+    // desactive ici (cf. commentaire deepseekClient.ts) -- aucun champ
+    // "thinking" dans le corps envoye.
+    expect(parsedBody.thinking).toBeUndefined();
+  });
+
+  it("indique explicitement l'absence d'evenements plutot que d'en inventer, quand la liste est vide", async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify({ summary: 'x', key_points: [] })));
+
+    await requestSituationReport([], 'ma-cle');
+
+    const call = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    const [, requestInit] = call as [string, RequestInit];
+    const parsedBody = JSON.parse(requestInit.body as string);
+    expect(parsedBody.messages[1].content).toContain('aucun evenement disponible');
+  });
+
+  it("rejette si le HTTP status n'est pas ok", async () => {
+    mockFetchOnce(402, {});
+    await expect(requestSituationReport(sampleEvents, 'bad-key')).rejects.toThrow(/402/);
+  });
+
+  it('rejette si summary est manquant', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify({ key_points: [] })));
+    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/summary/);
+  });
+
+  it('rejette si key_points n\'est pas un tableau de chaines', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify({ summary: 'x', key_points: [1, 2] })));
+    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/key_points/);
   });
 });

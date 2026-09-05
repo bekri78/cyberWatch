@@ -31,3 +31,20 @@ export interface EventsPage {
   items: CyberEvent[];
   nextCursor: string | null;
 }
+
+/**
+ * Reprend la forme renvoyee par GET /api/v1/situation-report (Phase 6,
+ * cf. src/database/repositories/situationReports.ts cote backend) --
+ * compte rendu redige par DeepSeek a partir des evenements reels deja
+ * filtres (is_relevant=true).
+ */
+export interface SituationReport {
+  id: string;
+  summary: string;
+  keyPoints: string[];
+  eventCount: number;
+  windowStart: string;
+  windowEnd: string;
+  model: string;
+  generatedAt: string;
+}

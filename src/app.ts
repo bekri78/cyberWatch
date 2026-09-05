@@ -3,6 +3,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import type { Pool } from 'pg';
 import { healthRoutes } from './routes/health';
 import { eventsRoutes } from './routes/events';
+import { situationReportRoutes } from './routes/situationReport';
 import { syncRoutes } from './routes/sync';
 
 /**
@@ -23,6 +24,7 @@ export function buildApp(pool: Pool): FastifyInstance {
 
   app.register(healthRoutes, { prefix: '/api/v1' });
   app.register(eventsRoutes, { prefix: '/api/v1' });
+  app.register(situationReportRoutes, { prefix: '/api/v1' });
   app.register(syncRoutes, { prefix: '/api/v1' });
 
   // Alias racine pour les plateformes qui sondent /health par defaut
