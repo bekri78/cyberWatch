@@ -25,6 +25,11 @@ function makeRawRow(overrides: Record<string, unknown> = {}) {
     mitre_techniques: [],
     tags: ['certfr', 'vulnerability'],
     ai_generated: false,
+    // Phase 8 (cf. migration 012) : null par defaut (source institutionnelle
+    // certfr, jamais notee par la relecture IA) -- cf. le test dedie
+    // ci-dessous pour un evenement gdelt/google_news_fr reellement note.
+    score_total: null,
+    review_tier: null,
     ...overrides,
   };
 }
@@ -99,6 +104,22 @@ describe('listEvents', () => {
     await listEvents(pool, { limit: 20 });
 
     expect(calls[0]!.sql).toMatch(/is_relevant = true/);
+  });
+
+  it('mappe score_total/review_tier (Phase 8) -- null pour une source institutionnelle jamais notee', async () => {
+    const { pool } = makeFakePool([makeRawRow()]);
+    const page = await listEvents(pool, { limit: 20 });
+
+    expect(page.items[0]!.scoreTotal).toBeNull();
+    expect(page.items[0]!.reviewTier).toBeNull();
+  });
+
+  it('mappe score_total/review_tier renseignes pour un evenement gdelt/google_news_fr reellement note', async () => {
+    const { pool } = makeFakePool([makeRawRow({ score_total: 15, review_tier: 'veille' })]);
+    const page = await listEvents(pool, { limit: 20 });
+
+    expect(page.items[0]!.scoreTotal).toBe(15);
+    expect(page.items[0]!.reviewTier).toBe('veille');
   });
 });
 

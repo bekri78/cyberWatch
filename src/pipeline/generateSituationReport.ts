@@ -65,6 +65,8 @@ export async function generateSituationReport(pool: Pool, apiKey: string, log: L
     threatActors: event.threatActors,
     mitreTechniques: event.mitreTechniques,
     publishedAt: event.publishedAt,
+    scoreTotal: event.scoreTotal,
+    reviewTier: event.reviewTier,
   }));
 
   const timestamps = items.map((event) => new Date(event.publishedAt ?? event.createdAt).getTime());

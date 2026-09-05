@@ -32,6 +32,11 @@ function makeEventRow(overrides: Record<string, unknown> = {}) {
     mitre_techniques: [],
     tags: ['certfr'],
     ai_generated: false,
+    // Phase 8 (cf. migration 012) : null par defaut (source institutionnelle
+    // certfr, jamais notee) -- cf. le test dedie ci-dessous pour un
+    // evenement gdelt/google_news_fr reellement note.
+    score_total: null,
+    review_tier: null,
     ...overrides,
   };
 }
@@ -152,6 +157,30 @@ describe('generateSituationReport', () => {
           organizations: ['Schneider Electric'],
           sectors: ['Energie'],
         }),
+      ],
+      'fake-key',
+    );
+  });
+
+  it('transmet scoreTotal/reviewTier (Phase 8) a DeepSeek pour un evenement gdelt/google_news_fr reellement note, null pour une source institutionnelle', async () => {
+    const { pool } = makeFakePool([
+      makeEventRow({ id: 'e1', tags: ['certfr'] }),
+      makeEventRow({
+        id: 'e2',
+        title: 'Fraude bancaire en ligne signalee',
+        tags: ['gdelt'],
+        score_total: 15,
+        review_tier: 'veille',
+      }),
+    ]);
+    mockedRequest.mockResolvedValueOnce(emptyDeepseekReport());
+
+    await generateSituationReport(pool, 'fake-key', log);
+
+    expect(mockedRequest).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({ title: 'Fuite de donnees chez un operateur telecom francais', scoreTotal: null, reviewTier: null }),
+        expect.objectContaining({ title: 'Fraude bancaire en ligne signalee', scoreTotal: 15, reviewTier: 'veille' }),
       ],
       'fake-key',
     );

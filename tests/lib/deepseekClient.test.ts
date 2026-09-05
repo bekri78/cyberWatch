@@ -189,6 +189,10 @@ describe('requestSituationReport', () => {
       threatActors: [],
       mitreTechniques: [],
       publishedAt: '2026-09-05T10:00:00.000Z',
+      // Source institutionnelle (certfr) : jamais notee par la relecture IA
+      // (cf. REVIEWED_SOURCES) -- scoreTotal/reviewTier restent null.
+      scoreTotal: null,
+      reviewTier: null,
     },
   ];
 
@@ -260,6 +264,47 @@ describe('requestSituationReport', () => {
     // desactive ici (cf. commentaire deepseekClient.ts) -- aucun champ
     // "thinking" dans le corps envoye.
     expect(parsedBody.thinking).toBeUndefined();
+  });
+
+  it('ajoute la ligne "Score IA (Phase 5)" uniquement pour un evenement gdelt/google_news_fr reellement note (Phase 8)', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify(fullReportBody())));
+
+    const eventsWithScore = [
+      ...sampleEvents,
+      {
+        title: 'Fraude bancaire en ligne signalee en region parisienne',
+        summary: 'Plusieurs victimes ont signale des prelevements frauduleux.',
+        category: 'threat_intel',
+        severity: 'medium',
+        confidence: 'medium',
+        source: 'gdelt',
+        countries: [],
+        organizations: [],
+        sectors: [],
+        cves: [],
+        threatActors: [],
+        mitreTechniques: [],
+        publishedAt: '2026-09-05T09:00:00.000Z',
+        scoreTotal: 15,
+        reviewTier: 'veille',
+      },
+    ];
+
+    await requestSituationReport(eventsWithScore, 'ma-cle');
+
+    const call = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    const [, requestInit] = call as [string, RequestInit];
+    const parsedBody = JSON.parse(requestInit.body as string);
+    // L'evenement note porte la ligne de score...
+    expect(parsedBody.messages[1].content).toContain('Score IA (Phase 5): 15/25 (veille)');
+    // ...mais l'evenement certfr (jamais note) n'en porte aucune : on ne
+    // verifie pas juste l'absence globale (le texte apparait forcement une
+    // fois a cause du 2e evenement), on isole la ligne du 1er evenement.
+    const certfrLine = parsedBody.messages[1].content
+      .split('\n')
+      .find((line: string) => line.includes('operateur telecom francais'));
+    expect(certfrLine).toBeDefined();
+    expect(certfrLine).not.toContain('Score IA');
   });
 
   it("indique explicitement l'absence d'evenements plutot que d'en inventer, quand la liste est vide", async () => {

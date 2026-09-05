@@ -255,6 +255,9 @@ Les elements a faible valeur ne figurent pas dans le compte rendu.
 
 DOMAINES A SURVEILLER PARTICULIEREMENT (liste non exhaustive, mais attention renforcee) : defense, administrations publiques, infrastructures critiques, spatial, aeronautique, telecommunications, energie, OT/ICS/SCADA, satellites, chaines logistiques numeriques, cloud, VPN, firewalls, equipements reseau, hyperviseurs, systemes d'identite, Microsoft, Linux, VMware, Cisco, Fortinet, Palo Alto, Ivanti, Citrix, equipements industriels.
 
+SCORE DE PRE-FILTRAGE AUTOMATIQUE
+Certains evenements (sources gdelt et google_news_fr uniquement) portent un score de pre-filtrage automatique note "Score IA (Phase 5) : X/25 (palier)". Ce score est calcule par un premier passage IA distinct, selon 5 criteres (pertinence cyber, impact, interet strategique, fiabilite de la source, nouveaute), avec un palier associe (conserve/veille/prioritaire). C'est un signal automatise SUPPLEMENTAIRE, pas un jugement definitif ni un substitut a ta propre lecture : un evenement marque "prioritaire" par ce score peut se reveler moins interessant une fois le contenu reellement analyse, et inversement un evenement "conserve" peut meriter une place en tete du compte rendu si le contenu reel le justifie. Ne recopie jamais ce palier tel quel comme criticite de ton compte rendu -- ta propre evaluation (fondee sur les faits reels fournis) prime toujours. Les evenements sans ce score (CERT-FR, CISA KEV, Microsoft MSRC) sont des sources institutionnelles qui n'en ont jamais besoin -- son absence n'indique aucune moindre importance.
+
 FUSION DES DOUBLONS
 Si plusieurs evenements fournis decrivent manifestement le meme incident reel (memes faits, memes entites), fusionne-les en une seule entree et cite les sources reellement concernees -- ne cree jamais deux entrees pour un seul evenement. Le nombre d'evenements parlant d'un meme sujet n'est jamais a lui seul un indicateur de criticite.
 
@@ -309,6 +312,10 @@ export interface ReportEventInput {
   threatActors: string[];
   mitreTechniques: string[];
   publishedAt: string | null;
+  /** Score de pre-filtrage automatique (Phase 8, cf. migration 012) -- null pour les sources institutionnelles jamais notees (certfr, cisa_kev, msrc). */
+  scoreTotal: number | null;
+  /** Palier associe a scoreTotal ('conserve'|'veille'|'prioritaire') -- null si scoreTotal est null. */
+  reviewTier: string | null;
 }
 
 export interface ARetenirItem {
@@ -500,6 +507,12 @@ function formatReportEventLine(event: ReportEventInput): string {
   if (event.cves.length > 0) parts.push(`| CVE: ${event.cves.join(', ')}`);
   if (event.threatActors.length > 0) parts.push(`| Acteurs: ${event.threatActors.join(', ')}`);
   if (event.mitreTechniques.length > 0) parts.push(`| MITRE: ${event.mitreTechniques.join(', ')}`);
+  // Score de pre-filtrage automatique (Phase 8) : uniquement present pour
+  // gdelt/google_news_fr (cf. REVIEWED_SOURCES) -- absent (null) pour les
+  // sources institutionnelles, qui n'en ont jamais besoin (cf. prompt).
+  if (event.reviewTier !== null && event.scoreTotal !== null) {
+    parts.push(`| Score IA (Phase 5): ${event.scoreTotal}/25 (${event.reviewTier})`);
+  }
   return `- ${parts.join(' ')}`;
 }
 

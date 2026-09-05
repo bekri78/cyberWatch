@@ -22,6 +22,8 @@ interface CyberEventRow {
   mitre_techniques: string[];
   tags: string[];
   ai_generated: boolean;
+  score_total: number | null;
+  review_tier: string | null;
 }
 
 export interface CyberEvent {
@@ -45,6 +47,10 @@ export interface CyberEvent {
   mitreTechniques: string[];
   tags: string[];
   aiGenerated: boolean;
+  /** Score de pre-filtrage automatique sur 25 (Phase 8, cf. migration 012) -- null si jamais evalue (sources institutionnelles). */
+  scoreTotal: number | null;
+  /** Palier deduit de scoreTotal ('conserve'|'veille'|'prioritaire' -- 'rejete' n'apparait jamais ici, deja filtre par is_relevant). */
+  reviewTier: string | null;
 }
 
 function toApiEvent(row: CyberEventRow): CyberEvent {
@@ -69,6 +75,8 @@ function toApiEvent(row: CyberEventRow): CyberEvent {
     mitreTechniques: row.mitre_techniques,
     tags: row.tags,
     aiGenerated: row.ai_generated,
+    scoreTotal: row.score_total,
+    reviewTier: row.review_tier,
   };
 }
 
