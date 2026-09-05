@@ -1,3 +1,4 @@
+import { detectOtVendor } from '../lib/text/detectOtVendor';
 import { extractCves } from '../lib/text/extractCves';
 import { extractCvssScore } from '../lib/text/extractCvssScore';
 
@@ -71,8 +72,17 @@ function classifySeverity(category: string, hasCve: boolean, activeExploitation:
   return 'low';
 }
 
-function buildTags(sourceName: string, category: string): string[] {
-  return [...new Set([sourceName, category])];
+/**
+ * Le tag 'ot' est ajoute des qu'un editeur industriel connu est mentionne
+ * (cf. detectOtVendor), quelle que soit la source ou le flux d'origine --
+ * qu'un avis Siemens arrive via /avis/ ou via /feed/scada/ ne doit pas
+ * changer sa detectabilite (cf. document d'architecture, l'un est un
+ * sous-ensemble filtre de l'autre, pas un contenu distinct).
+ */
+function buildTags(sourceName: string, category: string, haystack: string): string[] {
+  const tags = [sourceName, category];
+  if (detectOtVendor(haystack)) tags.push('ot');
+  return [...new Set(tags)];
 }
 
 /**
@@ -97,7 +107,7 @@ export function classifyEvent(input: ClassificationInput): Classification {
       severity: 'critical',
       confidence: 'low',
       cves,
-      tags: buildTags(input.sourceName, category),
+      tags: buildTags(input.sourceName, category, haystack),
     };
   }
 
@@ -117,7 +127,7 @@ export function classifyEvent(input: ClassificationInput): Classification {
       severity,
       confidence: 'low',
       cves,
-      tags: buildTags(input.sourceName, category),
+      tags: buildTags(input.sourceName, category, haystack),
     };
   }
 
@@ -129,6 +139,6 @@ export function classifyEvent(input: ClassificationInput): Classification {
     severity,
     confidence: 'low',
     cves,
-    tags: buildTags(input.sourceName, category),
+    tags: buildTags(input.sourceName, category, haystack),
   };
 }

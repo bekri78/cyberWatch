@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+<channel>
+<title>CERT-FR</title>
+<link>https://www.cert.ssi.gouv.fr/feed/</link>
+<description>Centre gouvernemental de veille, d'alerte et de réponse aux attaques informatiques.</description>
+<atom:link href="https://www.cert.ssi.gouv.fr/feed/" rel="self"/>
+<docs>http://www.rssboard.org/rss-specification</docs>
+<generator>CERT-FR</generator>
+<language>fr-FR</language>
+<lastBuildDate>Fri, 04 Sep 2026 12:21:57 +0000</lastBuildDate>
+<item>
+<title>Multiples vulnérabilités dans les produits Siemens (09 juin 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0714/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Siemens. Elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, un déni de service à distance et une atteinte à la confidentialité des données.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0714/</guid>
+<pubDate>Tue, 09 Jun 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans les produits Moxa (12 juin 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0743/</link>
+<description>Une vulnérabilité a été découverte dans les produits Moxa. Elle permet à un attaquant de provoquer une atteinte à la confidentialité des données.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0743/</guid>
+<pubDate>Fri, 12 Jun 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Moxa (16 juin 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0760/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Moxa. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une atteinte à la confidentialité des données et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0760/</guid>
+<pubDate>Tue, 16 Jun 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans les produits Moxa (17 juin 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0763/</link>
+<description>Une vulnérabilité a été découverte dans les produits Moxa. Elle permet à un attaquant de provoquer un déni de service à distance et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0763/</guid>
+<pubDate>Wed, 17 Jun 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Siemens (10 juillet 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0860/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Siemens. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire, une élévation de privilèges et un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0860/</guid>
+<pubDate>Fri, 10 Jul 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Siemens (15 juillet 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0880/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Siemens. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une élévation de privilèges et un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0880/</guid>
+<pubDate>Wed, 15 Jul 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans Schneider Electric EcoStruxure (15 juillet 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0881/</link>
+<description>Une vulnérabilité a été découverte dans Schneider Electric EcoStruxure. Elle permet à un attaquant de provoquer un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0881/</guid>
+<pubDate>Wed, 15 Jul 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans les produits Moxa (24 juillet 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0931/</link>
+<description>Une vulnérabilité a été découverte dans les produits Moxa. Elle permet à un attaquant de provoquer une élévation de privilèges.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0931/</guid>
+<pubDate>Fri, 24 Jul 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Multiples vulnérabilités dans les produits Siemens (12 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1009/</link>
+<description>De multiples vulnérabilités ont été découvertes dans les produits Siemens. Elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, un déni de service à distance et un contournement de la politique de sécurité.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1009/</guid>
+<pubDate>Wed, 12 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+<title>Vulnérabilité dans les produits Moxa (19 août 2026)</title>
+<link>https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1055/</link>
+<description>Une vulnérabilité a été découverte dans les produits Moxa. Elle permet à un attaquant de provoquer un déni de service à distance.</description>
+<guid isPermaLink="true">https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1055/</guid>
+<pubDate>Wed, 19 Aug 2026 00:00:00 +0000</pubDate>
+</item>
+</channel>
+</rss>

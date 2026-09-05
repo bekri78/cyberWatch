@@ -159,3 +159,48 @@ describe('certfr collector -- flux cti reel (cert.ssi.gouv.fr/cti/feed/)', () =>
     expect(result.publishedAt?.toISOString()).toBe('2022-12-07T00:00:00.000Z');
   });
 });
+
+describe('certfr collector -- flux scada reel (cert.ssi.gouv.fr/feed/scada/)', () => {
+  it('parse et normalise les 10 vraies entrees sans erreur (ce sont des avis normaux, meme format)', async () => {
+    const xml = loadFixture('scada-feed-real.xml');
+    const feed = await parser.parseString(xml);
+
+    expect(feed.items).toHaveLength(10);
+
+    const items = feed.items.map((entry) => normalizeEntry(entry));
+
+    for (const item of items) {
+      expect(item.title).not.toBe('(sans titre)');
+      // Le flux scada renvoie de vraies URL /avis/ -- pas un format distinct.
+      expect(item.url).toMatch(/^https:\/\/www\.cert\.ssi\.gouv\.fr\/avis\/CERTFR-\d{4}-AVI-\d+\/$/);
+      expect(item.externalId).toMatch(/^CERTFR-\d{4}-AVI-\d+$/);
+      expect(item.publishedAt).toBeInstanceOf(Date);
+      expect(item.publishedAt?.getTime()).not.toBeNaN();
+    }
+  });
+
+  it('normalise correctement une vraie entree Siemens (CERTFR-2026-AVI-0714, 09/06/2026)', async () => {
+    const xml = loadFixture('scada-feed-real.xml');
+    const feed = await parser.parseString(xml);
+    const entry = feed.items.find((item) => item.link?.includes('CERTFR-2026-AVI-0714'));
+
+    expect(entry).toBeDefined();
+    const result = normalizeEntry(entry!);
+
+    expect(result.externalId).toBe('CERTFR-2026-AVI-0714');
+    expect(result.title).toBe('Multiples vulnérabilités dans les produits Siemens (09 juin 2026)');
+    expect(result.publishedAt?.toISOString()).toBe('2026-06-09T00:00:00.000Z');
+  });
+
+  it('normalise correctement une vraie entree Moxa (CERTFR-2026-AVI-1055, la plus recente du jeu)', async () => {
+    const xml = loadFixture('scada-feed-real.xml');
+    const feed = await parser.parseString(xml);
+    const entry = feed.items.find((item) => item.link?.includes('CERTFR-2026-AVI-1055'));
+
+    expect(entry).toBeDefined();
+    const result = normalizeEntry(entry!);
+
+    expect(result.externalId).toBe('CERTFR-2026-AVI-1055');
+    expect(result.contentExcerpt).toContain('Moxa');
+  });
+});

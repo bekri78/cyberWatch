@@ -27,6 +27,7 @@ export const eventsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
             cursor: { type: 'string' },
             category: { type: 'string' },
             severity: { type: 'string' },
+            tag: { type: 'string' },
           },
         },
         response: {
@@ -43,11 +44,12 @@ export const eventsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
       },
     },
     async (request, reply) => {
-      const { limit, cursor, category, severity } = request.query as {
+      const { limit, cursor, category, severity, tag } = request.query as {
         limit: number;
         cursor?: string;
         category?: string;
         severity?: string;
+        tag?: string;
       };
 
       try {
@@ -56,6 +58,7 @@ export const eventsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
           cursor: cursor ? decodeCursor(cursor) : undefined,
           category,
           severity,
+          tag,
         });
         return page;
       } catch (err) {

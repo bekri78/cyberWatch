@@ -77,6 +77,7 @@ export interface ListEventsOptions {
   cursor?: Cursor;
   category?: string;
   severity?: string;
+  tag?: string;
 }
 
 export interface Page {
@@ -102,6 +103,13 @@ export async function listEvents(pool: Pool, options: ListEventsOptions): Promis
   if (options.severity) {
     params.push(options.severity);
     conditions.push(`severity = $${params.length}`);
+  }
+  if (options.tag) {
+    // tags est un text[] (cf. classifyEvent.buildTags) -- ex: ?tag=ot pour
+    // les avis mentionnant un editeur industriel connu, quelle que soit la
+    // source d'origine (certfr avis/scada, etc.).
+    params.push(options.tag);
+    conditions.push(`$${params.length} = ANY(tags)`);
   }
   if (options.cursor) {
     params.push(options.cursor.sortValue, options.cursor.id);

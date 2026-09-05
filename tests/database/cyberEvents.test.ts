@@ -84,6 +84,15 @@ describe('listEvents', () => {
     expect(params).toContain('xyz');
     expect(params).toContain(10);
   });
+
+  it('filtre par tag via "= ANY(tags)" (ex: ?tag=ot pour les avis industriels)', async () => {
+    const { pool, calls } = makeFakePool([makeRawRow({ tags: ['certfr', 'vulnerability', 'ot'] })]);
+    const page = await listEvents(pool, { limit: 20, tag: 'ot' });
+
+    expect(calls[0]!.sql).toMatch(/\$1 = ANY\(tags\)/);
+    expect(calls[0]!.params).toContain('ot');
+    expect(page.items[0]!.tags).toEqual(['certfr', 'vulnerability', 'ot']);
+  });
 });
 
 describe('getEventById', () => {

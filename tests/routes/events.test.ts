@@ -71,6 +71,14 @@ describe('GET /api/v1/events', () => {
     expect(response.json().error).toBe('curseur invalide');
   });
 
+  it('accepte le parametre ?tag= sans erreur de validation (ex: filtrage OT)', async () => {
+    app = buildApp(makeFakePool());
+
+    const response = await app.inject({ method: 'GET', url: '/api/v1/events?tag=ot' });
+
+    expect(response.statusCode).toBe(200);
+  });
+
   it('rejette une limite hors bornes (validation de schema)', async () => {
     app = buildApp(makeFakePool());
 

@@ -187,6 +187,34 @@ describe('classifyEvent -- CERT-FR mentionnant "CVSS" dans son propre texte (non
   });
 });
 
+describe('classifyEvent -- avis CERT-FR industriel (CERTFR-2026-AVI-0714, Siemens, flux scada)', () => {
+  it('ajoute le tag "ot" en plus de "certfr"/"vulnerability" quand un editeur industriel est mentionne', () => {
+    const result = classifyEvent({
+      sourceName: 'certfr',
+      url: 'https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-0714/',
+      title: 'Multiples vulnérabilités dans les produits Siemens (09 juin 2026)',
+      contentExcerpt:
+        'De multiples vulnérabilités ont été découvertes dans les produits Siemens. Elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, un déni de service à distance et une atteinte à la confidentialité des données.',
+    });
+
+    expect(result.category).toBe('vulnerability');
+    expect(result.tags).toEqual(['certfr', 'vulnerability', 'ot']);
+  });
+});
+
+describe('classifyEvent -- avis CERT-FR sans editeur industriel (non-regression)', () => {
+  it("n'ajoute pas le tag \"ot\" pour un avis sans editeur OT connu", () => {
+    const result = classifyEvent({
+      sourceName: 'certfr',
+      url: 'https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1103/',
+      title: 'Multiples vulnérabilités dans les produits SonicWall (02 septembre 2026)',
+      contentExcerpt: 'De multiples vulnérabilités ont été découvertes dans les produits SonicWall.',
+    });
+
+    expect(result.tags).toEqual(['certfr', 'vulnerability']);
+  });
+});
+
 describe('classifyEvent -- source inconnue', () => {
   it('retombe sur la categorie "other" et la severite "low" sans planter', () => {
     const result = classifyEvent({

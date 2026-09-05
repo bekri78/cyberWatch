@@ -3,17 +3,27 @@ import { withRetry } from '../../lib/http/retry';
 import type { Collector, CollectorItem } from '../types';
 import { normalizeEntry } from './normalize';
 
-// Avis + alertes + cti : les trois flux CERT-FR retenus (cf. document
-// d'architecture, section 09). cti apporte un contenu reellement distinct
-// (rapports de menace / campagnes d'attaquants nommes), contrairement a
-// ioc (annonces sans les indicateurs bruts, redondant avec cti), dur
-// (guides generiques, tres faible volume) et actualite (resume
+// Avis + alertes + cti + scada : les quatre flux CERT-FR retenus (cf.
+// document d'architecture, section 09). cti apporte un contenu reellement
+// distinct (rapports de menace / campagnes d'attaquants nommes),
+// contrairement a ioc (annonces sans les indicateurs bruts, redondant avec
+// cti), dur (guides generiques, tres faible volume) et actualite (resume
 // hebdomadaire de ce qui est deja collecte) -- volontairement laisses de
 // cote.
+//
+// scada n'est PAS un format distinct : ce sont de vrais avis
+// (CERTFR-xxxx-AVI-xxxx, meme URL /avis/...), juste filtres sur les
+// editeurs industriels (Siemens, Moxa, Schneider Electric...). Sa valeur
+// n'est pas d'apporter un contenu nouveau mais de rattraper des avis
+// industriels qui auraient deja defile hors de la fenetre visible du flux
+// /avis/ (volume general eleve) -- la contrainte UNIQUE(source_id, url) fait
+// que les avis encore visibles dans /avis/ ne sont simplement pas
+// redoublonnes.
 const FEED_URLS = [
   'https://cert.ssi.gouv.fr/avis/feed/',
   'https://cert.ssi.gouv.fr/alerte/feed/',
   'https://cert.ssi.gouv.fr/cti/feed/',
+  'https://cert.ssi.gouv.fr/feed/scada/',
 ] as const;
 
 const parser = new Parser({
