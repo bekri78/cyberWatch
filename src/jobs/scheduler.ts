@@ -16,8 +16,9 @@ const COLLECTORS = [certfrCollector];
  * l'echec de l'un n'empeche jamais les autres de tourner.
  */
 export function startScheduler(pool: Pool, log: Logger): void {
-  // Toutes les 20 minutes.
-  cron.schedule('*/20 * * * *', () => {
+  // Toutes les 2 heures (rythme reduit volontairement pendant la phase de
+  // test -- a resserrer une fois le systeme stabilise en production).
+  cron.schedule('0 */2 * * *', () => {
     for (const collector of COLLECTORS) {
       void runCollector(pool, collector, log);
     }
