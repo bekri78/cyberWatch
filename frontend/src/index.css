@@ -265,5 +265,21 @@ button, input, select, textarea { font-family: inherit; }
   font-size: 10px !important;
 }
 .leaflet-control-attribution a { color: var(--text-tertiary) !important; }
-.cw-map-tooltip { font-size: 12px; }
-.cw-map-tooltip strong { color: var(--text-primary); }
+
+/* Le tooltip Leaflet par defaut est clair -- l'accorder au theme sombre,
+   sinon le texte (blanc par defaut chez nous) devient illisible dessus. */
+.leaflet-tooltip {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-standard) !important;
+  color: var(--text-secondary) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+  padding: 8px 10px !important;
+}
+.leaflet-tooltip-top::before { border-top-color: var(--bg-surface) !important; }
+.leaflet-tooltip-bottom::before { border-bottom-color: var(--bg-surface) !important; }
+.leaflet-tooltip-left::before { border-left-color: var(--bg-surface) !important; }
+.leaflet-tooltip-right::before { border-right-color: var(--bg-surface) !important; }
+
+.cw-map-tooltip { font-size: 12px; display: flex; flex-direction: column; gap: 2px; max-width: 240px; }
+.cw-map-tooltip strong { color: var(--text-primary); font-size: 12.5px; line-height: 1.35; }

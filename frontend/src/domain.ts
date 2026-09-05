@@ -17,6 +17,14 @@ export function severityClass(severity: string): string {
   return SEVERITY_LABELS[severity] ? `cw-badge--${severity}` : 'cw-badge--low';
 }
 
+/** Memes teintes que les jetons --crit-* de index.css (les marqueurs Leaflet ont besoin d'une couleur litterale, pas d'un var()). */
+export const SEVERITY_COLORS: Record<string, string> = {
+  low: '#7a7fad',
+  medium: '#5e6ad2',
+  high: '#f76b15',
+  critical: '#e5484d',
+};
+
 export const CATEGORY_LABELS: Record<string, string> = {
   vulnerability: 'Vulnerabilite',
   alert: 'Alerte',
