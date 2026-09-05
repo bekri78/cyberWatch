@@ -93,7 +93,12 @@ export interface Page {
  * continue de recevoir des insertions pendant la pagination.
  */
 export async function listEvents(pool: Pool, options: ListEventsOptions): Promise<Page> {
-  const conditions: string[] = [];
+  // is_relevant = false : evenement gdelt ecarte par la relecture IA (Phase
+  // 5, cf. reviewGdeltEvents.ts) -- jamais retourne par le catalogue public.
+  // Condition litterale (pas de parametre bind) : elle ne s'applique pas
+  // conditionnellement, donc ne decale pas la numerotation $1/$2/... des
+  // autres filtres.
+  const conditions: string[] = ['is_relevant = true'];
   const params: unknown[] = [];
 
   if (options.category) {
@@ -140,7 +145,14 @@ export async function listEvents(pool: Pool, options: ListEventsOptions): Promis
 }
 
 export async function getEventById(pool: Pool, id: string): Promise<CyberEvent | null> {
-  const { rows } = await pool.query<CyberEventRow>('SELECT * FROM cyber_events WHERE id = $1', [id]);
+  // Meme regle que listEvents/syncEvents : un evenement ecarte par la
+  // relecture IA (is_relevant = false) n'est pas accessible publiquement,
+  // meme par id direct -- pas de page admin pour le consulter autrement
+  // (cf. decision utilisateur), donc pas de raison d'exposer un lien mort.
+  const { rows } = await pool.query<CyberEventRow>(
+    'SELECT * FROM cyber_events WHERE id = $1 AND is_relevant = true',
+    [id],
+  );
   const row = rows[0];
   return row ? toApiEvent(row) : null;
 }
@@ -157,7 +169,10 @@ export interface SyncEventsOptions {
  * catalogue -- cf. §08 du document d'architecture.
  */
 export async function syncEvents(pool: Pool, options: SyncEventsOptions): Promise<Page> {
-  const conditions: string[] = [];
+  // Meme filtre que listEvents (cf. commentaire ci-dessus) : un client qui
+  // ne consommerait que /sync ne doit jamais recevoir un evenement ecarte
+  // par la relecture IA.
+  const conditions: string[] = ['is_relevant = true'];
   const params: unknown[] = [];
 
   if (options.cursor) {

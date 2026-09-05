@@ -13,9 +13,12 @@ loadDotenv();
  * Configuration lue depuis les variables d'environnement.
  *
  * DATABASE_URL est obligatoire depuis la Phase 2 (integration PostgreSQL).
- * DEEPSEEK_API_KEY reste optionnelle pour l'instant : elle deviendra
- * obligatoire en Phase 5 (integration DeepSeek) — il suffira de retirer
- * `.optional()` ci-dessous.
+ * DEEPSEEK_API_KEY reste volontairement optionnelle (Phase 5, relecture IA
+ * des evenements gdelt, cf. jobs/aiReviewScheduler.ts) : son absence ne doit
+ * jamais empecher le serveur de demarrer, elle desactive juste le filtrage
+ * IA (les evenements gdelt restent visibles tels quels, is_relevant=true
+ * par defaut, cf. migration 008) plutot que de faire planter tout le
+ * systeme pour une cle manquante.
  */
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

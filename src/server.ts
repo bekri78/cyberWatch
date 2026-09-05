@@ -2,6 +2,7 @@ import { buildApp } from './app';
 import { env } from './config/env';
 import { pool, pingDatabase } from './database/client';
 import { runMigrations } from './database/migrate';
+import { runInitialAiReview, startAiReviewScheduler } from './jobs/aiReviewScheduler';
 import { runInitialCollection, startScheduler } from './jobs/scheduler';
 
 const app = buildApp(pool);
@@ -31,6 +32,19 @@ async function start(): Promise<void> {
   // et une source indisponible n'empeche jamais /health de repondre.
   runInitialCollection(pool, app.log);
   startScheduler(pool, app.log);
+
+  // Phase 5 (DeepSeek) : optionnelle tant que DEEPSEEK_API_KEY n'est pas
+  // configuree (cf. config/env.ts) -- son absence ne doit jamais empecher
+  // le reste du systeme de demarrer, seuls les evenements gdelt restent
+  // non filtres (is_relevant=true par defaut, cf. migration 008).
+  if (env.DEEPSEEK_API_KEY) {
+    runInitialAiReview(pool, env.DEEPSEEK_API_KEY, app.log);
+    startAiReviewScheduler(pool, env.DEEPSEEK_API_KEY, app.log);
+  } else {
+    app.log.warn(
+      'DEEPSEEK_API_KEY absent : relecture IA (Phase 5) desactivee, les evenements gdelt restent non filtres',
+    );
+  }
 
   try {
     await app.listen({ host: '0.0.0.0', port: env.PORT });

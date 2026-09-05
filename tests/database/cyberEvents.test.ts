@@ -93,6 +93,13 @@ describe('listEvents', () => {
     expect(calls[0]!.params).toContain('ot');
     expect(page.items[0]!.tags).toEqual(['certfr', 'vulnerability', 'ot']);
   });
+
+  it('exclut toujours les evenements ecartes par la relecture IA (is_relevant = true, Phase 5)', async () => {
+    const { pool, calls } = makeFakePool([]);
+    await listEvents(pool, { limit: 20 });
+
+    expect(calls[0]!.sql).toMatch(/is_relevant = true/);
+  });
 });
 
 describe('getEventById', () => {
@@ -106,6 +113,13 @@ describe('getEventById', () => {
     const { pool } = makeFakePool([]);
     const event = await getEventById(pool, 'inexistant');
     expect(event).toBeNull();
+  });
+
+  it('filtre aussi is_relevant = true (pas de page admin pour consulter un evenement ecarte)', async () => {
+    const { pool, calls } = makeFakePool([]);
+    await getEventById(pool, 'un-id');
+
+    expect(calls[0]!.sql).toMatch(/is_relevant = true/);
   });
 });
 
@@ -124,5 +138,12 @@ describe('syncEvents', () => {
 
     expect(calls[0]!.params).toEqual([50]);
     expect(page.items).toHaveLength(1);
+  });
+
+  it('exclut toujours les evenements ecartes par la relecture IA (is_relevant = true, Phase 5)', async () => {
+    const { pool, calls } = makeFakePool([]);
+    await syncEvents(pool, { limit: 50 });
+
+    expect(calls[0]!.sql).toMatch(/is_relevant = true/);
   });
 });
