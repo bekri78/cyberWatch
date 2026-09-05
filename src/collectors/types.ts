@@ -13,7 +13,7 @@ export interface CollectorItem {
   raw: unknown;
 }
 
-export type SourceType = 'api' | 'rss' | 'atom' | 'json' | 'stix_taxii';
+export type SourceType = 'api' | 'rss' | 'atom' | 'json' | 'csv' | 'stix_taxii';
 
 export interface Collector {
   readonly name: string;

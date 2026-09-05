@@ -50,10 +50,11 @@ describe('runMigrations', () => {
       '004_create_collector_runs.sql',
       '005_seed_sources.sql',
       '006_align_timestamp_precision.sql',
+      '007_seed_gdelt_source.sql',
     ]);
     expect(result.skipped).toEqual([]);
     // BEGIN + SQL + INSERT INTO schema_migrations + COMMIT, par migration
-    expect((client.query as any).mock.calls.length).toBe(6 * 4);
+    expect((client.query as any).mock.calls.length).toBe(7 * 4);
   });
 
   it('ignore les migrations deja appliquees (idempotence)', async () => {
@@ -70,8 +71,9 @@ describe('runMigrations', () => {
       '004_create_collector_runs.sql',
       '005_seed_sources.sql',
       '006_align_timestamp_precision.sql',
+      '007_seed_gdelt_source.sql',
     ]);
-    expect((client.query as any).mock.calls.length).toBe(4 * 4);
+    expect((client.query as any).mock.calls.length).toBe(5 * 4);
   });
 
   it('ne pose aucune migration en double si tout est deja applique', async () => {
@@ -82,12 +84,13 @@ describe('runMigrations', () => {
       '004_create_collector_runs.sql',
       '005_seed_sources.sql',
       '006_align_timestamp_precision.sql',
+      '007_seed_gdelt_source.sql',
     ]);
 
     const result = await runMigrations(pool);
 
     expect(result.applied).toEqual([]);
-    expect(result.skipped.length).toBe(6);
+    expect(result.skipped.length).toBe(7);
   });
 
   it('fait un rollback et propage l\'erreur si une migration echoue', async () => {

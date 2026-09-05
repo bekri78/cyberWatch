@@ -215,6 +215,21 @@ describe('classifyEvent -- avis CERT-FR sans editeur industriel (non-regression)
   });
 });
 
+describe('classifyEvent -- GDELT (vraie ligne thehindu.com, fraude cryptomonnaie/cybercriminalite)', () => {
+  it('categorise "attack" (pas "vulnerability" : incident reel, pas une divulgation)', () => {
+    const result = classifyEvent({
+      sourceName: 'gdelt',
+      url: 'https://www.thehindu.com/news/cities/chennai/ed-arrests-two-in-40-crore-hashpe-cryptocurrency-fraud/article71429252.ece',
+      title: 'ED arrests two in ₹40-crore HashPe cryptocurrency fraud',
+      contentExcerpt: 'Organisations: cyber crime police — Personnes: hitesh kumar — Themes GDELT: CYBER_ATTACK, WB_2457_CYBER_CRIME',
+    });
+
+    expect(result.category).toBe('attack');
+    expect(result.severity).toBe('low'); // pas de CVE, pas de branche dediee (cf. §41)
+    expect(result.tags).toEqual(['gdelt', 'attack']);
+  });
+});
+
 describe('classifyEvent -- source inconnue', () => {
   it('retombe sur la categorie "other" et la severite "low" sans planter', () => {
     const result = classifyEvent({

@@ -36,6 +36,10 @@ function classifyCategory(sourceName: string, url: string): string {
   }
   if (sourceName === 'cisa_kev') return 'vulnerability';
   if (sourceName === 'microsoft_msrc') return 'vulnerability';
+  // gdelt : incident reel (attaque/compromission rapportee dans la presse
+  // mondiale), pas une divulgation de vulnerabilite -- categorie distincte
+  // volontairement, cf. §37.
+  if (sourceName === 'gdelt') return 'attack';
   return 'other';
 }
 
@@ -131,6 +135,15 @@ export function classifyEvent(input: ClassificationInput): Classification {
     };
   }
 
+  // gdelt retombe volontairement ici (pas de branche dediee) : contrairement
+  // a MSRC (score CVSS numerique) ou CISA KEV (appartenance = exploitation
+  // confirmee), le GKG ne fournit aucun signal deterministe fiable de
+  // severite technique -- ACTIVE_EXPLOITATION_PATTERN ne matchera jamais sa
+  // prose anglaise, donc severite = 'medium' si un CVE est mentionne (rare),
+  // sinon 'low'. Le raffinement reel est laisse a la relecture IA (Phase 5,
+  // pas encore branchee sur cette source -- cf. §41) plutot que d'inventer
+  // une heuristique fragile (ex: le score de ton V1.5TONE ne mesure que la
+  // negativite du style redactionnel, pas la gravite technique).
   const activeExploitation = ACTIVE_EXPLOITATION_PATTERN.test(haystack);
   const severity = classifySeverity(category, cves.length > 0, activeExploitation);
 
