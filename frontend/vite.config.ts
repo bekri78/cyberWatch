@@ -1,3 +1,4 @@
+import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -8,4 +9,8 @@ export default defineConfig({
   // (page de projet, meme repo que le backend) -- a changer si le frontend
   // est publie depuis un depot different.
   base: '/cyberWatch/',
+  resolve: {
+    // Alias shadcn/ui (@/... -> src/...), miroir de tsconfig.app.json.
+    alias: { '@': path.resolve(import.meta.dirname, './src') },
+  },
 });

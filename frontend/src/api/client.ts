@@ -36,3 +36,22 @@ export async function fetchRecentEvents(limit = 100): Promise<EventsPage> {
 
   return (await response.json()) as EventsPage;
 }
+
+/**
+ * Recupere les evenements reels d'une seule source (le 1er tag = nom de la
+ * source, cf. classifyEvent.buildTags ; le backend filtre via
+ * `$n = ANY(tags)`, cf. src/database/repositories/cyberEvents.ts). Utilise
+ * pour construire un echantillon equilibre entre sources plutot que de
+ * prendre le top N global -- GDELT (toutes les 15 min, gros volume GKG)
+ * ecrase sinon systematiquement CERT-FR/CISA KEV/MSRC (toutes les 2h,
+ * quelques items par passage) dans un simple tri par recence.
+ */
+export async function fetchEventsBySource(sourceTag: string, limit = 20): Promise<EventsPage> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/events?limit=${limit}&tag=${encodeURIComponent(sourceTag)}`);
+
+  if (!response.ok) {
+    throw new ApiError(`L'API a repondu ${response.status} ${response.statusText}`, response.status);
+  }
+
+  return (await response.json()) as EventsPage;
+}

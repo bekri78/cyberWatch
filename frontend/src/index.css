@@ -4,7 +4,15 @@
    typographie, composants "Panneau"/"Pastille"/"Bouton" traduits en CSS
    pur) -- sans aucune reference SharePoint/intradef, sans page admin, et
    branche sur la vraie API Railway plutot que sur des listes SharePoint.
+
+   Migration Tailwind v4 + shadcn/ui (cf. mapcn.vercel.app, qui exige les
+   deux) : les jetons ci-dessous restent la seule source de verite pour la
+   palette -- le bloc @theme se contente de les exposer a Tailwind sous
+   forme d'utilitaires (bg-panel, text-primary, border-standard, etc.),
+   sans dupliquer les valeurs ni en introduire de nouvelles.
    ========================================================================== */
+
+@import 'tailwindcss';
 
 *, ::after, ::before { box-sizing: border-box; }
 
@@ -49,6 +57,75 @@
   --crit-high-bg: rgba(247, 107, 21, 0.15);
   --crit-critical: #e5484d;
   --crit-critical-bg: rgba(229, 72, 77, 0.16);
+
+  /* Jetons shadcn/ui standards (convention attendue par les composants
+     copies depuis mapcn.vercel.app -- bg-popover, text-foreground,
+     bg-muted-foreground, border, ring, etc.) : mappes sur nos vraies
+     couleurs ci-dessus, pas de nouvelle palette. App volontairement
+     dark-only (comme l'app de reference), pas de variante claire. */
+  --background: var(--bg-panel);
+  --foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-secondary);
+  --muted: var(--s2);
+  --muted-foreground: var(--text-tertiary);
+  --border: var(--border-standard);
+  --ring: var(--accent);
+  --radius: 0.5rem;
+}
+
+/* Passerelle vers Tailwind : chaque jeton reste defini une seule fois
+   ci-dessus, @theme se contente de le nommer pour generer les utilitaires
+   (bg-panel, text-secondary, border-standard, fill-crit-high, ...). */
+@theme {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --color-marketing: var(--bg-marketing);
+  --color-deepest: var(--bg-deepest);
+  --color-panel: var(--bg-panel);
+  --color-surface: var(--bg-surface);
+
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-quaternary: var(--text-quaternary);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-brand: var(--brand);
+  --color-security: var(--security);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-standard: var(--border-standard);
+  --color-border-solid: var(--border-solid);
+
+  --color-crit-low: var(--crit-low);
+  --color-crit-low-bg: var(--crit-low-bg);
+  --color-crit-medium: var(--crit-medium);
+  --color-crit-medium-bg: var(--crit-medium-bg);
+  --color-crit-high: var(--crit-high);
+  --color-crit-high-bg: var(--crit-high-bg);
+  --color-crit-critical: var(--crit-critical);
+  --color-crit-critical-bg: var(--crit-critical-bg);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 html, body, #root { height: 100%; }
@@ -88,81 +165,9 @@ button, input, select, textarea { font-family: inherit; }
   }
 }
 
-/* ── Mise en page d'ensemble ─────────────────────────────────────────────── */
-.cw-app { display: flex; height: 100vh; overflow: hidden; background: var(--bg-marketing); }
-
-.cw-sidebar {
-  width: 208px;
-  flex-shrink: 0;
-  background: var(--bg-panel);
-  border-right: 1px solid var(--border-standard);
-  display: flex;
-  flex-direction: column;
-}
-
-.cw-sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 16px 16px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-  text-decoration: none;
-}
-.cw-sidebar-mark {
-  width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
-  background: linear-gradient(135deg, rgba(113, 112, 255, 0.3), rgba(94, 106, 210, 0.1));
-  border: 1px solid rgba(113, 112, 255, 0.35);
-  display: flex; align-items: center; justify-content: center;
-}
-.cw-sidebar-name { font-size: 14px; font-weight: 700; letter-spacing: 0.02em; color: var(--text-primary); }
-.cw-sidebar-tag { font-size: 8.5px; font-weight: 600; letter-spacing: 0.18em; color: var(--accent); margin-top: 2px; }
-
-.cw-nav { padding: 8px; flex: 1; display: flex; flex-direction: column; gap: 1px; }
-.cw-nav-item {
-  display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 7px;
-  text-decoration: none; position: relative; transition: all 150ms;
-  color: var(--text-tertiary); font-size: 12.5px; font-weight: 400; background: transparent;
-  border: none; cursor: pointer; width: 100%; text-align: left;
-}
-.cw-nav-item:hover { background: var(--s2); color: var(--text-secondary); }
-.cw-nav-item.is-active { background: var(--s3); color: var(--text-primary); font-weight: 510; }
-.cw-nav-item.is-active::before {
-  content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2.5px;
-  background: var(--accent); border-radius: 2px;
-}
-.cw-nav-item.is-disabled { color: var(--text-quaternary); cursor: default; }
-.cw-nav-item.is-disabled:hover { background: transparent; color: var(--text-quaternary); }
-.cw-nav-soon {
-  margin-left: auto; font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--text-quaternary); background: var(--s2);
-  border: 1px solid var(--border-standard); border-radius: 4px; padding: 1px 5px;
-}
-
-.cw-sidebar-footer { padding: 14px; border-top: 1px solid var(--border-subtle); }
-
-.cw-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-
-.cw-header {
-  height: 56px; flex-shrink: 0; border-bottom: 1px solid var(--border-standard);
-  background: rgba(15, 16, 17, 0.75); backdrop-filter: blur(12px);
-  display: flex; align-items: center; padding: 0 22px; gap: 14px;
-}
-.cw-header-title { font-size: 13.5px; font-weight: 590; color: var(--text-primary); letter-spacing: -0.1px; flex-shrink: 0; }
-.cw-header-sub { font-size: 12px; color: var(--text-quaternary); }
-.cw-header-spacer { flex: 1; }
-.cw-header-status { font-size: 11.5px; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 7px; }
-
-.cw-scroll { flex: 1; overflow-y: auto; }
-.cw-content { max-width: 1180px; margin: 0 auto; padding: 22px 26px 48px; display: flex; flex-direction: column; gap: 26px; }
-
-@media (max-width: 900px) {
-  .cw-sidebar { width: 56px; }
-  .cw-sidebar-name, .cw-sidebar-tag, .cw-nav-item span:last-child, .cw-nav-soon { display: none; }
-}
-@media (max-width: 760px) {
-  .cw-masquable { display: none !important; }
-  .cw-content { padding: 16px 14px 40px; }
-}
+/* ── Mise en page d'ensemble ──────────────────────────────────────────────
+   Layout/Header/Sidebar sont passes en utilitaires Tailwind directement
+   dans leur JSX (cf. migration Tailwind/shadcn) -- plus de classes ici. */
 
 /* ── Composants ──────────────────────────────────────────────────────────── */
 .cw-panel { background: var(--bg-panel); border: 1px solid var(--border-standard); border-radius: 12px; padding: 18px; }
@@ -257,29 +262,17 @@ button, input, select, textarea { font-family: inherit; }
 .cw-event-meta { font-size: 11.5px; color: var(--text-quaternary); margin-top: 3px; display: flex; gap: 7px; flex-wrap: wrap; }
 .cw-event-side { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-/* Carte du monde */
+/* Carte du monde : desormais MapLibre GL (composants mapcn, cf.
+   src/components/ui/map.tsx) -- plus de CSS Leaflet, maplibre-gl importe
+   son propre CSS directement. Le conteneur/tooltip sont stylees en
+   utilitaires Tailwind directement dans WorldMap.tsx. */
 .cw-map-wrap { border-radius: 12px; overflow: hidden; border: 1px solid var(--border-standard); }
-.leaflet-container { background: var(--bg-deepest) !important; font-family: var(--font-sans) !important; }
-.leaflet-control-attribution {
-  background: rgba(15,16,17,0.7) !important; color: var(--text-quaternary) !important;
+
+/* MapLibre inclut son propre control d'attribution (CSS charge par
+   maplibre-gl/dist/maplibre-gl.css) -- assorti au theme sombre. */
+.maplibregl-ctrl-attrib {
+  background: rgba(15, 16, 17, 0.7) !important;
+  color: var(--text-quaternary) !important;
   font-size: 10px !important;
 }
-.leaflet-control-attribution a { color: var(--text-tertiary) !important; }
-
-/* Le tooltip Leaflet par defaut est clair -- l'accorder au theme sombre,
-   sinon le texte (blanc par defaut chez nous) devient illisible dessus. */
-.leaflet-tooltip {
-  background: var(--bg-surface) !important;
-  border: 1px solid var(--border-standard) !important;
-  color: var(--text-secondary) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
-  padding: 8px 10px !important;
-}
-.leaflet-tooltip-top::before { border-top-color: var(--bg-surface) !important; }
-.leaflet-tooltip-bottom::before { border-bottom-color: var(--bg-surface) !important; }
-.leaflet-tooltip-left::before { border-left-color: var(--bg-surface) !important; }
-.leaflet-tooltip-right::before { border-right-color: var(--bg-surface) !important; }
-
-.cw-map-tooltip { font-size: 12px; display: flex; flex-direction: column; gap: 2px; max-width: 240px; }
-.cw-map-tooltip strong { color: var(--text-primary); font-size: 12.5px; line-height: 1.35; }
+.maplibregl-ctrl-attrib a { color: var(--text-tertiary) !important; }

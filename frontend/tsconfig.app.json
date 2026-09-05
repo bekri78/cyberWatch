@@ -16,6 +16,12 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Alias shadcn/ui (convention @/... -> src/...), utilise par les
+       composants generes/adaptes de mapcn.vercel.app. Pas besoin de
+       baseUrl : les chemins de "paths" sont deja resolus relativement a
+       ce fichier depuis TS 5+. */
+    "paths": { "@/*": ["./src/*"] },
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,

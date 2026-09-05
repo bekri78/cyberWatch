@@ -1,12 +1,16 @@
-import 'leaflet/dist/leaflet.css';
-import { useMemo, useState } from 'react';
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
 import type { CyberEvent } from '../api/types';
 import { COUNTRY_CENTROIDS } from '../countryCentroids';
 import { CATEGORY_LABELS, SEVERITY_COLORS, sourceFromTags } from '../domain';
 import { Icon } from './Icon';
+import { Map as MapLibreMap, MapMarker, MarkerContent, MarkerTooltip, useMap } from './ui/map';
 
-const CENTROIDS = new Map<string, [number, number]>(Object.entries(COUNTRY_CENTROIDS));
+// world-countries donne [lat, lng] ; MapLibre attend [lng, lat] partout
+// (viewport, marqueurs, project/unproject) -- on convertit une seule fois
+// ici plutot que de jongler avec l'ordre dans tout le composant.
+const CENTROIDS = new Map<string, [number, number]>(
+  Object.entries(COUNTRY_CENTROIDS).map(([name, [lat, lng]]) => [name, [lng, lat]]),
+);
 
 /**
  * GDELT ecrit parfois un nom legerement different de world-countries (ex:
@@ -36,7 +40,7 @@ interface MapPoint {
   event: CyberEvent;
   country: string;
   extraCountries: number;
-  centroid: [number, number];
+  lngLat: [number, number];
   indexInGroup: number;
 }
 
@@ -56,29 +60,35 @@ function spiralPixelOffset(index: number): [number, number] {
 }
 
 /**
- * Rendu des marqueurs a l'interieur de MapContainer (necessaire pour
- * useMap) : chaque evenement est projete en pixels a partir du vrai
- * centroide du pays cite, ecarte de ses voisins du meme pays via
- * spiralPixelOffset, puis reprojete en lat/lng -- recalcule a chaque
- * changement de zoom (project/unproject dependent du zoom, pas du
- * panoramique).
+ * Rendu des marqueurs a l'interieur de <Map> (necessaire pour useMap) :
+ * chaque evenement est projete en pixels a partir du vrai centroide du
+ * pays cite, ecarte de ses voisins du meme pays via spiralPixelOffset,
+ * puis reprojete en lng/lat -- recalcule a chaque changement de zoom
+ * (map.project/unproject utilisent la projection courante de la carte).
  */
 function EventMarkers({ points }: { points: MapPoint[] }) {
-  const map = useMap();
-  const [zoom, setZoom] = useState(map.getZoom());
+  const { map } = useMap();
+  const [zoom, setZoom] = useState(() => map?.getZoom() ?? 2);
 
-  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+  useEffect(() => {
+    if (!map) return;
+    const handleZoom = () => setZoom(map.getZoom());
+    map.on('zoom', handleZoom);
+    return () => {
+      map.off('zoom', handleZoom);
+    };
+  }, [map]);
 
-  const positioned = useMemo(
-    () =>
-      points.map((p) => {
-        const basePixel = map.project(p.centroid, zoom);
-        const [dx, dy] = spiralPixelOffset(p.indexInGroup);
-        const latlng = map.unproject([basePixel.x + dx, basePixel.y + dy], zoom);
-        return { ...p, position: [latlng.lat, latlng.lng] as [number, number] };
-      }),
-    [points, zoom, map],
-  );
+  const positioned = useMemo(() => {
+    if (!map) return [];
+    return points.map((p) => {
+      const basePixel = map.project(p.lngLat);
+      const [dx, dy] = spiralPixelOffset(p.indexInGroup);
+      const lngLat = map.unproject([basePixel.x + dx, basePixel.y + dy]);
+      return { ...p, position: [lngLat.lng, lngLat.lat] as [number, number] };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [points, zoom, map]);
 
   return (
     <>
@@ -87,25 +97,26 @@ function EventMarkers({ points }: { points: MapPoint[] }) {
         const source = sourceFromTags(event.tags);
 
         return (
-          <CircleMarker
-            key={event.id}
-            center={position}
-            radius={7}
-            pathOptions={{ color, fillColor: color, fillOpacity: 0.55, weight: 1.5 }}
-          >
-            <Tooltip direction="top" offset={[0, -6]}>
-              <div className="cw-map-tooltip">
-                <strong>{event.title}</strong>
-                <div>
+          <MapMarker key={event.id} longitude={position[0]} latitude={position[1]}>
+            <MarkerContent>
+              <div
+                className="h-3.5 w-3.5 rounded-full border border-white/70 shadow-md"
+                style={{ backgroundColor: color }}
+              />
+            </MarkerContent>
+            <MarkerTooltip>
+              <div className="flex max-w-60 flex-col gap-0.5">
+                <strong className="text-[12.5px] leading-snug">{event.title}</strong>
+                <span>
                   {formatDate(event.publishedAt ?? event.createdAt)} · {CATEGORY_LABELS[event.category] ?? event.category}
-                </div>
-                <div style={{ color: source.color }}>
+                </span>
+                <span style={{ color: source.color }}>
                   {source.label}
                   {extraCountries > 0 && ` · ${country} (+${extraCountries} autre${extraCountries > 1 ? 's' : ''} pays)`}
-                </div>
+                </span>
               </div>
-            </Tooltip>
-          </CircleMarker>
+            </MarkerTooltip>
+          </MapMarker>
         );
       })}
     </>
@@ -122,8 +133,8 @@ export function WorldMap({ events, height = 340 }: { events: CyberEvent[]; heigh
     const country = event.countries[0];
     if (!country) continue;
 
-    const centroid = resolveCentroid(country);
-    if (!centroid) {
+    const lngLat = resolveCentroid(country);
+    if (!lngLat) {
       citedButUnresolved++;
       continue;
     }
@@ -131,32 +142,29 @@ export function WorldMap({ events, height = 340 }: { events: CyberEvent[]; heigh
     const indexInGroup = seenPerCountry.get(country) ?? 0;
     seenPerCountry.set(country, indexInGroup + 1);
 
-    points.push({ event, country, extraCountries: event.countries.length - 1, centroid, indexInGroup });
+    points.push({ event, country, extraCountries: event.countries.length - 1, lngLat, indexInGroup });
   }
 
   return (
     <div className="cw-map-wrap">
-      <MapContainer
-        center={[20, 10]}
-        zoom={2}
-        minZoom={1}
-        maxBounds={[
-          [-85, -180],
-          [85, 180],
-        ]}
-        style={{ height, width: '100%', background: 'var(--bg-deepest)' }}
-        scrollWheelZoom={false}
-        attributionControl={true}
-      >
-        {/* Tuiles sombres CARTO (Dark Matter), gratuites, sans cle API. */}
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          subdomains="abcd"
-          maxZoom={19}
-        />
-        <EventMarkers points={points} />
-      </MapContainer>
+      <div style={{ height, width: '100%' }}>
+        <MapLibreMap
+          theme="dark"
+          viewport={{ center: [10, 20], zoom: 2, bearing: 0, pitch: 0 }}
+          minZoom={1}
+          // Pas de maxBounds : declenche un crash reel et reproductible dans
+          // MapLibre GL (calcMatrices lit un tableau null pendant le resize
+          // initial, quelle que soit la forme du tableau passee -- constate
+          // en test, pas une hypothese). renderWorldCopies=false (defaut du
+          // composant Map de mapcn) empeche deja la duplication horizontale
+          // du monde ; on perd seulement le blocage strict du pan vertical
+          // au-dela des poles, un compromis mineur face a un plantage.
+          scrollZoom={false}
+          className="bg-deepest"
+        >
+          <EventMarkers points={points} />
+        </MapLibreMap>
+      </div>
       {points.length === 0 && (
         <div className="cw-empty" style={{ borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderRight: 'none' }}>
           <Icon name="globe" size={20} color="var(--text-quaternary)" />

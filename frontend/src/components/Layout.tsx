@@ -14,12 +14,14 @@ export function Layout({
   children: ReactNode;
 }) {
   return (
-    <div className="cw-app">
+    <div className="flex h-screen overflow-hidden bg-marketing">
       <Sidebar />
-      <div className="cw-main">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header title={title} subtitle={subtitle} status={status} />
-        <div className="cw-scroll">
-          <div className="cw-content">{children}</div>
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto flex max-w-[1180px] flex-col gap-[26px] px-[26px] pt-[22px] pb-12 max-[760px]:px-3.5 max-[760px]:pt-4 max-[760px]:pb-10">
+            {children}
+          </div>
         </div>
       </div>
     </div>

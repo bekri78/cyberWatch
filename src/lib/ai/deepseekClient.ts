@@ -1,5 +1,11 @@
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
-const DEEPSEEK_MODEL = 'deepseek-chat';
+// 'deepseek-chat' (utilise a l'origine) a ete retire par DeepSeek le
+// 2026-07-24 (cf. changelog officiel api-docs.deepseek.com/updates) --
+// 'deepseek-v4-flash' est son successeur direct (mode non-thinking, meme
+// tarif : 0,14 $/1M tokens en entree hors cache, 0,28 $/1M en sortie,
+// cf. verification faite le 2026-09-05). Sans cette mise a jour, la
+// relecture IA continuerait d'echouer meme apres recharge du compte.
+const DEEPSEEK_MODEL = 'deepseek-v4-flash';
 const REQUEST_TIMEOUT_MS = 20_000;
 
 const VALID_SEVERITIES = new Set(['low', 'medium', 'high', 'critical']);
@@ -98,6 +104,16 @@ export async function reviewEventWithDeepseek(
         model: DEEPSEEK_MODEL,
         response_format: { type: 'json_object' },
         temperature: 0,
+        // deepseek-v4-flash active le "thinking" (raisonnement) PAR DEFAUT,
+        // effort "high", des que ce champ est absent (cf. guide officiel
+        // api-docs.deepseek.com/guides/thinking_mode, verifie le
+        // 2026-09-05) -- inutile et couteux pour une simple triage
+        // is_relevant/severity/confidence, et surtout : en mode thinking,
+        // "temperature" est silencieusement ignore, ce qui casserait le
+        // caractere deterministe recherche ici. On le desactive donc
+        // explicitement pour retrouver le comportement de l'ancien
+        // deepseek-chat (non-thinking).
+        thinking: { type: 'disabled' },
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: `Titre: ${input.title}\n\nExtrait: ${input.excerpt}` },
