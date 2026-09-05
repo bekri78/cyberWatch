@@ -10,6 +10,14 @@ export interface DiversifiedEventsState {
   events: CyberEvent[];
   /** Sources reellement interrogees qui n'ont renvoye aucun evenement (ex: bleepingcomputer/hackernews, sans collecteur implemente). */
   emptySources: string[];
+  /**
+   * Nombre reel d'evenements renvoyes par source AVANT fusion/deduplication
+   * (donc avant d'etre tronque par perSourceLimit sur l'affichage) -- sert a
+   * afficher une vraie repartition, pas une estimation.
+   */
+  countsBySource: Record<string, number>;
+  /** Sources dont le compte ci-dessus est plafonne par perSourceLimit (nextCursor non-null cote API) -- le vrai total est superieur. */
+  cappedSources: string[];
   reload: () => void;
 }
 
@@ -28,6 +36,8 @@ function eventTimestamp(event: CyberEvent): number {
 export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsState {
   const [events, setEvents] = useState<CyberEvent[]>([]);
   const [emptySources, setEmptySources] = useState<string[]>([]);
+  const [countsBySource, setCountsBySource] = useState<Record<string, number>>({});
+  const [cappedSources, setCappedSources] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -44,14 +54,20 @@ export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsStat
 
       const merged = new Map<string, CyberEvent>();
       const empty: string[] = [];
+      const counts: Record<string, number> = {};
+      const capped: string[] = [];
       let anySucceeded = false;
 
       results.forEach((result, i) => {
         const tag = sourceTags[i];
         if (result.status !== 'fulfilled') return;
         anySucceeded = true;
+        counts[tag] = result.value.items.length;
         if (result.value.items.length === 0) {
           empty.push(tag);
+        }
+        if (result.value.nextCursor !== null) {
+          capped.push(tag);
         }
         for (const event of result.value.items) {
           merged.set(event.id, event);
@@ -64,6 +80,8 @@ export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsStat
       } else {
         setEvents([...merged.values()].sort((a, b) => eventTimestamp(b) - eventTimestamp(a)));
         setEmptySources(empty);
+        setCountsBySource(counts);
+        setCappedSources(capped);
       }
       setLoading(false);
     });
@@ -73,5 +91,13 @@ export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsStat
     };
   }, [perSourceLimit, attempt]);
 
-  return { loading, error, events, emptySources, reload: () => setAttempt((a) => a + 1) };
+  return {
+    loading,
+    error,
+    events,
+    emptySources,
+    countsBySource,
+    cappedSources,
+    reload: () => setAttempt((a) => a + 1),
+  };
 }

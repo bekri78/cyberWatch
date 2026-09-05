@@ -1,7 +1,9 @@
+import { useMemo, useState } from 'react';
 import { EventList } from '../components/EventList';
 import { Icon } from '../components/Icon';
 import { Layout } from '../components/Layout';
 import { ErrorState, LoadingState } from '../components/RequestState';
+import { SourceBreakdown } from '../components/SourceBreakdown';
 import { SummaryPlaceholder } from '../components/SummaryPlaceholder';
 import { PostureBanner } from '../components/PostureBanner';
 import { SOURCE_META } from '../domain';
@@ -18,6 +20,13 @@ export function SituationPage() {
   // Echantillon equilibre par source (cf. useDiversifiedEvents) : evite que
   // le volume GDELT ne masque CERT-FR/CISA KEV/MSRC dans la liste affichee.
   const diversified = useDiversifiedEvents(15);
+
+  // Filtre optionnel sur une seule source, pilote par les chips SourceBreakdown.
+  const [sourceFilter, setSourceFilter] = useState<string | null>(null);
+  const filteredEvents = useMemo(
+    () => (sourceFilter ? diversified.events.filter((event) => event.tags[0] === sourceFilter) : diversified.events),
+    [diversified.events, sourceFilter],
+  );
 
   const posture = derivePosture(events, events.length);
   const indicators = buildIndicators(events);
@@ -43,11 +52,8 @@ export function SituationPage() {
                 <h2 className="cw-section-title">Derniers evenements</h2>
                 <p className="cw-section-desc">
                   Un echantillon recent de chaque source active ({activeSourceCount} sur {Object.keys(SOURCE_META).length}{' '}
-                  enregistrees), pour que le volume GDELT ne masque pas CERT-FR/CISA KEV/MSRC.
-                  {diversified.emptySources.length > 0 &&
-                    ` Aucun collecteur implemente pour : ${diversified.emptySources
-                      .map((tag) => SOURCE_META[tag]?.label ?? tag)
-                      .join(', ')}.`}
+                  enregistrees), pour que le volume GDELT ne masque pas CERT-FR/CISA KEV/MSRC. Cliquez une source pour
+                  filtrer la liste.
                 </p>
               </div>
             </div>
@@ -55,7 +61,19 @@ export function SituationPage() {
             {!diversified.loading && diversified.error && (
               <ErrorState message={diversified.error} onRetry={diversified.reload} />
             )}
-            {!diversified.loading && !diversified.error && <EventList events={diversified.events} limit={8} />}
+            {!diversified.loading && !diversified.error && (
+              <div className="flex flex-col gap-3">
+                <SourceBreakdown
+                  counts={diversified.countsBySource}
+                  cappedSources={diversified.cappedSources}
+                  emptySources={diversified.emptySources}
+                  total={diversified.events.length}
+                  activeFilter={sourceFilter}
+                  onFilterChange={setSourceFilter}
+                />
+                <EventList events={filteredEvents} limit={sourceFilter ? 20 : 8} />
+              </div>
+            )}
           </section>
         </>
       )}

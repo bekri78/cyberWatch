@@ -4,6 +4,10 @@ import { Icon } from './Icon';
 
 function EventRow({ event }: { event: CyberEvent }) {
   const source = sourceFromTags(event.tags);
+  // La revue IA (Phase 5 DeepSeek) ne s'applique reellement qu'aux
+  // evenements GDELT (cf. reviewGdeltEvents.ts cote backend) -- pour les
+  // autres sources ai_generated reste toujours false et n'a rien a signaler.
+  const showAiStatus = event.tags[0] === 'gdelt';
 
   return (
     <div className="cw-event-row" title={event.summary}>
@@ -15,6 +19,18 @@ function EventRow({ event }: { event: CyberEvent }) {
         <div className="cw-event-title">{event.title}</div>
         <div className="cw-event-meta">
           <span style={{ color: source.color }}>{source.label}</span>
+          {showAiStatus && (
+            <span
+              className={`inline-flex items-center ${event.aiGenerated ? 'text-accent' : 'text-quaternary'}`}
+              title={
+                event.aiGenerated
+                  ? 'Pertinence verifiee par IA (DeepSeek)'
+                  : 'En attente de revue IA (DeepSeek) -- prochain passage planifie'
+              }
+            >
+              <Icon name={event.aiGenerated ? 'brain' : 'clock'} size={11} />
+            </span>
+          )}
           <span>·</span>
           <span>{CATEGORY_LABELS[event.category] ?? event.category}</span>
           <span>·</span>
