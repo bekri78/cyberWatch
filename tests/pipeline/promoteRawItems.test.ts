@@ -44,7 +44,7 @@ describe('promoteRawItems', () => {
     expect(result).toEqual({ promoted: 1 });
     expect(insertCalls).toHaveLength(1);
 
-    const [title, summary, description, category, severity, confidence, publishedAt, cves, tags, rawItemId] =
+    const [title, summary, description, category, severity, confidence, publishedAt, cves, tags, countries, rawItemId] =
       insertCalls[0]!;
 
     expect(title).toBe('Vulnérabilité dans Cisco Catalyst SD-WAN (25 février 2026)');
@@ -53,6 +53,7 @@ describe('promoteRawItems', () => {
     expect(confidence).toBe('low');
     expect(cves).toEqual(['CVE-2026-20127']);
     expect(tags).toEqual(['certfr', 'alert']);
+    expect(countries).toEqual([]); // certfr n'a pas de champ geo structure (cf. §46)
     expect(rawItemId).toBe('raw-item-1');
     expect(summary).toContain('Cisco Catalyst SD-WAN');
     expect(description).toContain('activement exploitée');

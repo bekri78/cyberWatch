@@ -1,3 +1,4 @@
+import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { Pool } from 'pg';
 import { healthRoutes } from './routes/health';
@@ -13,6 +14,12 @@ import { syncRoutes } from './routes/sync';
 export function buildApp(pool: Pool): FastifyInstance {
   const app = Fastify({ logger: true });
   app.decorate('pool', pool);
+
+  // Front public (GitHub Pages) : origine differente du backend Railway,
+  // le navigateur bloquerait les appels fetch() sans CORS. API en lecture
+  // seule (GET) sur des donnees OSINT deja publiques -- decision utilisateur
+  // explicite (cf. discussion §"Exposition") : pas de restriction d'origine.
+  void app.register(cors, { origin: true, methods: ['GET'] });
 
   app.register(healthRoutes, { prefix: '/api/v1' });
   app.register(eventsRoutes, { prefix: '/api/v1' });

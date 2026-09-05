@@ -11,10 +11,11 @@ import type { CollectorItem } from '../types';
 const enum Col {
   GkgRecordId = 0,
   V21Date = 1,
-  V1Themes = 7,
   V2DocumentIdentifier = 4,
-  V1Organizations = 13,
+  V1Themes = 7,
+  V1Locations = 9,
   V1Persons = 11,
+  V1Organizations = 13,
   V2ExtrasXml = 26,
 }
 
@@ -46,6 +47,32 @@ function parseSemicolonList(value: string): string[] {
     .split(';')
     .map((v) => v.trim())
     .filter((v) => v.length > 0);
+}
+
+/**
+ * V1LOCATIONS est une liste de blocs separes par ";", chaque bloc separe par
+ * "#" : Type#FullName#CountryCode#ADM1Code#Lat#Long#FeatureID (verifie sur de
+ * vraies lignes -- cf. tests/collectors/gdelt-fixtures). FullName est soit un
+ * pays seul (Type=1, ex "United Kingdom"), soit "Ville, Region, Pays"
+ * (Type=3/4/5, ex "Chennai, Tamil Nadu, India") -- dans les deux cas, le
+ * dernier segment separe par une virgule EST le nom du pays. Utilise pour
+ * peupler cyber_events.countries (aucune source actuelle ne le faisait avant
+ * -- cf. §46, verifie sur la prod : countries=[] sur tous les evenements).
+ */
+export function extractCountries(v1Locations: string): string[] {
+  const blocks = parseSemicolonList(v1Locations);
+  const countries = new Set<string>();
+
+  for (const block of blocks) {
+    const fields = block.split('#');
+    const fullName = fields[1]?.trim();
+    if (!fullName) continue;
+    const segments = fullName.split(',');
+    const country = segments[segments.length - 1]?.trim();
+    if (country) countries.add(country);
+  }
+
+  return [...countries];
 }
 
 /**
@@ -103,8 +130,17 @@ export function parseGdeltDate(v21Date: string): Date | null {
  * personnes, themes matches), jamais de texte invente, pour donner un
  * minimum de contexte a classifyEvent et a la future relecture IA (Phase 5).
  */
-export function buildContentExcerpt(matchedThemes: string[], organizations: string[], persons: string[]): string {
+export function buildContentExcerpt(
+  matchedThemes: string[],
+  organizations: string[],
+  persons: string[],
+  countries: string[],
+): string {
   const parts: string[] = [];
+  // "Pays: ..." doit rester un segment reconnaissable tel quel : c'est ce
+  // que classifyEvent.extractGdeltCountries() reparse (raw_items ne conserve
+  // pas CollectorItem.raw, seulement contentExcerpt -- cf. §46).
+  if (countries.length > 0) parts.push(`Pays: ${countries.slice(0, 8).join(', ')}`);
   if (organizations.length > 0) parts.push(`Organisations: ${organizations.slice(0, 8).join(', ')}`);
   if (persons.length > 0) parts.push(`Personnes: ${persons.slice(0, 8).join(', ')}`);
   parts.push(`Themes GDELT: ${matchedThemes.join(', ')}`);
@@ -138,13 +174,14 @@ export function normalizeGkgLine(line: string): CollectorItem | null {
   const publishedAt = parseGdeltDate(cols[Col.V21Date] ?? '');
   const organizations = parseSemicolonList(cols[Col.V1Organizations] ?? '');
   const persons = parseSemicolonList(cols[Col.V1Persons] ?? '');
+  const countries = extractCountries(cols[Col.V1Locations] ?? '');
 
   return {
     externalId: cols[Col.GkgRecordId]?.trim() || undefined,
     url,
     title,
     publishedAt,
-    contentExcerpt: buildContentExcerpt(matchedThemes, organizations, persons),
-    raw: { themes, organizations, persons },
+    contentExcerpt: buildContentExcerpt(matchedThemes, organizations, persons, countries),
+    raw: { themes, organizations, persons, countries },
   };
 }

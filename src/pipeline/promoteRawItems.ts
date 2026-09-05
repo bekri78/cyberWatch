@@ -60,11 +60,11 @@ export async function promoteRawItems(pool: Pool): Promise<PromotionResult> {
     await pool.query(
       `WITH new_event AS (
          INSERT INTO cyber_events
-           (title, summary, description, category, severity, confidence, published_at, cves, tags, ai_generated)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, false)
+           (title, summary, description, category, severity, confidence, published_at, cves, tags, countries, ai_generated)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false)
          RETURNING id
        )
-       UPDATE raw_items SET cyber_event_id = (SELECT id FROM new_event) WHERE id = $10`,
+       UPDATE raw_items SET cyber_event_id = (SELECT id FROM new_event) WHERE id = $11`,
       [
         row.title,
         summary,
@@ -75,6 +75,7 @@ export async function promoteRawItems(pool: Pool): Promise<PromotionResult> {
         row.published_at,
         classification.cves,
         classification.tags,
+        classification.countries,
         row.id,
       ],
     );

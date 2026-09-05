@@ -221,12 +221,33 @@ describe('classifyEvent -- GDELT (vraie ligne thehindu.com, fraude cryptomonnaie
       sourceName: 'gdelt',
       url: 'https://www.thehindu.com/news/cities/chennai/ed-arrests-two-in-40-crore-hashpe-cryptocurrency-fraud/article71429252.ece',
       title: 'ED arrests two in ₹40-crore HashPe cryptocurrency fraud',
-      contentExcerpt: 'Organisations: cyber crime police — Personnes: hitesh kumar — Themes GDELT: CYBER_ATTACK, WB_2457_CYBER_CRIME',
+      contentExcerpt: 'Pays: India — Organisations: cyber crime police — Personnes: hitesh kumar — Themes GDELT: CYBER_ATTACK, WB_2457_CYBER_CRIME',
     });
 
     expect(result.category).toBe('attack');
     expect(result.severity).toBe('low'); // pas de CVE, pas de branche dediee (cf. §41)
     expect(result.tags).toEqual(['gdelt', 'attack']);
+    expect(result.countries).toEqual(['India']);
+  });
+});
+
+describe('classifyEvent -- pays non peuple pour les sources sans champ geo structure (non-regression)', () => {
+  it('countries reste [] pour certfr/cisa_kev/microsoft_msrc', () => {
+    const certfr = classifyEvent({
+      sourceName: 'certfr',
+      url: 'https://www.cert.ssi.gouv.fr/avis/CERTFR-2026-AVI-1103/',
+      title: 'Multiples vulnérabilités dans les produits SonicWall (02 septembre 2026)',
+      contentExcerpt: 'De multiples vulnérabilités ont été découvertes dans les produits SonicWall.',
+    });
+    expect(certfr.countries).toEqual([]);
+
+    const cisaKev = classifyEvent({
+      sourceName: 'cisa_kev',
+      url: 'https://nvd.nist.gov/vuln/detail/CVE-2026-85046',
+      title: 'CVE-2026-85046 - Google Chromium V8 Type Confusion Vulnerability',
+      contentExcerpt: 'Google Chromium V8 contains a type confusion vulnerability.',
+    });
+    expect(cisaKev.countries).toEqual([]);
   });
 });
 

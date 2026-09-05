@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   buildContentExcerpt,
+  extractCountries,
   extractPageTitle,
   isCyberSignal,
   normalizeGkgLine,
@@ -79,12 +80,35 @@ describe('parseGdeltDate', () => {
 });
 
 describe('buildContentExcerpt', () => {
-  it('assemble organisations, personnes et themes matches, tronque a 2000 caracteres', () => {
-    const excerpt = buildContentExcerpt(['CYBER_ATTACK'], ['cyber crime police'], ['hitesh kumar']);
+  it('assemble pays, organisations, personnes et themes matches, tronque a 2000 caracteres', () => {
+    const excerpt = buildContentExcerpt(['CYBER_ATTACK'], ['cyber crime police'], ['hitesh kumar'], ['India']);
+    expect(excerpt).toContain('Pays: India');
     expect(excerpt).toContain('Organisations: cyber crime police');
     expect(excerpt).toContain('Personnes: hitesh kumar');
     expect(excerpt).toContain('Themes GDELT: CYBER_ATTACK');
     expect(excerpt.length).toBeLessThanOrEqual(2000);
+  });
+});
+
+describe('extractCountries', () => {
+  it("extrait le pays d'un bloc pays seul (Type=1, vraie donnee : \"United Kingdom\")", () => {
+    expect(extractCountries('1#United Kingdom#UK#UK#54#-4#UK')).toEqual(['United Kingdom']);
+  });
+
+  it('extrait le pays (dernier segment) d\'un bloc ville complet (Type=4, vraie donnee : Chennai, Inde)', () => {
+    expect(extractCountries('4#Chennai, Tamil Nadu, India#IN#IN25#13.0833#80.2833#-2103041')).toEqual(['India']);
+  });
+
+  it('deduplique et combine plusieurs blocs reels (vraie ligne thehindu.com : 3 lieux, 1 seul pays)', () => {
+    const v1locations =
+      '4#Chennai, Tamil Nadu, India#IN#IN25#13.0833#80.2833#-2103041;' +
+      '4#Puducherry, Pondicherry, India#IN#IN22#11.93#79.83#-2108165;' +
+      '4#Kolkata, West Bengal, India#IN#IN28#22.5697#88.3697#-2092511';
+    expect(extractCountries(v1locations)).toEqual(['India']);
+  });
+
+  it('renvoie [] pour un champ vide', () => {
+    expect(extractCountries('')).toEqual([]);
   });
 });
 
@@ -102,6 +126,7 @@ describe('normalizeGkgLine -- vraies lignes completes', () => {
     expect(result!.publishedAt?.toISOString()).toBe('2026-09-05T07:15:00.000Z');
     // V1ORGANIZATIONS est en minuscules dans le vrai flux GDELT (verifie).
     expect(result!.contentExcerpt).toContain('cyber crime police');
+    expect(result!.contentExcerpt).toContain('Pays: India');
   });
 
   it('renvoie null pour une vraie ligne sans theme cyber (newburytoday.co.uk)', () => {

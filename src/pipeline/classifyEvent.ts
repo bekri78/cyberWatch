@@ -15,6 +15,24 @@ export interface Classification {
   confidence: string;
   cves: string[];
   tags: string[];
+  countries: string[];
+}
+
+// "Pays: X, Y" est ecrit tel quel par gdelt/normalize.ts (buildContentExcerpt)
+// a partir du vrai champ V1LOCATIONS -- raw_items ne conserve pas
+// CollectorItem.raw (pas de colonne dediee, cf. §46), donc contentExcerpt est
+// le seul endroit ou cette information survit jusqu'ici. Restreint a gdelt :
+// aucune autre source n'ecrit ce segment.
+const GDELT_COUNTRIES_PATTERN = /Pays: ([^—]+)/;
+
+function extractGdeltCountries(contentExcerpt: string | null): string[] {
+  if (!contentExcerpt) return [];
+  const match = GDELT_COUNTRIES_PATTERN.exec(contentExcerpt);
+  if (!match?.[1]) return [];
+  return match[1]
+    .split(',')
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0);
 }
 
 // "activement exploitee/exploite/exploitees" -- CERT-FR utilise
@@ -112,6 +130,7 @@ export function classifyEvent(input: ClassificationInput): Classification {
       confidence: 'low',
       cves,
       tags: buildTags(input.sourceName, category, haystack),
+      countries: [],
     };
   }
 
@@ -132,6 +151,7 @@ export function classifyEvent(input: ClassificationInput): Classification {
       confidence: 'low',
       cves,
       tags: buildTags(input.sourceName, category, haystack),
+      countries: [],
     };
   }
 
@@ -147,11 +167,18 @@ export function classifyEvent(input: ClassificationInput): Classification {
   const activeExploitation = ACTIVE_EXPLOITATION_PATTERN.test(haystack);
   const severity = classifySeverity(category, cves.length > 0, activeExploitation);
 
+  // countries : uniquement gdelt sait le fournir aujourd'hui (V1LOCATIONS
+  // reel, cf. extractCountries dans gdelt/normalize.ts). CERT-FR/CISA/MSRC
+  // n'ont pas de champ geo structure -- laisse a [] plutot que de deviner un
+  // pays a partir du texte libre.
+  const countries = input.sourceName === 'gdelt' ? extractGdeltCountries(input.contentExcerpt) : [];
+
   return {
     category,
     severity,
     confidence: 'low',
     cves,
     tags: buildTags(input.sourceName, category, haystack),
+    countries,
   };
 }

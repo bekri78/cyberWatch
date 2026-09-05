@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/bekri78/cyberWatch#readme",
   "dependencies": {
+    "@fastify/cors": "^11.3.0",
     "adm-zip": "^0.6.0",
     "dotenv": "^17.4.2",
     "fast-xml-parser": "^5.11.1",
