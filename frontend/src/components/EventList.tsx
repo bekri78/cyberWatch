@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import type { CyberEvent } from '../api/types';
 import { CATEGORY_LABELS, relativeTime, severityClass, sourceFromTags, SEVERITY_LABELS } from '../domain';
+import { EventDetailModal } from './EventDetailModal';
 import { Icon } from './Icon';
 
-function EventRow({ event }: { event: CyberEvent }) {
+function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: CyberEvent) => void }) {
   const source = sourceFromTags(event.tags);
   // La revue IA (Phase 5 DeepSeek) ne s'applique reellement qu'aux
   // evenements GDELT (cf. reviewGdeltEvents.ts cote backend) -- pour les
@@ -10,7 +12,19 @@ function EventRow({ event }: { event: CyberEvent }) {
   const showAiStatus = event.tags[0] === 'gdelt';
 
   return (
-    <div className="cw-event-row" title={event.summary}>
+    <div
+      className="cw-event-row"
+      title={event.summary}
+      role="button"
+      tabIndex={0}
+      onClick={() => onSelect(event)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(event);
+        }
+      }}
+    >
       <span
         className="cw-event-stripe"
         style={{ background: `var(--crit-${event.severity in SEVERITY_LABELS ? event.severity : 'low'})` }}
@@ -56,6 +70,7 @@ function EventRow({ event }: { event: CyberEvent }) {
 
 export function EventList({ events, limit = 8 }: { events: CyberEvent[]; limit?: number }) {
   const visible = events.slice(0, limit);
+  const [selected, setSelected] = useState<CyberEvent | null>(null);
 
   if (visible.length === 0) {
     return (
@@ -68,10 +83,13 @@ export function EventList({ events, limit = 8 }: { events: CyberEvent[]; limit?:
   }
 
   return (
-    <div className="cw-panel" style={{ padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {visible.map((event) => (
-        <EventRow key={event.id} event={event} />
-      ))}
-    </div>
+    <>
+      <div className="cw-panel" style={{ padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {visible.map((event) => (
+          <EventRow key={event.id} event={event} onSelect={setSelected} />
+        ))}
+      </div>
+      {selected && <EventDetailModal event={selected} onClose={() => setSelected(null)} />}
+    </>
   );
 }
