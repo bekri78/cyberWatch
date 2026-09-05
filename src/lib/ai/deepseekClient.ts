@@ -11,33 +11,74 @@ const REQUEST_TIMEOUT_MS = 20_000;
 const VALID_SEVERITIES = new Set(['low', 'medium', 'high', 'critical']);
 const VALID_CONFIDENCES = new Set(['low', 'medium', 'high']);
 
+// Bornes d'un critere individuel (cf. migration 012).
+const SCORE_MIN = 0;
+const SCORE_MAX = 5;
+
+// Seuils de palier fournis par l'utilisateur (echange du 2026-09-05),
+// total sur 25 (5 criteres notes 0-5 chacun) -- calcules cote serveur,
+// jamais demandes au modele : lui faire annoncer aussi le palier
+// ouvrirait la porte a une incoherence entre les scores et le palier
+// (ex: total=15 mais palier="prioritaire").
+const TIER_REJECT_MAX = 7; // total < 8
+const TIER_CONSERVE_MAX = 12; // 8-12
+const TIER_VEILLE_MAX = 17; // 13-17
+// 18+ => 'prioritaire'
+
+export type ReviewTier = 'rejete' | 'conserve' | 'veille' | 'prioritaire';
+
 /**
  * Instruction envoyee a DeepSeek pour trancher un cas que le filtre
- * thematique deterministe de gdelt (CYBER_ATTACK/WB_2457_CYBER_CRIME) ne
- * sait pas resoudre lui-meme (cf. §"faux positifs confirmes en prod" dans
- * la migration 008). Reponse forcee en JSON strict pour rester parseable
- * sans ambiguite -- aucune prose libre acceptee.
+ * thematique/mots-cles deterministe de gdelt et google_news_fr ne sait pas
+ * resoudre lui-meme (cf. §"faux positifs confirmes en prod" dans la
+ * migration 008). Remplace la decision binaire is_relevant par un scoring
+ * a 5 criteres (Phase 8, cf. migration 012) : plus riche qu'un simple
+ * booleen, et evite de reduire prematurement une evaluation nuancee a
+ * oui/non avant meme de savoir sur quels criteres elle repose. Reponse
+ * forcee en JSON strict pour rester parseable sans ambiguite -- aucune
+ * prose libre acceptee.
  */
 const SYSTEM_PROMPT = `Tu es un analyste en cyber-renseignement pour un service de veille OSINT.
 
-On te donne le titre et un extrait d'un article de presse mondiale, deja pre-filtre par un systeme de mots-cles thematiques (GDELT, themes "CYBER_ATTACK" / "WB_2457_CYBER_CRIME"). Ce filtre par mots-cles produit beaucoup de faux positifs : articles boursiers, geopolitique generale, conflits militaires classiques, licenciements, actualite institutionnelle -- qui mentionnent juste incidemment un terme proche sans decrire un incident cyber reel.
+On te donne le titre et un extrait d'un article de presse, deja pre-filtre par une recherche par mots-cles thematiques (GDELT ou Google Actualites) qui produit beaucoup de faux positifs : articles boursiers, geopolitique generale, conflits militaires classiques, licenciements, actualite institutionnelle, conferences ou annonces produit -- qui mentionnent juste incidemment un terme proche sans decrire un incident cyber reel.
 
-Ta tache : determiner si ce texte decrit REELLEMENT un evenement de cybersecurite concret (cyberattaque, fuite de donnees, rancongiciel, fraude ou cybercriminalite, campagne de logiciel malveillant, vulnerabilite activement exploitee, operation d'espionnage informatique, etc.), et non une mention tangentielle, une metaphore, ou un sujet sans rapport.
+Ta tache : evaluer ce texte selon 5 criteres independants, chacun note par un entier de 0 a 5 :
+
+- pertinence_cyber : decrit-il REELLEMENT un evenement de cybersecurite concret (cyberattaque, fuite de donnees, rancongiciel, fraude ou cybercriminalite, campagne de logiciel malveillant, vulnerabilite activement exploitee, operation d'espionnage informatique, etc.) ? 0 si c'est une mention tangentielle, une metaphore ou un sujet sans rapport ; 5 si c'est manifestement et principalement un incident cyber.
+- impact : ampleur reelle des consequences decrites (organisations/personnes touchees, criticite du service affecte, duree). 0 si aucun impact concret n'est decrit.
+- interet_strategique : pertinence pour une veille cyberdefense francaise -- secteur touche (defense, administration publique, infrastructures critiques, spatial, energie, sante, OT/ICS/SCADA, telecommunications) et/ou dimension etatique (espionnage, APT, sabotage). 0 si le sujet est purement prive et sans dimension strategique.
+- fiabilite_source : le texte cite-t-il des faits verifiables (organisme officiel, CVE, chiffres precis, citation attribuee) plutot que des rumeurs ou affirmations non sourcees ? 0 si tres incertain, 5 si les faits sont clairement etablis.
+- nouveaute : s'agit-il d'une information nouvelle/inhabituelle plutot que la repetition d'un sujet deja largement couvert ou d'une generalite deja connue ? 0 si c'est un sujet rebattu, 5 si c'est un fait notable et recent.
 
 Reponds UNIQUEMENT avec un objet JSON de cette forme exacte, sans texte autour :
-{"is_relevant": boolean, "severity": "low"|"medium"|"high"|"critical", "confidence": "low"|"medium"|"high", "reasoning": "une phrase courte en francais"}
+{"pertinence_cyber": 0-5, "impact": 0-5, "interet_strategique": 0-5, "fiabilite_source": 0-5, "nouveaute": 0-5, "severity": "low"|"medium"|"high"|"critical", "confidence": "low"|"medium"|"high", "reasoning": "une phrase courte en francais"}
 
-- is_relevant=false des que le texte n'est pas reellement un evenement de cybersecurite concret.
-- severity : gravite technique reelle si is_relevant=true (sinon "low", sans importance).
-- confidence : ta confiance dans ce jugement (pas dans la gravite).
-- reasoning : une phrase courte justifiant la decision, en francais.`;
+- Chaque score est un entier entre 0 et 5, jamais un decimal.
+- severity : gravite technique reelle si le texte decrit un incident cyber concret (sinon "low", sans importance).
+- confidence : ta confiance dans cette evaluation (pas dans la gravite).
+- reasoning : une phrase courte justifiant les scores, en francais.
+- Ne calcule et n'annonce jamais toi-meme un total ou un palier -- donne uniquement les 5 scores individuels.`;
 
 export interface DeepseekReviewInput {
   title: string;
   excerpt: string;
 }
 
+export interface DeepseekReviewScores {
+  pertinenceCyber: number;
+  impact: number;
+  interetStrategique: number;
+  fiabiliteSource: number;
+  nouveaute: number;
+}
+
 export interface DeepseekReview {
+  scores: DeepseekReviewScores;
+  /** Somme des 5 scores (0-25), calculee cote serveur -- jamais renvoyee par le modele. */
+  scoreTotal: number;
+  /** Palier deduit deterministiquement de scoreTotal (cf. computeReviewTier). */
+  tier: ReviewTier;
+  /** Derive de tier (tier !== 'rejete') -- conserve pour la colonne is_relevant existante (migration 008), comportement inchange. */
   isRelevant: boolean;
   severity: 'low' | 'medium' | 'high' | 'critical';
   confidence: 'low' | 'medium' | 'high';
@@ -48,6 +89,31 @@ interface DeepseekChatResponse {
   choices?: { message?: { content?: string } }[];
 }
 
+function computeScoreTotal(scores: DeepseekReviewScores): number {
+  return (
+    scores.pertinenceCyber + scores.impact + scores.interetStrategique + scores.fiabiliteSource + scores.nouveaute
+  );
+}
+
+/**
+ * Paliers fournis par l'utilisateur (cf. migration 012) : < 8 rejete,
+ * 8-12 conserve, 13-17 veille, 18+ prioritaire. Fonction pure et
+ * exportee pour etre testee independamment de tout appel reseau.
+ */
+export function computeReviewTier(scoreTotal: number): ReviewTier {
+  if (scoreTotal <= TIER_REJECT_MAX) return 'rejete';
+  if (scoreTotal <= TIER_CONSERVE_MAX) return 'conserve';
+  if (scoreTotal <= TIER_VEILLE_MAX) return 'veille';
+  return 'prioritaire';
+}
+
+function validateScoreValue(value: unknown, field: string): number {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < SCORE_MIN || value > SCORE_MAX) {
+    throw new Error(`Reponse DeepSeek invalide (${field} doit etre un entier entre 0 et 5)`);
+  }
+  return value;
+}
+
 function validateReview(parsed: unknown): DeepseekReview {
   if (typeof parsed !== 'object' || parsed === null) {
     throw new Error('Reponse DeepSeek invalide (pas un objet JSON)');
@@ -55,9 +121,14 @@ function validateReview(parsed: unknown): DeepseekReview {
 
   const p = parsed as Record<string, unknown>;
 
-  if (typeof p.is_relevant !== 'boolean') {
-    throw new Error('Reponse DeepSeek invalide (is_relevant manquant ou non booleen)');
-  }
+  const scores: DeepseekReviewScores = {
+    pertinenceCyber: validateScoreValue(p.pertinence_cyber, 'pertinence_cyber'),
+    impact: validateScoreValue(p.impact, 'impact'),
+    interetStrategique: validateScoreValue(p.interet_strategique, 'interet_strategique'),
+    fiabiliteSource: validateScoreValue(p.fiabilite_source, 'fiabilite_source'),
+    nouveaute: validateScoreValue(p.nouveaute, 'nouveaute'),
+  };
+
   if (typeof p.severity !== 'string' || !VALID_SEVERITIES.has(p.severity)) {
     throw new Error('Reponse DeepSeek invalide (severity)');
   }
@@ -68,8 +139,14 @@ function validateReview(parsed: unknown): DeepseekReview {
     throw new Error('Reponse DeepSeek invalide (reasoning)');
   }
 
+  const scoreTotal = computeScoreTotal(scores);
+  const tier = computeReviewTier(scoreTotal);
+
   return {
-    isRelevant: p.is_relevant,
+    scores,
+    scoreTotal,
+    tier,
+    isRelevant: tier !== 'rejete',
     severity: p.severity as DeepseekReview['severity'],
     confidence: p.confidence as DeepseekReview['confidence'],
     reasoning: p.reasoning,
@@ -78,7 +155,8 @@ function validateReview(parsed: unknown): DeepseekReview {
 
 /**
  * Appelle DeepSeek (API compatible OpenAI, cf. platform.deepseek.com/docs)
- * pour relire un evenement gdelt et decider s'il est reellement pertinent.
+ * pour relire un evenement gdelt/google_news_fr et le noter selon les 5
+ * criteres de la Phase 8 (cf. SYSTEM_PROMPT).
  *
  * Ne fait aucune retry interne : un echec (timeout, quota, reponse
  * malformee) remonte tel quel a l'appelant (reviewGdeltEvents.ts), qui
@@ -107,8 +185,8 @@ export async function reviewEventWithDeepseek(
         // deepseek-v4-flash active le "thinking" (raisonnement) PAR DEFAUT,
         // effort "high", des que ce champ est absent (cf. guide officiel
         // api-docs.deepseek.com/guides/thinking_mode, verifie le
-        // 2026-09-05) -- inutile et couteux pour une simple triage
-        // is_relevant/severity/confidence, et surtout : en mode thinking,
+        // 2026-09-05) -- inutile et couteux pour un simple scoring
+        // 0-5 x 5 criteres + severity/confidence, et surtout : en mode thinking,
         // "temperature" est silencieusement ignore, ce qui casserait le
         // caractere deterministe recherche ici. On le desactive donc
         // explicitement pour retrouver le comportement de l'ancien

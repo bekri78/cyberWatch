@@ -20,6 +20,21 @@ function makePendingRow(overrides: Record<string, unknown> = {}) {
   };
 }
 
+// Reponse reviewEventWithDeepseek complete (Phase 8, cf. migration 012) --
+// evite de repeter les 5 scores + scoreTotal/tier dans chaque mock.
+function makeReview(overrides: Record<string, unknown> = {}) {
+  return {
+    scores: { pertinenceCyber: 0, impact: 0, interetStrategique: 0, fiabiliteSource: 0, nouveaute: 0 },
+    scoreTotal: 0,
+    tier: 'rejete',
+    isRelevant: false,
+    severity: 'low',
+    confidence: 'low',
+    reasoning: 'x',
+    ...overrides,
+  };
+}
+
 function makeFakePool(pendingRows: ReturnType<typeof makePendingRow>[]) {
   const updateCalls: unknown[][] = [];
   const query = vi.fn(async (sql: string, params: unknown[] = []) => {
@@ -50,27 +65,39 @@ describe('reviewGdeltEvents', () => {
     expect(updateCalls).toHaveLength(0);
   });
 
-  it('marque is_relevant=false et ai_generated=true pour un vrai faux positif confirme (Tata/JLR)', async () => {
+  it('marque is_relevant=false et ai_generated=true pour un vrai faux positif confirme (Tata/JLR), scores/tier ecrits en base', async () => {
     const { pool, updateCalls } = makeFakePool([makePendingRow()]);
-    mockedReview.mockResolvedValueOnce({
-      isRelevant: false,
-      severity: 'low',
-      confidence: 'high',
-      reasoning: "Suppressions d'emplois, aucun incident cyber.",
-    });
+    mockedReview.mockResolvedValueOnce(
+      makeReview({
+        scores: { pertinenceCyber: 0, impact: 0, interetStrategique: 0, fiabiliteSource: 3, nouveaute: 0 },
+        scoreTotal: 3,
+        tier: 'rejete',
+        isRelevant: false,
+        confidence: 'high',
+        reasoning: "Suppressions d'emplois, aucun incident cyber.",
+      }),
+    );
 
     const result = await reviewGdeltEvents(pool, 'fake-key', log);
 
     expect(result).toEqual({ reviewed: 1, markedIrrelevant: 1, failed: 0 });
     expect(updateCalls).toHaveLength(1);
-    const [isRelevant, severity, confidence, eventId] = updateCalls[0]!;
+    const [isRelevant, severity, confidence, scorePertinence, scoreImpact, scoreInteret, scoreFiabilite, scoreNouveaute, scoreTotal, tier, eventId] =
+      updateCalls[0]!;
     expect(isRelevant).toBe(false);
     expect(severity).toBe('low');
     expect(confidence).toBe('high');
+    expect(scorePertinence).toBe(0);
+    expect(scoreImpact).toBe(0);
+    expect(scoreInteret).toBe(0);
+    expect(scoreFiabilite).toBe(3);
+    expect(scoreNouveaute).toBe(0);
+    expect(scoreTotal).toBe(3);
+    expect(tier).toBe('rejete');
     expect(eventId).toBe('event-1');
   });
 
-  it('marque is_relevant=true pour un vrai vrai-positif (fraude cryptomonnaie)', async () => {
+  it('marque is_relevant=true pour un vrai vrai-positif (fraude cryptomonnaie), palier "veille"', async () => {
     const { pool, updateCalls } = makeFakePool([
       makePendingRow({
         id: 'event-2',
@@ -78,18 +105,25 @@ describe('reviewGdeltEvents', () => {
         description: 'Pays: India — Organisations: cyber crime police',
       }),
     ]);
-    mockedReview.mockResolvedValueOnce({
-      isRelevant: true,
-      severity: 'medium',
-      confidence: 'high',
-      reasoning: 'Fraude cryptomonnaie confirmee.',
-    });
+    mockedReview.mockResolvedValueOnce(
+      makeReview({
+        scores: { pertinenceCyber: 4, impact: 3, interetStrategique: 2, fiabiliteSource: 4, nouveaute: 2 },
+        scoreTotal: 15,
+        tier: 'veille',
+        isRelevant: true,
+        severity: 'medium',
+        confidence: 'high',
+        reasoning: 'Fraude cryptomonnaie confirmee.',
+      }),
+    );
 
     const result = await reviewGdeltEvents(pool, 'fake-key', log);
 
     expect(result).toEqual({ reviewed: 1, markedIrrelevant: 0, failed: 0 });
-    const [isRelevant] = updateCalls[0]!;
+    const [isRelevant, , , , , , , , scoreTotal, tier] = updateCalls[0]!;
     expect(isRelevant).toBe(true);
+    expect(scoreTotal).toBe(15);
+    expect(tier).toBe('veille');
   });
 
   it("laisse l'evenement non relu (ai_generated toujours false) si l'appel DeepSeek echoue, sans faire planter le passage", async () => {
@@ -98,12 +132,7 @@ describe('reviewGdeltEvents', () => {
       makePendingRow({ id: 'event-4' }),
     ]);
     mockedReview.mockRejectedValueOnce(new Error('DeepSeek API a repondu 429 Too Many Requests'));
-    mockedReview.mockResolvedValueOnce({
-      isRelevant: true,
-      severity: 'low',
-      confidence: 'low',
-      reasoning: 'ok',
-    });
+    mockedReview.mockResolvedValueOnce(makeReview({ isRelevant: true, tier: 'conserve', scoreTotal: 10, reasoning: 'ok' }));
 
     const result = await reviewGdeltEvents(pool, 'fake-key', log);
 
@@ -111,13 +140,13 @@ describe('reviewGdeltEvents', () => {
     // seul le 2eme evenement (succes) genere un UPDATE -- le 1er (echec)
     // reste tel quel, retente au prochain passage planifie.
     expect(updateCalls).toHaveLength(1);
-    expect(updateCalls[0]![3]).toBe('event-4');
+    expect(updateCalls[0]![10]).toBe('event-4'); // eventId est desormais le 11e parametre (cf. migration 012)
     expect(log.error).toHaveBeenCalledOnce();
   });
 
   it('utilise le titre + description (fallback: summary si description absente) comme extrait envoye a DeepSeek', async () => {
     const { pool } = makeFakePool([makePendingRow({ description: null, summary: 'Resume de secours' })]);
-    mockedReview.mockResolvedValueOnce({ isRelevant: true, severity: 'low', confidence: 'low', reasoning: 'x' });
+    mockedReview.mockResolvedValueOnce(makeReview({ isRelevant: true, tier: 'conserve', scoreTotal: 10 }));
 
     await reviewGdeltEvents(pool, 'fake-key', log);
 

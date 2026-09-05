@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { requestSituationReport, reviewEventWithDeepseek } from '../../src/lib/ai/deepseekClient';
+import { computeReviewTier, requestSituationReport, reviewEventWithDeepseek } from '../../src/lib/ai/deepseekClient';
 
 /**
  * Les 3 cas ci-dessous sont les vrais faux positifs gdelt confirmes en
@@ -31,17 +31,51 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+// Reponse de scoring complete (Phase 8, cf. migration 012) : les 5 criteres
+// + severity/confidence/reasoning attendus par validateReview. Un helper
+// evite de repeter les 5 champs de score dans chaque test.
+function scoreBody(scores: Record<string, number>, overrides: Record<string, unknown> = {}) {
+  return {
+    pertinence_cyber: 0,
+    impact: 0,
+    interet_strategique: 0,
+    fiabilite_source: 0,
+    nouveaute: 0,
+    ...scores,
+    severity: 'low',
+    confidence: 'low',
+    reasoning: 'x',
+    ...overrides,
+  };
+}
+
+describe('computeReviewTier', () => {
+  it('applique les seuils fournis par l\'utilisateur (total < 8 rejete, 8-12 conserve, 13-17 veille, 18+ prioritaire)', () => {
+    expect(computeReviewTier(0)).toBe('rejete');
+    expect(computeReviewTier(7)).toBe('rejete');
+    expect(computeReviewTier(8)).toBe('conserve');
+    expect(computeReviewTier(12)).toBe('conserve');
+    expect(computeReviewTier(13)).toBe('veille');
+    expect(computeReviewTier(17)).toBe('veille');
+    expect(computeReviewTier(18)).toBe('prioritaire');
+    expect(computeReviewTier(25)).toBe('prioritaire');
+  });
+});
+
 describe('reviewEventWithDeepseek', () => {
-  it('reconnait un vrai faux positif gdelt (licenciements Tata/JLR, sans rapport avec un incident cyber)', async () => {
+  it('reconnait un vrai faux positif gdelt (licenciements Tata/JLR, sans rapport avec un incident cyber) -- scores bas, palier "rejete"', async () => {
     mockFetchOnce(
       200,
       deepseekBody(
-        JSON.stringify({
-          is_relevant: false,
-          severity: 'low',
-          confidence: 'high',
-          reasoning: "Actualite sur des suppressions d'emplois, aucun incident de cybersecurite decrit.",
-        }),
+        JSON.stringify(
+          scoreBody(
+            { pertinence_cyber: 0, impact: 0, interet_strategique: 0, fiabilite_source: 3, nouveaute: 0 },
+            {
+              confidence: 'high',
+              reasoning: "Actualite sur des suppressions d'emplois, aucun incident de cybersecurite decrit.",
+            },
+          ),
+        ),
       ),
     );
 
@@ -50,20 +84,26 @@ describe('reviewEventWithDeepseek', () => {
       'fake-api-key',
     );
 
+    expect(review.scoreTotal).toBe(3);
+    expect(review.tier).toBe('rejete');
     expect(review.isRelevant).toBe(false);
     expect(review.confidence).toBe('high');
   });
 
-  it('reconnait un vrai vrai-positif (fraude cryptomonnaie, meme texte que gdelt-normalize.test.ts)', async () => {
+  it('reconnait un vrai vrai-positif (fraude cryptomonnaie, meme texte que gdelt-normalize.test.ts) -- scores moyens, palier "veille"', async () => {
     mockFetchOnce(
       200,
       deepseekBody(
-        JSON.stringify({
-          is_relevant: true,
-          severity: 'medium',
-          confidence: 'high',
-          reasoning: 'Arrestations reelles pour fraude a la cryptomonnaie, incident de cybercriminalite concret.',
-        }),
+        JSON.stringify(
+          scoreBody(
+            { pertinence_cyber: 4, impact: 3, interet_strategique: 2, fiabilite_source: 4, nouveaute: 2 },
+            {
+              severity: 'medium',
+              confidence: 'high',
+              reasoning: 'Arrestations reelles pour fraude a la cryptomonnaie, incident de cybercriminalite concret.',
+            },
+          ),
+        ),
       ),
     );
 
@@ -75,15 +115,21 @@ describe('reviewEventWithDeepseek', () => {
       'fake-api-key',
     );
 
+    expect(review.scores).toEqual({
+      pertinenceCyber: 4,
+      impact: 3,
+      interetStrategique: 2,
+      fiabiliteSource: 4,
+      nouveaute: 2,
+    });
+    expect(review.scoreTotal).toBe(15);
+    expect(review.tier).toBe('veille');
     expect(review.isRelevant).toBe(true);
     expect(review.severity).toBe('medium');
   });
 
   it('envoie la cle API en Bearer et le titre/extrait dans le message utilisateur', async () => {
-    mockFetchOnce(
-      200,
-      deepseekBody(JSON.stringify({ is_relevant: true, severity: 'low', confidence: 'low', reasoning: 'x' })),
-    );
+    mockFetchOnce(200, deepseekBody(JSON.stringify(scoreBody({}))));
 
     await reviewEventWithDeepseek({ title: 'Mon Titre', excerpt: 'Mon Extrait' }, 'ma-cle-secrete');
 
@@ -103,14 +149,21 @@ describe('reviewEventWithDeepseek', () => {
 
   it('rejette si la reponse est un JSON malforme (champ manquant)', async () => {
     mockFetchOnce(200, deepseekBody(JSON.stringify({ severity: 'low', confidence: 'low', reasoning: 'x' })));
-    await expect(reviewEventWithDeepseek({ title: 't', excerpt: 'e' }, 'key')).rejects.toThrow(/is_relevant/);
+    await expect(reviewEventWithDeepseek({ title: 't', excerpt: 'e' }, 'key')).rejects.toThrow(/pertinence_cyber/);
+  });
+
+  it("rejette si un score n'est pas un entier entre 0 et 5", async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify(scoreBody({ impact: 7 }))));
+    await expect(reviewEventWithDeepseek({ title: 't', excerpt: 'e' }, 'key')).rejects.toThrow(/impact/);
+  });
+
+  it("rejette si un score est un decimal plutot qu'un entier", async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify(scoreBody({ nouveaute: 2.5 }))));
+    await expect(reviewEventWithDeepseek({ title: 't', excerpt: 'e' }, 'key')).rejects.toThrow(/nouveaute/);
   });
 
   it("rejette si severity n'est pas une valeur valide", async () => {
-    mockFetchOnce(
-      200,
-      deepseekBody(JSON.stringify({ is_relevant: true, severity: 'catastrophique', confidence: 'low', reasoning: 'x' })),
-    );
+    mockFetchOnce(200, deepseekBody(JSON.stringify(scoreBody({}, { severity: 'catastrophique' }))));
     await expect(reviewEventWithDeepseek({ title: 't', excerpt: 'e' }, 'key')).rejects.toThrow(/severity/);
   });
 
