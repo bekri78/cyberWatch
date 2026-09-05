@@ -17,6 +17,28 @@ function toArray<T>(value: T | T[] | undefined): T[] {
 }
 
 /**
+ * Deduplication par CVE, en plus de la contrainte UNIQUE(source_id, url) en
+ * base. Constate en production : un meme CVE peut apparaitre sur plusieurs
+ * noeuds <vuln:Vulnerability> distincts d'un bulletin CVRF (frequent pour
+ * les CVE noyau Linux/Mariner traites par lot) -- deux raw_items promus en
+ * double ont ete observes le 05/09/2026 (CVE-2026-80616, meme titre, meme
+ * score). Filtrer ici, cote application, evite de dependre uniquement de la
+ * contrainte SQL pour une cause dont l'origine exacte cote MSRC reste
+ * incertaine.
+ */
+export function dedupeByCve(items: CollectorItem[]): CollectorItem[] {
+  const seen = new Set<string>();
+  const result: CollectorItem[] = [];
+  for (const item of items) {
+    const key = item.externalId;
+    if (key && seen.has(key)) continue;
+    if (key) seen.add(key);
+    result.push(item);
+  }
+  return result;
+}
+
+/**
  * L'identifiant d'un bulletin CVRF MSRC est "{Annee}-{MoisAbrege}" (ex:
  * "2026-Feb", "2026-Sep") -- format verifie via le vrai index
  * https://api.msrc.microsoft.com/cvrf/v3.0/updates. On le calcule
@@ -105,6 +127,6 @@ export const msrcCollector: Collector = {
       console.error(`[microsoft_msrc] echec partiel : ${errors.join(' | ')}`);
     }
 
-    return items;
+    return dedupeByCve(items);
   },
 };

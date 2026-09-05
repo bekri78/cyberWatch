@@ -99,7 +99,13 @@ function extractEarliestRevisionDate(vuln: MsrcVulnerability): Date | null {
  * l'appelant plutot que de fabriquer un identifiant arbitraire.
  */
 export function normalizeVulnerability(vuln: MsrcVulnerability): CollectorItem | null {
-  const cve = vuln['vuln:CVE']?.trim();
+  // toUpperCase() par prudence (comme extractCves.ts) : un vrai document
+  // CVRF a montre en production le meme CVE promu en double, signe que
+  // MSRC peut repeter un CVE sur plusieurs noeuds <vuln:Vulnerability> --
+  // une casse incoherente entre deux occurrences produirait sinon deux URL
+  // distinctes qui echapperaient a la deduplication (cf. dedupeByCve() dans
+  // index.ts, qui traite la cause racine independamment de cette normalisation).
+  const cve = vuln['vuln:CVE']?.trim().toUpperCase();
   if (!cve) return null;
 
   const vulnTitle = vuln['vuln:Title']?.trim() || '(sans titre)';
