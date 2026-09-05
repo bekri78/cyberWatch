@@ -1,20 +1,41 @@
 import type { Pool } from 'pg';
+import type {
+  ARetenirItem,
+  MenaceCampagneItem,
+  SecteurItem,
+  VulnerabiliteItem,
+} from '../../lib/ai/deepseekClient';
 
 interface SituationReportRow {
   id: string;
   summary: string;
-  key_points: string[];
   event_count: number;
   window_start: Date;
   window_end: Date;
   model: string;
   generated_at: Date;
+  sections: SituationReportSections;
+}
+
+/**
+ * Detail structure du compte rendu "analyste" (cf. deepseekClient.ts
+ * Phase 6.1) -- stocke tel quel dans la colonne jsonb `sections`.
+ */
+export interface SituationReportSections {
+  aRetenir: ARetenirItem[];
+  vulnerabilitesImportantes: VulnerabiliteItem[];
+  menacesCampagnes: MenaceCampagneItem[];
+  otIcs: SecteurItem[];
+  defenseSpatial: SecteurItem[];
+  tendances: string[];
+  pointsASurveiller: string[];
 }
 
 export interface SituationReport {
   id: string;
+  /** Synthese executive courte (2 a 4 phrases). */
   summary: string;
-  keyPoints: string[];
+  sections: SituationReportSections;
   eventCount: number;
   windowStart: string;
   windowEnd: string;
@@ -26,7 +47,7 @@ function toApiReport(row: SituationReportRow): SituationReport {
   return {
     id: row.id,
     summary: row.summary,
-    keyPoints: row.key_points,
+    sections: row.sections,
     eventCount: row.event_count,
     windowStart: row.window_start.toISOString(),
     windowEnd: row.window_end.toISOString(),
@@ -51,7 +72,7 @@ export async function getLatestSituationReport(pool: Pool): Promise<SituationRep
 
 export interface InsertSituationReportInput {
   summary: string;
-  keyPoints: string[];
+  sections: SituationReportSections;
   eventCount: number;
   windowStart: string;
   windowEnd: string;
@@ -62,15 +83,17 @@ export interface InsertSituationReportInput {
  * N'ecrase jamais un compte rendu precedent : chaque generation ajoute une
  * ligne (historique conserve pour audit, cf. migration 009) -- seule la
  * lecture publique (getLatestSituationReport) ne garde que la plus
- * recente.
+ * recente. key_points (colonne v1, cf. migration 010) n'est plus alimentee
+ * -- tableau vide, jamais relu par le code actuel.
  */
 export async function insertSituationReport(pool: Pool, input: InsertSituationReportInput): Promise<void> {
   await pool.query(
-    `INSERT INTO situation_reports (summary, key_points, event_count, window_start, window_end, model)
-     VALUES ($1, $2, $3, $4, $5, $6)`,
+    `INSERT INTO situation_reports (summary, key_points, sections, event_count, window_start, window_end, model)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
     [
       input.summary,
-      JSON.stringify(input.keyPoints),
+      JSON.stringify([]),
+      JSON.stringify(input.sections),
       input.eventCount,
       input.windowStart,
       input.windowEnd,

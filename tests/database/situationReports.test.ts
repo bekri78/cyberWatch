@@ -2,11 +2,30 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Pool } from 'pg';
 import { getLatestSituationReport, insertSituationReport } from '../../src/database/repositories/situationReports';
 
+const SAMPLE_SECTIONS = {
+  aRetenir: [
+    {
+      titre: 'Fuite de donnees chez un operateur telecom francais',
+      criticite: 'ELEVEE',
+      concerne: 'Orange',
+      situation: 'x',
+      evaluation: 'x',
+      sources: ['certfr'],
+    },
+  ],
+  vulnerabilitesImportantes: [],
+  menacesCampagnes: [],
+  otIcs: [],
+  defenseSpatial: [],
+  tendances: [],
+  pointsASurveiller: [],
+};
+
 function makeRawRow(overrides: Record<string, unknown> = {}) {
   return {
     id: 'a1f4b1d4-b9d2-48d8-bc1d-8ce000920bc7',
     summary: 'Une fuite de donnees a ete signalee chez un operateur telecom francais.',
-    key_points: ['Fuite de donnees chez un operateur telecom francais (France, severite elevee).'],
+    sections: SAMPLE_SECTIONS,
     event_count: 12,
     window_start: new Date('2026-09-05T08:00:00.000Z'),
     window_end: new Date('2026-09-05T14:30:00.000Z'),
@@ -26,14 +45,14 @@ function makeFakePool(rowsToReturn: ReturnType<typeof makeRawRow>[]) {
 }
 
 describe('getLatestSituationReport', () => {
-  it('mappe les colonnes snake_case en camelCase avec dates ISO', async () => {
+  it('mappe les colonnes snake_case en camelCase avec dates ISO, sections deja parsees (jsonb)', async () => {
     const { pool } = makeFakePool([makeRawRow()]);
     const report = await getLatestSituationReport(pool);
 
     expect(report).toMatchObject({
       id: 'a1f4b1d4-b9d2-48d8-bc1d-8ce000920bc7',
       summary: 'Une fuite de donnees a ete signalee chez un operateur telecom francais.',
-      keyPoints: ['Fuite de donnees chez un operateur telecom francais (France, severite elevee).'],
+      sections: SAMPLE_SECTIONS,
       eventCount: 12,
       windowStart: '2026-09-05T08:00:00.000Z',
       windowEnd: '2026-09-05T14:30:00.000Z',
@@ -58,12 +77,12 @@ describe('getLatestSituationReport', () => {
 });
 
 describe('insertSituationReport', () => {
-  it('serialise key_points en JSON pour la colonne jsonb', async () => {
+  it('serialise sections en JSON pour la colonne jsonb, key_points (v1) reste un tableau vide', async () => {
     const { pool, calls } = makeFakePool([]);
 
     await insertSituationReport(pool, {
       summary: 'x',
-      keyPoints: ['point 1', 'point 2'],
+      sections: SAMPLE_SECTIONS,
       eventCount: 5,
       windowStart: '2026-09-05T08:00:00.000Z',
       windowEnd: '2026-09-05T10:00:00.000Z',
@@ -72,9 +91,10 @@ describe('insertSituationReport', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0]!.sql).toMatch(/INSERT INTO situation_reports/);
-    const [summary, keyPointsJson, eventCount, windowStart, windowEnd, model] = calls[0]!.params;
+    const [summary, keyPointsJson, sectionsJson, eventCount, windowStart, windowEnd, model] = calls[0]!.params;
     expect(summary).toBe('x');
-    expect(JSON.parse(keyPointsJson as string)).toEqual(['point 1', 'point 2']);
+    expect(JSON.parse(keyPointsJson as string)).toEqual([]);
+    expect(JSON.parse(sectionsJson as string)).toEqual(SAMPLE_SECTIONS);
     expect(eventCount).toBe(5);
     expect(windowStart).toBe('2026-09-05T08:00:00.000Z');
     expect(windowEnd).toBe('2026-09-05T10:00:00.000Z');

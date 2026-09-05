@@ -3,10 +3,29 @@ import type { FastifyInstance } from 'fastify';
 import type { Pool } from 'pg';
 import { buildApp } from '../../src/app';
 
+const SAMPLE_SECTIONS = {
+  aRetenir: [
+    {
+      titre: 'Fuite de donnees chez un operateur telecom francais',
+      criticite: 'ELEVEE',
+      concerne: 'Orange',
+      situation: 'x',
+      evaluation: 'x',
+      sources: ['certfr'],
+    },
+  ],
+  vulnerabilitesImportantes: [],
+  menacesCampagnes: [],
+  otIcs: [],
+  defenseSpatial: [],
+  tendances: [],
+  pointsASurveiller: [],
+};
+
 const SAMPLE_REPORT_ROW = {
   id: 'a1f4b1d4-b9d2-48d8-bc1d-8ce000920bc7',
   summary: 'Une fuite de donnees a ete signalee chez un operateur telecom francais.',
-  key_points: ['Fuite de donnees chez un operateur telecom francais (France, severite elevee).'],
+  sections: SAMPLE_SECTIONS,
   event_count: 12,
   window_start: new Date('2026-09-05T08:00:00.000Z'),
   window_end: new Date('2026-09-05T14:30:00.000Z'),
@@ -26,7 +45,7 @@ describe('GET /api/v1/situation-report', () => {
     await app?.close();
   });
 
-  it('renvoie le dernier compte rendu au format camelCase', async () => {
+  it('renvoie le dernier compte rendu structure au format camelCase', async () => {
     app = buildApp(makeFakePool([SAMPLE_REPORT_ROW]));
 
     const response = await app.inject({ method: 'GET', url: '/api/v1/situation-report' });
@@ -36,7 +55,7 @@ describe('GET /api/v1/situation-report', () => {
     expect(body.report).toMatchObject({
       id: 'a1f4b1d4-b9d2-48d8-bc1d-8ce000920bc7',
       summary: 'Une fuite de donnees a ete signalee chez un operateur telecom francais.',
-      keyPoints: ['Fuite de donnees chez un operateur telecom francais (France, severite elevee).'],
+      sections: SAMPLE_SECTIONS,
       eventCount: 12,
       model: 'deepseek-v4-flash',
     });

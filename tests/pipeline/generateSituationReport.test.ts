@@ -15,7 +15,7 @@ function makeEventRow(overrides: Record<string, unknown> = {}) {
     id: 'e1',
     title: 'Fuite de donnees chez un operateur telecom francais',
     summary: 'Fuite de donnees chez un operateur telecom francais',
-    description: null,
+    description: 'Des donnees clients ont ete exposees suite a une intrusion.',
     category: 'threat_intel',
     severity: 'high',
     confidence: 'high',
@@ -25,8 +25,8 @@ function makeEventRow(overrides: Record<string, unknown> = {}) {
     created_at: new Date('2026-09-05T10:00:00.000Z'),
     updated_at: new Date('2026-09-05T10:00:00.000Z'),
     countries: ['France'],
-    organizations: [],
-    sectors: [],
+    organizations: ['Orange'],
+    sectors: ['Telecommunications'],
     cves: [],
     threat_actors: [],
     mitre_techniques: [],
@@ -53,6 +53,20 @@ function makeFakePool(eventRows: ReturnType<typeof makeEventRow>[]) {
 
 const log = { info: vi.fn(), error: vi.fn() };
 
+function emptyDeepseekReport(overrides: Record<string, unknown> = {}) {
+  return {
+    syntheseExecutive: 'x',
+    aRetenir: [],
+    vulnerabilitesImportantes: [],
+    menacesCampagnes: [],
+    otIcs: [],
+    defenseSpatial: [],
+    tendances: [],
+    pointsASurveiller: [],
+    ...overrides,
+  };
+}
+
 afterEach(() => {
   vi.clearAllMocks();
 });
@@ -67,21 +81,41 @@ describe('generateSituationReport', () => {
     expect(mockedRequest).not.toHaveBeenCalled();
   });
 
-  it('genere et insere un compte rendu a partir des evenements reels reellement collectes', async () => {
+  it('genere et insere un compte rendu structure a partir des evenements reels reellement collectes', async () => {
     const { pool, inserts } = makeFakePool([makeEventRow()]);
-    mockedRequest.mockResolvedValueOnce({
-      summary: 'Une fuite de donnees a ete signalee chez un operateur telecom francais.',
-      keyPoints: ['Fuite de donnees chez un operateur telecom francais (France, severite elevee).'],
-    });
+    mockedRequest.mockResolvedValueOnce(
+      emptyDeepseekReport({
+        syntheseExecutive: 'Une fuite de donnees a ete signalee chez un operateur telecom francais.',
+        aRetenir: [
+          {
+            titre: 'Fuite de donnees chez un operateur telecom francais',
+            criticite: 'ELEVEE',
+            concerne: 'Orange',
+            situation: 'x',
+            evaluation: 'x',
+            sources: ['certfr'],
+          },
+        ],
+      }),
+    );
 
     const result = await generateSituationReport(pool, 'fake-key', log);
 
     expect(result).toEqual({ generated: true, eventCount: 1 });
     expect(inserts).toHaveLength(1);
-    const [summary, keyPointsJson, eventCount, windowStart, windowEnd, model] = inserts[0]!;
+    const [summary, keyPointsJson, sectionsJson, eventCount, windowStart, windowEnd, model] = inserts[0]!;
     expect(summary).toBe('Une fuite de donnees a ete signalee chez un operateur telecom francais.');
-    expect(JSON.parse(keyPointsJson as string)).toEqual([
-      'Fuite de donnees chez un operateur telecom francais (France, severite elevee).',
+    expect(JSON.parse(keyPointsJson as string)).toEqual([]);
+    const sections = JSON.parse(sectionsJson as string);
+    expect(sections.aRetenir).toEqual([
+      {
+        titre: 'Fuite de donnees chez un operateur telecom francais',
+        criticite: 'ELEVEE',
+        concerne: 'Orange',
+        situation: 'x',
+        evaluation: 'x',
+        sources: ['certfr'],
+      },
     ]);
     expect(eventCount).toBe(1);
     expect(windowStart).toBe('2026-09-05T10:00:00.000Z');
@@ -89,17 +123,20 @@ describe('generateSituationReport', () => {
     expect(model).toBe('deepseek-v4-flash');
   });
 
-  it('transmet a DeepSeek le titre/categorie/severite/source/pays reels de chaque evenement', async () => {
+  it('transmet a DeepSeek le titre/resume/categorie/severite/source/pays/organisations/secteurs reels de chaque evenement', async () => {
     const { pool } = makeFakePool([
       makeEventRow({
         title: 'Alerte CERT-FR SCADA',
+        description: 'Une vulnerabilite affecte un automate industriel.',
         category: 'alert',
         severity: 'medium',
         tags: ['certfr'],
         countries: ['France'],
+        organizations: ['Schneider Electric'],
+        sectors: ['Energie'],
       }),
     ]);
-    mockedRequest.mockResolvedValueOnce({ summary: 'x', keyPoints: [] });
+    mockedRequest.mockResolvedValueOnce(emptyDeepseekReport());
 
     await generateSituationReport(pool, 'fake-key', log);
 
@@ -107,12 +144,27 @@ describe('generateSituationReport', () => {
       [
         expect.objectContaining({
           title: 'Alerte CERT-FR SCADA',
+          summary: 'Une vulnerabilite affecte un automate industriel.',
           category: 'alert',
           severity: 'medium',
           source: 'certfr',
           countries: ['France'],
+          organizations: ['Schneider Electric'],
+          sectors: ['Energie'],
         }),
       ],
+      'fake-key',
+    );
+  });
+
+  it('utilise summary en repli quand description est absente', async () => {
+    const { pool } = makeFakePool([makeEventRow({ description: null, summary: 'Resume de secours' })]);
+    mockedRequest.mockResolvedValueOnce(emptyDeepseekReport());
+
+    await generateSituationReport(pool, 'fake-key', log);
+
+    expect(mockedRequest).toHaveBeenCalledWith(
+      [expect.objectContaining({ summary: 'Resume de secours' })],
       'fake-key',
     );
   });
@@ -122,11 +174,11 @@ describe('generateSituationReport', () => {
       makeEventRow({ id: 'e1', published_at: new Date('2026-09-05T08:00:00.000Z') }),
       makeEventRow({ id: 'e2', published_at: new Date('2026-09-05T14:30:00.000Z') }),
     ]);
-    mockedRequest.mockResolvedValueOnce({ summary: 'x', keyPoints: [] });
+    mockedRequest.mockResolvedValueOnce(emptyDeepseekReport());
 
     await generateSituationReport(pool, 'fake-key', log);
 
-    const [, , , windowStart, windowEnd] = inserts[0]!;
+    const [, , , , windowStart, windowEnd] = inserts[0]!;
     expect(windowStart).toBe('2026-09-05T08:00:00.000Z');
     expect(windowEnd).toBe('2026-09-05T14:30:00.000Z');
   });

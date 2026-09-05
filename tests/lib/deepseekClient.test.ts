@@ -124,35 +124,74 @@ describe('requestSituationReport', () => {
   const sampleEvents = [
     {
       title: 'Fuite de donnees chez un operateur telecom francais',
+      summary: 'Des donnees clients ont ete exposees suite a une intrusion.',
       category: 'threat_intel',
       severity: 'high',
+      confidence: 'high',
       source: 'certfr',
       countries: ['France'],
+      organizations: ['Orange'],
+      sectors: ['Telecommunications'],
+      cves: [],
+      threatActors: [],
+      mitreTechniques: [],
       publishedAt: '2026-09-05T10:00:00.000Z',
     },
   ];
 
-  it('renvoie summary + keyPoints a partir d\'une reponse DeepSeek valide', async () => {
+  function fullReportBody(overrides: Record<string, unknown> = {}) {
+    return {
+      synthese_executive: 'x',
+      a_retenir: [],
+      vulnerabilites_importantes: [],
+      menaces_campagnes: [],
+      ot_ics: [],
+      defense_spatial: [],
+      tendances: [],
+      points_a_surveiller: [],
+      ...overrides,
+    };
+  }
+
+  it('renvoie un compte rendu structure a partir d\'une reponse DeepSeek valide', async () => {
     mockFetchOnce(
       200,
       deepseekBody(
-        JSON.stringify({
-          summary: "Une fuite de donnees a ete signalee chez un operateur telecom francais.",
-          key_points: ['Fuite de donnees chez un operateur telecom francais (France, severite elevee).'],
-        }),
+        JSON.stringify(
+          fullReportBody({
+            synthese_executive: "Une fuite de donnees a ete signalee chez un operateur telecom francais.",
+            a_retenir: [
+              {
+                titre: 'Fuite de donnees chez un operateur telecom francais',
+                criticite: 'ELEVEE',
+                concerne: 'Orange, secteur telecommunications',
+                situation: 'Des donnees clients ont ete exposees.',
+                evaluation: 'Impact potentiel sur la confidentialite des abonnes.',
+                sources: ['certfr'],
+              },
+            ],
+          }),
+        ),
       ),
     );
 
     const report = await requestSituationReport(sampleEvents, 'fake-api-key');
 
-    expect(report.summary).toContain('operateur telecom');
-    expect(report.keyPoints).toEqual([
-      'Fuite de donnees chez un operateur telecom francais (France, severite elevee).',
+    expect(report.syntheseExecutive).toContain('operateur telecom');
+    expect(report.aRetenir).toEqual([
+      {
+        titre: 'Fuite de donnees chez un operateur telecom francais',
+        criticite: 'ELEVEE',
+        concerne: 'Orange, secteur telecommunications',
+        situation: 'Des donnees clients ont ete exposees.',
+        evaluation: 'Impact potentiel sur la confidentialite des abonnes.',
+        sources: ['certfr'],
+      },
     ]);
   });
 
-  it('envoie le titre/categorie/severite/source/pays reels de chaque evenement dans le message utilisateur', async () => {
-    mockFetchOnce(200, deepseekBody(JSON.stringify({ summary: 'x', key_points: [] })));
+  it('envoie le titre/resume/pays/organisations/secteurs reels de chaque evenement dans le message utilisateur', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify(fullReportBody())));
 
     await requestSituationReport(sampleEvents, 'ma-cle');
 
@@ -160,7 +199,10 @@ describe('requestSituationReport', () => {
     const [, requestInit] = call as [string, RequestInit];
     const parsedBody = JSON.parse(requestInit.body as string);
     expect(parsedBody.messages[1].content).toContain('Fuite de donnees chez un operateur telecom francais');
+    expect(parsedBody.messages[1].content).toContain('exposees suite a une intrusion');
     expect(parsedBody.messages[1].content).toContain('France');
+    expect(parsedBody.messages[1].content).toContain('Orange');
+    expect(parsedBody.messages[1].content).toContain('Telecommunications');
     // Contrairement a reviewEventWithDeepseek, le thinking n'est PAS
     // desactive ici (cf. commentaire deepseekClient.ts) -- aucun champ
     // "thinking" dans le corps envoye.
@@ -168,7 +210,7 @@ describe('requestSituationReport', () => {
   });
 
   it("indique explicitement l'absence d'evenements plutot que d'en inventer, quand la liste est vide", async () => {
-    mockFetchOnce(200, deepseekBody(JSON.stringify({ summary: 'x', key_points: [] })));
+    mockFetchOnce(200, deepseekBody(JSON.stringify(fullReportBody())));
 
     await requestSituationReport([], 'ma-cle');
 
@@ -183,13 +225,75 @@ describe('requestSituationReport', () => {
     await expect(requestSituationReport(sampleEvents, 'bad-key')).rejects.toThrow(/402/);
   });
 
-  it('rejette si summary est manquant', async () => {
-    mockFetchOnce(200, deepseekBody(JSON.stringify({ key_points: [] })));
-    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/summary/);
+  it('rejette si synthese_executive est manquante', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify({ ...fullReportBody(), synthese_executive: undefined })));
+    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/synthese_executive/);
   });
 
-  it('rejette si key_points n\'est pas un tableau de chaines', async () => {
-    mockFetchOnce(200, deepseekBody(JSON.stringify({ summary: 'x', key_points: [1, 2] })));
-    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/key_points/);
+  it('rejette si a_retenir contient une criticite invalide', async () => {
+    mockFetchOnce(
+      200,
+      deepseekBody(
+        JSON.stringify(
+          fullReportBody({
+            a_retenir: [
+              {
+                titre: 'x',
+                criticite: 'ULTRA-CRITIQUE',
+                concerne: 'x',
+                situation: 'x',
+                evaluation: 'x',
+                sources: [],
+              },
+            ],
+          }),
+        ),
+      ),
+    );
+    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/criticite/);
+  });
+
+  it('rejette si vulnerabilites_importantes contient une exploitation invalide', async () => {
+    mockFetchOnce(
+      200,
+      deepseekBody(
+        JSON.stringify(
+          fullReportBody({
+            vulnerabilites_importantes: [
+              {
+                cve: 'CVE-2026-1234',
+                produit: 'x',
+                criticite: 'critique',
+                exploitation: 'Peut-etre',
+                kev: 'Non',
+                epss: null,
+                resume: 'x',
+                impact: 'x',
+              },
+            ],
+          }),
+        ),
+      ),
+    );
+    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/exploitation/);
+  });
+
+  it('rejette si tendances ne contient pas que des chaines', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify(fullReportBody({ tendances: [1, 2] }))));
+    await expect(requestSituationReport(sampleEvents, 'key')).rejects.toThrow(/tendances/);
+  });
+
+  it('accepte les tableaux vides pour toutes les sections (regle de non-evenement)', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify(fullReportBody({ synthese_executive: 'Aucun evenement cyber majeur.' }))));
+
+    const report = await requestSituationReport(sampleEvents, 'key');
+
+    expect(report.aRetenir).toEqual([]);
+    expect(report.vulnerabilitesImportantes).toEqual([]);
+    expect(report.menacesCampagnes).toEqual([]);
+    expect(report.otIcs).toEqual([]);
+    expect(report.defenseSpatial).toEqual([]);
+    expect(report.tendances).toEqual([]);
+    expect(report.pointsASurveiller).toEqual([]);
   });
 });

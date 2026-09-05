@@ -9,6 +9,8 @@ import {
   Check,
   Clock,
   ExternalLink,
+  Eye,
+  Factory,
   FileText,
   Fingerprint,
   Globe,
@@ -55,6 +57,8 @@ const ICONS: Record<string, LucideIcon> = {
   hash: Hash,
   calendar: Calendar,
   link: ExternalLink,
+  eye: Eye,
+  factory: Factory,
 };
 
 export function Icon({

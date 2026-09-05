@@ -85,131 +85,6 @@ function validateReview(parsed: unknown): DeepseekReview {
  * laisse l'evenement non relu -- il sera retente au prochain passage
  * planifie plutot que de bloquer ou de deviner une valeur par defaut.
  */
-/**
- * Instruction envoyee a DeepSeek pour rediger le compte rendu de situation
- * (Phase 6). Contrairement au triage (SYSTEM_PROMPT ci-dessus), la matiere
- * premiere ici est deja filtree (is_relevant=true, cf.
- * pipeline/generateSituationReport.ts) -- la seule tache est de synthetiser
- * des evenements REELS deja etablis, jamais d'en inventer.
- */
-const REPORT_SYSTEM_PROMPT = `Tu es analyste en cyber-renseignement pour un service de veille OSINT (Ministere des Armees francais). Tu rediges un compte rendu de situation cyber a partir d'une liste d'evenements REELLEMENT collectes (fournie ci-dessous), et de rien d'autre.
-
-Regles strictes :
-- N'utilise QUE les evenements fournis. N'invente aucun fait, aucune date, aucun pays, aucune organisation qui n'y figure pas.
-- Redige en francais, registre professionnel (note de synthese), sans familiarite ni sensationnalisme.
-- summary : 3 a 5 phrases degageant les tendances de la periode (categories dominantes, zones geographiques citees, niveau de gravite global), sans lister chaque evenement un par un.
-- key_points : 3 a 6 puces courtes ; chacune peut citer un evenement precis marquant (severite critique/elevee) par son titre exact tel que fourni, sans reformuler ni ajouter de details absents de la liste.
-- Si la liste est vide ou tres courte, dis-le explicitement plutot que d'inventer du contenu pour la remplir.
-
-Reponds UNIQUEMENT avec un objet JSON de cette forme exacte, sans texte autour :
-{"summary": "...", "key_points": ["...", "..."]}`;
-
-export interface ReportEventInput {
-  title: string;
-  category: string;
-  severity: string;
-  source: string;
-  countries: string[];
-  publishedAt: string | null;
-}
-
-export interface DeepseekSituationReport {
-  summary: string;
-  keyPoints: string[];
-}
-
-function validateReport(parsed: unknown): DeepseekSituationReport {
-  if (typeof parsed !== 'object' || parsed === null) {
-    throw new Error('Reponse DeepSeek invalide (pas un objet JSON)');
-  }
-
-  const p = parsed as Record<string, unknown>;
-
-  if (typeof p.summary !== 'string' || p.summary.trim().length === 0) {
-    throw new Error('Reponse DeepSeek invalide (summary manquant)');
-  }
-  if (!Array.isArray(p.key_points) || !p.key_points.every((v) => typeof v === 'string')) {
-    throw new Error('Reponse DeepSeek invalide (key_points)');
-  }
-
-  return { summary: p.summary, keyPoints: p.key_points as string[] };
-}
-
-function formatReportEventLine(event: ReportEventInput): string {
-  const date = event.publishedAt ? event.publishedAt.slice(0, 10) : 'date inconnue';
-  const countries = event.countries.length > 0 ? event.countries.join(', ') : 'pays non precise';
-  return `- [${date}] (${event.severity}, ${event.category}, source ${event.source}) ${event.title} -- ${countries}`;
-}
-
-/**
- * Appelle DeepSeek pour synthetiser une liste d'evenements reels deja
- * filtres en un compte rendu redige (Phase 6).
- *
- * Contrairement a reviewEventWithDeepseek (triage deterministe d'UN seul
- * evenement, ou le thinking est desactive car il ignore temperature et
- * n'apporte rien a un JSON booleen), la synthese de plusieurs dizaines
- * d'evenements en une note coherente beneficie reellement du raisonnement
- * -- et ce job tourne quelques fois par jour seulement (pas par
- * evenement, cf. jobs/situationReportScheduler.ts), donc le cout
- * supplementaire reste negligeable. Thinking est donc laisse actif
- * (comportement par defaut de deepseek-v4-flash) plutot que desactive.
- *
- * Meme philosophie de resilience que reviewEventWithDeepseek : aucune
- * retry interne, un echec remonte tel quel a l'appelant.
- */
-export async function requestSituationReport(
-  events: ReportEventInput[],
-  apiKey: string,
-): Promise<DeepseekSituationReport> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  const eventsBlock =
-    events.length > 0 ? events.map(formatReportEventLine).join('\n') : '(aucun evenement disponible pour cette periode)';
-
-  let response: Response;
-  try {
-    response = await fetch(DEEPSEEK_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: DEEPSEEK_MODEL,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: REPORT_SYSTEM_PROMPT },
-          { role: 'user', content: `Evenements (${events.length}) :\n${eventsBlock}` },
-        ],
-      }),
-      signal: controller.signal,
-    });
-  } finally {
-    clearTimeout(timeout);
-  }
-
-  if (!response.ok) {
-    throw new Error(`DeepSeek API a repondu ${response.status} ${response.statusText}`);
-  }
-
-  const body = (await response.json()) as DeepseekChatResponse;
-  const content = body.choices?.[0]?.message?.content;
-
-  if (!content) {
-    throw new Error('Reponse DeepSeek sans contenu (choices[0].message.content absent)');
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(content);
-  } catch {
-    throw new Error('Reponse DeepSeek non-JSON malgre response_format json_object');
-  }
-
-  return validateReport(parsed);
-}
-
 export async function reviewEventWithDeepseek(
   input: DeepseekReviewInput,
   apiKey: string,
@@ -269,4 +144,352 @@ export async function reviewEventWithDeepseek(
   }
 
   return validateReview(parsed);
+}
+
+// ---------------------------------------------------------------------
+// Phase 6 : compte rendu de situation "analyste" (rediges par DeepSeek)
+// ---------------------------------------------------------------------
+
+/**
+ * Instruction envoyee a DeepSeek pour rediger le compte rendu de situation
+ * (Phase 6). Reprend le brief analyste fourni par l'utilisateur (tri,
+ * recoupement, hierarchisation par criticite reelle -- pas un simple
+ * resume plat) -- traduit en sortie JSON stricte (au lieu du markdown a
+ * emoji du brief original) pour rester exploitable programmatiquement par
+ * le frontend, champ par champ, sans reparser du texte libre.
+ *
+ * La matiere premiere est deja filtree (is_relevant=true, cf.
+ * pipeline/generateSituationReport.ts) -- la seule tache est d'analyser
+ * des evenements REELS deja etablis, jamais d'en inventer.
+ */
+const REPORT_SYSTEM_PROMPT = `Tu es CYBERWATCH, un analyste specialise en veille cyber, cyberdefense, vulnerabilites, menaces numeriques, renseignement cyber et securite des systemes d'information, pour un service de veille OSINT (Ministere des Armees francais).
+
+Tu ne te comportes pas comme un chatbot generaliste. Ta mission est de transformer les evenements reels fournis (deja collectes et filtres) en un compte rendu de veille clair, synthetique, hierarchise et exploitable operationnellement. Tu travailles comme un analyste : tu tries, recoupes, contextualises, fusionnes les doublons, evalues la criticite reelle et identifies ce qui merite vraiment l'attention.
+
+PRINCIPE FONDAMENTAL
+Ne produis JAMAIS une liste exhaustive des evenements recus. Selectionne uniquement ce qui a une reelle valeur de veille. Une vulnerabilite avec un score eleve mais sans exploitation connue n'est pas automatiquement plus importante qu'une vulnerabilite moins grave mais activement exploitee. Prends en compte : exploitation connue, presence dans CISA KEV (le tag de source "cisa_kev" l'indique), campagne d'attaque associee, ransomware, espionnage, menace etatique, impact potentiel, exposition des produits concernes, criticite du secteur touche, caractere nouveau ou inhabituel.
+
+PRIORISATION
+Priorite CRITIQUE : vulnerabilite activement exploitee ou ajoutee au CISA KEV, zero-day, campagne cyber majeure, activite APT, espionnage etatique, attaque contre defense/gouvernement/infrastructures critiques, compromission massive, ransomware a fort impact, attaque supply-chain, compromission d'un editeur/fournisseur strategique.
+Priorite ELEVEE : forte probabilite d'exploitation, vulnerabilite critique sur equipements reseau/securite/virtualisation/cloud/identite, campagne de phishing ou malware significative, attaque OT/ICS/SCADA, nouvelles techniques d'acteurs cyber.
+Priorite MODEREE : vulnerabilite importante mais sans exploitation observee, correctif significatif, evolution interessante d'une menace existante.
+Les elements a faible valeur ne figurent pas dans le compte rendu.
+
+DOMAINES A SURVEILLER PARTICULIEREMENT (liste non exhaustive, mais attention renforcee) : defense, administrations publiques, infrastructures critiques, spatial, aeronautique, telecommunications, energie, OT/ICS/SCADA, satellites, chaines logistiques numeriques, cloud, VPN, firewalls, equipements reseau, hyperviseurs, systemes d'identite, Microsoft, Linux, VMware, Cisco, Fortinet, Palo Alto, Ivanti, Citrix, equipements industriels.
+
+FUSION DES DOUBLONS
+Si plusieurs evenements fournis decrivent manifestement le meme incident reel (memes faits, memes entites), fusionne-les en une seule entree et cite les sources reellement concernees -- ne cree jamais deux entrees pour un seul evenement. Le nombre d'evenements parlant d'un meme sujet n'est jamais a lui seul un indicateur de criticite.
+
+FIABILITE -- REGLE ABSOLUE
+N'invente JAMAIS : un groupe cyber, une attribution, une victime, un CVE, un score, une exploitation, une date, un pays, un produit, une consequence. N'utilise QUE les evenements fournis ci-apres (titre, resume, categorie, severite, source, pays, organisations, secteurs, CVE, acteurs de menace, techniques MITRE deja associes reellement a chaque evenement) -- si une information n'y figure pas, ne la complete jamais par une supposition. Distingue dans ta redaction ce qui est un FAIT etabli d'une EVALUATION (ton analyse) ou d'une HYPOTHESE (incertaine) -- utilise des formulations comme "a ce stade", "l'attribution n'est pas confirmee", "aucune exploitation active n'est mentionnee" plutot que d'affirmer sans base. Une attribution reposant seulement sur une similarite technique, une infrastructure commune ou une revendication non verifiee doit etre presentee avec un niveau de confiance explicite (confiance elevee / moyenne / faible) dans le texte, jamais comme certaine.
+
+Aucune donnee EPSS ni score CVSS chiffre ne t'est fournie : ne renseigne jamais ces valeurs, laisse-les absentes (null) plutot que d'en deviner une.
+
+REGLE DE SYNTHESE
+Le compte rendu doit etre beaucoup plus court que les donnees sources : un grand nombre d'evenements bruts ne doit produire qu'une poignee d'entrees "a_retenir" reellement pertinentes, et une synthese executive de 2 a 4 evenements majeurs maximum. La valeur vient de la selection, pas du volume.
+
+REGLE DE NON-EVENEMENT
+S'il n'y a aucun evenement cyber majeur dans les donnees fournies, dis-le explicitement dans la synthese executive et laisse les tableaux de sections vides -- ne remplis jamais artificiellement le compte rendu.
+
+STYLE
+Professionnel, factuel, analytique, concis, oriente aide a la decision. Evite le sensationnalisme, les superlatifs inutiles, les longues introductions, le jargon inutile, les repetitions. Prefere "Une vulnerabilite critique affectant FortiOS est activement exploitee. Elle permet..." a "Fortinet vient de publier une nouvelle vulnerabilite extremement dangereuse...". Redige en francais.
+
+FORMAT DE REPONSE
+Reponds UNIQUEMENT avec un objet JSON de cette forme exacte, sans texte autour, sans balise markdown :
+{
+  "synthese_executive": "5 a 10 lignes maximum ; si un seul evenement est vraiment important, dis-le ; si aucun, dis-le aussi",
+  "a_retenir": [
+    {"titre": "court et factuel", "criticite": "CRITIQUE"|"ELEVEE"|"MODEREE", "concerne": "produits/organisations/secteurs concernes", "situation": "ce qui s'est produit", "evaluation": "pourquoi c'est important, consequences possibles", "sources": ["nom de source", "..."]}
+  ],
+  "vulnerabilites_importantes": [
+    {"cve": "CVE-XXXX-XXXXX ou null", "produit": "string", "criticite": "string", "exploitation": "Oui"|"Non connue"|"Suspectee", "kev": "Oui"|"Non", "epss": null, "resume": "tres court", "impact": "tres court"}
+  ],
+  "menaces_campagnes": [
+    {"titre": "string", "objectif": "string ou null", "secteurs": "string ou null", "details": "string"}
+  ],
+  "ot_ics": [{"titre": "string", "details": "string"}],
+  "defense_spatial": [{"titre": "string", "details": "string"}],
+  "tendances": ["une phrase par tendance reellement convergente (plusieurs evenements), jamais deduite d'un seul cas"],
+  "points_a_surveiller": ["maximum 5 elements pas encore assez etablis pour etre une alerte"]
+}
+
+Chaque tableau peut etre vide ([]) quand rien ne merite d'y figurer -- ne force jamais une entree artificielle. "vulnerabilites_importantes" ne contient que des vulnerabilites a valeur operationnelle reelle, pas toutes les vulnerabilites recues.`;
+
+export interface ReportEventInput {
+  title: string;
+  /** Extrait reel (event.summary ou description), pour une analyse au-dela du seul titre. */
+  summary: string;
+  category: string;
+  severity: string;
+  confidence: string;
+  /** tags[0] (nom de la source, cf. classifyEvent.buildTags) -- signale aussi l'appartenance CISA KEV. */
+  source: string;
+  countries: string[];
+  organizations: string[];
+  sectors: string[];
+  cves: string[];
+  threatActors: string[];
+  mitreTechniques: string[];
+  publishedAt: string | null;
+}
+
+export interface ARetenirItem {
+  titre: string;
+  criticite: 'CRITIQUE' | 'ELEVEE' | 'MODEREE';
+  concerne: string;
+  situation: string;
+  evaluation: string;
+  sources: string[];
+}
+
+export interface VulnerabiliteItem {
+  cve: string | null;
+  produit: string;
+  criticite: string;
+  exploitation: 'Oui' | 'Non connue' | 'Suspectee';
+  kev: 'Oui' | 'Non';
+  epss: string | null;
+  resume: string;
+  impact: string;
+}
+
+export interface MenaceCampagneItem {
+  titre: string;
+  objectif: string | null;
+  secteurs: string | null;
+  details: string;
+}
+
+export interface SecteurItem {
+  titre: string;
+  details: string;
+}
+
+export interface DeepseekSituationReport {
+  syntheseExecutive: string;
+  aRetenir: ARetenirItem[];
+  vulnerabilitesImportantes: VulnerabiliteItem[];
+  menacesCampagnes: MenaceCampagneItem[];
+  otIcs: SecteurItem[];
+  defenseSpatial: SecteurItem[];
+  tendances: string[];
+  pointsASurveiller: string[];
+}
+
+const VALID_CRITICITES = new Set(['CRITIQUE', 'ELEVEE', 'MODEREE']);
+const VALID_EXPLOITATIONS = new Set(['Oui', 'Non connue', 'Suspectee']);
+const VALID_KEV = new Set(['Oui', 'Non']);
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((v) => typeof v === 'string');
+}
+
+function validateARetenir(items: unknown): ARetenirItem[] {
+  if (!Array.isArray(items)) throw new Error('Reponse DeepSeek invalide (a_retenir doit etre un tableau)');
+  return items.map((raw, i) => {
+    if (typeof raw !== 'object' || raw === null) {
+      throw new Error(`Reponse DeepSeek invalide (a_retenir[${i}] n'est pas un objet)`);
+    }
+    const item = raw as Record<string, unknown>;
+    if (typeof item.titre !== 'string' || item.titre.length === 0) {
+      throw new Error(`Reponse DeepSeek invalide (a_retenir[${i}].titre)`);
+    }
+    if (typeof item.criticite !== 'string' || !VALID_CRITICITES.has(item.criticite)) {
+      throw new Error(`Reponse DeepSeek invalide (a_retenir[${i}].criticite)`);
+    }
+    if (typeof item.concerne !== 'string') throw new Error(`Reponse DeepSeek invalide (a_retenir[${i}].concerne)`);
+    if (typeof item.situation !== 'string') throw new Error(`Reponse DeepSeek invalide (a_retenir[${i}].situation)`);
+    if (typeof item.evaluation !== 'string') throw new Error(`Reponse DeepSeek invalide (a_retenir[${i}].evaluation)`);
+    if (!isStringArray(item.sources)) throw new Error(`Reponse DeepSeek invalide (a_retenir[${i}].sources)`);
+    return {
+      titre: item.titre,
+      criticite: item.criticite as ARetenirItem['criticite'],
+      concerne: item.concerne,
+      situation: item.situation,
+      evaluation: item.evaluation,
+      sources: item.sources,
+    };
+  });
+}
+
+function validateVulnerabilites(items: unknown): VulnerabiliteItem[] {
+  if (!Array.isArray(items)) throw new Error('Reponse DeepSeek invalide (vulnerabilites_importantes doit etre un tableau)');
+  return items.map((raw, i) => {
+    if (typeof raw !== 'object' || raw === null) {
+      throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}] n'est pas un objet)`);
+    }
+    const item = raw as Record<string, unknown>;
+    if (item.cve !== null && typeof item.cve !== 'string') {
+      throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].cve)`);
+    }
+    if (typeof item.produit !== 'string') throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].produit)`);
+    if (typeof item.criticite !== 'string') throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].criticite)`);
+    if (typeof item.exploitation !== 'string' || !VALID_EXPLOITATIONS.has(item.exploitation)) {
+      throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].exploitation)`);
+    }
+    if (typeof item.kev !== 'string' || !VALID_KEV.has(item.kev)) {
+      throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].kev)`);
+    }
+    if (item.epss !== null && typeof item.epss !== 'string') {
+      throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].epss)`);
+    }
+    if (typeof item.resume !== 'string') throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].resume)`);
+    if (typeof item.impact !== 'string') throw new Error(`Reponse DeepSeek invalide (vulnerabilites_importantes[${i}].impact)`);
+    return {
+      cve: item.cve,
+      produit: item.produit,
+      criticite: item.criticite,
+      exploitation: item.exploitation as VulnerabiliteItem['exploitation'],
+      kev: item.kev as VulnerabiliteItem['kev'],
+      epss: item.epss,
+      resume: item.resume,
+      impact: item.impact,
+    };
+  });
+}
+
+function validateMenaces(items: unknown): MenaceCampagneItem[] {
+  if (!Array.isArray(items)) throw new Error('Reponse DeepSeek invalide (menaces_campagnes doit etre un tableau)');
+  return items.map((raw, i) => {
+    if (typeof raw !== 'object' || raw === null) {
+      throw new Error(`Reponse DeepSeek invalide (menaces_campagnes[${i}] n'est pas un objet)`);
+    }
+    const item = raw as Record<string, unknown>;
+    if (typeof item.titre !== 'string') throw new Error(`Reponse DeepSeek invalide (menaces_campagnes[${i}].titre)`);
+    if (item.objectif !== null && typeof item.objectif !== 'string') {
+      throw new Error(`Reponse DeepSeek invalide (menaces_campagnes[${i}].objectif)`);
+    }
+    if (item.secteurs !== null && typeof item.secteurs !== 'string') {
+      throw new Error(`Reponse DeepSeek invalide (menaces_campagnes[${i}].secteurs)`);
+    }
+    if (typeof item.details !== 'string') throw new Error(`Reponse DeepSeek invalide (menaces_campagnes[${i}].details)`);
+    return { titre: item.titre, objectif: item.objectif, secteurs: item.secteurs, details: item.details };
+  });
+}
+
+function validateSecteurItems(items: unknown, field: string): SecteurItem[] {
+  if (!Array.isArray(items)) throw new Error(`Reponse DeepSeek invalide (${field} doit etre un tableau)`);
+  return items.map((raw, i) => {
+    if (typeof raw !== 'object' || raw === null) {
+      throw new Error(`Reponse DeepSeek invalide (${field}[${i}] n'est pas un objet)`);
+    }
+    const item = raw as Record<string, unknown>;
+    if (typeof item.titre !== 'string') throw new Error(`Reponse DeepSeek invalide (${field}[${i}].titre)`);
+    if (typeof item.details !== 'string') throw new Error(`Reponse DeepSeek invalide (${field}[${i}].details)`);
+    return { titre: item.titre, details: item.details };
+  });
+}
+
+function validateReport(parsed: unknown): DeepseekSituationReport {
+  if (typeof parsed !== 'object' || parsed === null) {
+    throw new Error('Reponse DeepSeek invalide (pas un objet JSON)');
+  }
+
+  const p = parsed as Record<string, unknown>;
+
+  if (typeof p.synthese_executive !== 'string' || p.synthese_executive.trim().length === 0) {
+    throw new Error('Reponse DeepSeek invalide (synthese_executive manquante)');
+  }
+  if (!isStringArray(p.tendances)) throw new Error('Reponse DeepSeek invalide (tendances)');
+  if (!isStringArray(p.points_a_surveiller)) throw new Error('Reponse DeepSeek invalide (points_a_surveiller)');
+
+  return {
+    syntheseExecutive: p.synthese_executive,
+    aRetenir: validateARetenir(p.a_retenir),
+    vulnerabilitesImportantes: validateVulnerabilites(p.vulnerabilites_importantes),
+    menacesCampagnes: validateMenaces(p.menaces_campagnes),
+    otIcs: validateSecteurItems(p.ot_ics, 'ot_ics'),
+    defenseSpatial: validateSecteurItems(p.defense_spatial, 'defense_spatial'),
+    tendances: p.tendances,
+    pointsASurveiller: p.points_a_surveiller,
+  };
+}
+
+// Longueur max de l'extrait envoye par evenement : borne la taille du
+// prompt (cout/latence) sur un lot de REPORT_EVENT_LIMIT evenements plutot
+// que d'envoyer des descriptions completes potentiellement longues.
+const EVENT_SUMMARY_MAX_CHARS = 300;
+
+function formatReportEventLine(event: ReportEventInput): string {
+  const date = event.publishedAt ? event.publishedAt.slice(0, 10) : 'date inconnue';
+  const countries = event.countries.length > 0 ? event.countries.join(', ') : 'pays non precise';
+  const excerpt = event.summary.slice(0, EVENT_SUMMARY_MAX_CHARS);
+  const parts = [`[${date}]`, `(${event.severity}, ${event.category}, source ${event.source})`, event.title];
+  parts.push(`-- ${excerpt}`);
+  parts.push(`| Pays: ${countries}`);
+  if (event.organizations.length > 0) parts.push(`| Organisations: ${event.organizations.join(', ')}`);
+  if (event.sectors.length > 0) parts.push(`| Secteurs: ${event.sectors.join(', ')}`);
+  if (event.cves.length > 0) parts.push(`| CVE: ${event.cves.join(', ')}`);
+  if (event.threatActors.length > 0) parts.push(`| Acteurs: ${event.threatActors.join(', ')}`);
+  if (event.mitreTechniques.length > 0) parts.push(`| MITRE: ${event.mitreTechniques.join(', ')}`);
+  return `- ${parts.join(' ')}`;
+}
+
+/**
+ * Appelle DeepSeek pour analyser une liste d'evenements reels deja filtres
+ * et produire un compte rendu de situation hierarchise (Phase 6).
+ *
+ * Contrairement a reviewEventWithDeepseek (triage deterministe d'UN seul
+ * evenement, ou le thinking est desactive car il ignore temperature et
+ * n'apporte rien a un JSON booleen), cette analyse -- tri, recoupement,
+ * priorisation par criticite reelle -- beneficie reellement du
+ * raisonnement, et ce job tourne quelques fois par jour seulement (pas
+ * par evenement, cf. jobs/situationReportScheduler.ts) : le cout
+ * supplementaire reste negligeable. Thinking est donc laisse actif
+ * (comportement par defaut de deepseek-v4-flash) plutot que desactive.
+ *
+ * Meme philosophie de resilience que reviewEventWithDeepseek : aucune
+ * retry interne, un echec remonte tel quel a l'appelant.
+ */
+export async function requestSituationReport(
+  events: ReportEventInput[],
+  apiKey: string,
+): Promise<DeepseekSituationReport> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  const eventsBlock =
+    events.length > 0 ? events.map(formatReportEventLine).join('\n') : '(aucun evenement disponible pour cette periode)';
+
+  let response: Response;
+  try {
+    response = await fetch(DEEPSEEK_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: REPORT_SYSTEM_PROMPT },
+          { role: 'user', content: `Evenements reels a analyser (${events.length}) :\n${eventsBlock}` },
+        ],
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  if (!response.ok) {
+    throw new Error(`DeepSeek API a repondu ${response.status} ${response.statusText}`);
+  }
+
+  const body = (await response.json()) as DeepseekChatResponse;
+  const content = body.choices?.[0]?.message?.content;
+
+  if (!content) {
+    throw new Error('Reponse DeepSeek sans contenu (choices[0].message.content absent)');
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    throw new Error('Reponse DeepSeek non-JSON malgre response_format json_object');
+  }
+
+  return validateReport(parsed);
 }

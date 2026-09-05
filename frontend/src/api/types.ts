@@ -32,16 +32,61 @@ export interface EventsPage {
   nextCursor: string | null;
 }
 
+export interface ARetenirItem {
+  titre: string;
+  criticite: 'CRITIQUE' | 'ELEVEE' | 'MODEREE';
+  concerne: string;
+  situation: string;
+  evaluation: string;
+  sources: string[];
+}
+
+export interface VulnerabiliteItem {
+  cve: string | null;
+  produit: string;
+  criticite: string;
+  exploitation: 'Oui' | 'Non connue' | 'Suspectee';
+  kev: 'Oui' | 'Non';
+  epss: string | null;
+  resume: string;
+  impact: string;
+}
+
+export interface MenaceCampagneItem {
+  titre: string;
+  objectif: string | null;
+  secteurs: string | null;
+  details: string;
+}
+
+export interface SecteurItem {
+  titre: string;
+  details: string;
+}
+
+export interface SituationReportSections {
+  aRetenir: ARetenirItem[];
+  vulnerabilitesImportantes: VulnerabiliteItem[];
+  menacesCampagnes: MenaceCampagneItem[];
+  otIcs: SecteurItem[];
+  defenseSpatial: SecteurItem[];
+  tendances: string[];
+  pointsASurveiller: string[];
+}
+
 /**
  * Reprend la forme renvoyee par GET /api/v1/situation-report (Phase 6,
  * cf. src/database/repositories/situationReports.ts cote backend) --
- * compte rendu redige par DeepSeek a partir des evenements reels deja
- * filtres (is_relevant=true).
+ * compte rendu "analyste" redige par DeepSeek a partir des evenements
+ * reels deja filtres (is_relevant=true) : synthese executive courte +
+ * sections hierarchisees par criticite (aucune section n'est garantie
+ * non-vide -- une section vide signifie que rien n'y meritait d'etre
+ * signale pour cette periode, ce n'est pas une erreur).
  */
 export interface SituationReport {
   id: string;
   summary: string;
-  keyPoints: string[];
+  sections: SituationReportSections;
   eventCount: number;
   windowStart: string;
   windowEnd: string;

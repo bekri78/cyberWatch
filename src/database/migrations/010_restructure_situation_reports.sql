@@ -1,0 +1,12 @@
+-- Phase 6.1 : compte rendu "analyste" hierarchise par criticite (a_retenir,
+-- vulnerabilites_importantes, menaces_campagnes, ot_ics, defense_spatial,
+-- tendances, points_a_surveiller), en remplacement du resume + liste de
+-- puces plate de la version initiale (cf. migration 009) -- jugee
+-- insuffisamment analytique par l'utilisateur.
+--
+-- summary continue de porter la synthese executive courte (meme role).
+-- key_points (v1) n'est plus alimentee par le generateur actuel --
+-- conservee telle quelle pour l'historique deja ecrit (jamais relue par le
+-- code actuel), le detail structure vit desormais dans la nouvelle colonne
+-- sections.
+ALTER TABLE situation_reports ADD COLUMN IF NOT EXISTS sections jsonb NOT NULL DEFAULT '{}'::jsonb;
