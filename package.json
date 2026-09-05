@@ -24,6 +24,7 @@
   "homepage": "https://github.com/bekri78/cyberWatch#readme",
   "dependencies": {
     "dotenv": "^17.4.2",
+    "fast-xml-parser": "^5.11.1",
     "fastify": "^5.12.3",
     "node-cron": "^4.6.0",
     "pg": "^8.23.0",

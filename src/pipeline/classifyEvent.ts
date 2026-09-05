@@ -1,4 +1,5 @@
 import { extractCves } from '../lib/text/extractCves';
+import { extractCvssScore } from '../lib/text/extractCvssScore';
 
 export interface ClassificationInput {
   sourceName: string;
@@ -33,7 +34,20 @@ function classifyCategory(sourceName: string, url: string): string {
     if (url.includes('/cti/')) return 'threat_intel';
   }
   if (sourceName === 'cisa_kev') return 'vulnerability';
+  if (sourceName === 'microsoft_msrc') return 'vulnerability';
   return 'other';
+}
+
+// Bandes de severite standard CVSS v3.x (echelle qualitative officielle
+// NVD/FIRST.org : 0.1-3.9 low, 4.0-6.9 medium, 7.0-8.9 high, 9.0-10.0
+// critical). Utilise uniquement pour microsoft_msrc, qui fournit un score
+// numerique fiable -- bien plus precis que la detection de phrase utilisee
+// pour CERT-FR.
+function classifySeverityFromCvss(score: number): string {
+  if (score >= 9.0) return 'critical';
+  if (score >= 7.0) return 'high';
+  if (score >= 4.0) return 'medium';
+  return 'low';
 }
 
 /**
@@ -81,6 +95,26 @@ export function classifyEvent(input: ClassificationInput): Classification {
     return {
       category,
       severity: 'critical',
+      confidence: 'low',
+      cves,
+      tags: buildTags(input.sourceName, category),
+    };
+  }
+
+  // Microsoft MSRC : score CVSS numerique fiable, ecrit deliberement dans
+  // contentExcerpt par le normalizer ("CVSS X.X — ..."). On en derive la
+  // severite par bande CVSS standard plutot que par detection de phrase
+  // (la prose anglaise de MSRC ne contient jamais "activement exploitee").
+  // Volontairement restreint a cette source : CERT-FR mentionne parfois
+  // aussi "CVSS" dans son propre texte (verifie sur les vraies fixtures),
+  // et son comportement deja teste ne doit pas changer.
+  if (input.sourceName === 'microsoft_msrc') {
+    const cvssScore = extractCvssScore(haystack);
+    const severity = cvssScore !== null ? classifySeverityFromCvss(cvssScore) : 'low';
+
+    return {
+      category,
+      severity,
       confidence: 'low',
       cves,
       tags: buildTags(input.sourceName, category),

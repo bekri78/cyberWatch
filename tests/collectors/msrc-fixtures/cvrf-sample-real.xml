@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cvrf:cvrfdoc xmlns:cvrf="http://www.icasi.org/CVRF/schema/cvrf/1.1" xmlns:vuln="http://www.icasi.org/CVRF/schema/vuln/1.1" xmlns:prod="http://www.icasi.org/CVRF/schema/prod/1.1">
+<cvrf:DocumentTitle xml:lang="en">February 2026 Security Updates</cvrf:DocumentTitle>
+<cvrf:DocumentType>Security Bulletin</cvrf:DocumentType>
+<cvrf:DocumentTracking>
+<cvrf:Identification>
+<cvrf:ID>2026-Feb</cvrf:ID>
+</cvrf:Identification>
+<cvrf:InitialReleaseDate>2026-02-10T08:00:00</cvrf:InitialReleaseDate>
+<cvrf:CurrentReleaseDate>2026-02-26T14:36:23</cvrf:CurrentReleaseDate>
+</cvrf:DocumentTracking>
+<vuln:Vulnerability Ordinal="0">
+<vuln:Title>libtiff up to v4.7.1 was discovered to contain a NULL pointer dereference via the component libtiff/tif_open.c.</vuln:Title>
+<vuln:Notes>
+<vuln:Note Title="Description" Type="Description" Ordinal="0"/>
+<vuln:Note Title="Mariner" Type="Tag" Ordinal="20">Mariner</vuln:Note>
+<vuln:Note Title="mitre" Type="CNA" Ordinal="30">mitre</vuln:Note>
+<vuln:Note Title="Customer Action Required" Type="Other" Ordinal="40">Yes</vuln:Note>
+</vuln:Notes>
+<vuln:CVE>CVE-2025-61143</vuln:CVE>
+<vuln:CWE ID="CWE-476">NULL Pointer Dereference</vuln:CWE>
+<vuln:ProductStatuses>
+<vuln:Status Type="Known Affected">
+<vuln:ProductID>20747-17084</vuln:ProductID>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:Status>
+</vuln:ProductStatuses>
+<vuln:Threats>
+<vuln:Threat Type="Impact">
+<vuln:Description/>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+</vuln:Threat>
+<vuln:Threat Type="Impact">
+<vuln:Description/>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:Threat>
+<vuln:Threat Type="Severity">
+<vuln:Description>Moderate</vuln:Description>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+</vuln:Threat>
+<vuln:Threat Type="Severity">
+<vuln:Description>Moderate</vuln:Description>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:Threat>
+</vuln:Threats>
+<vuln:CVSSScoreSets>
+<vuln:ScoreSet>
+<vuln:BaseScore>5.5</vuln:BaseScore>
+<vuln:TemporalScore>5.5</vuln:TemporalScore>
+<vuln:Vector>CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H</vuln:Vector>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+</vuln:ScoreSet>
+<vuln:ScoreSet>
+<vuln:BaseScore>5.5</vuln:BaseScore>
+<vuln:TemporalScore>5.5</vuln:TemporalScore>
+<vuln:Vector>CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H</vuln:Vector>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:ScoreSet>
+</vuln:CVSSScoreSets>
+<vuln:Remediations>
+<vuln:Remediation Type="Vendor Fix">
+<vuln:Description>CBL-Mariner Releases</vuln:Description>
+<vuln:URL/>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+<vuln:AffectedFiles/>
+<vuln:RestartRequired>No</vuln:RestartRequired>
+<vuln:SubType>Security Update</vuln:SubType>
+<vuln:FixedBuild>4.6.0-12</vuln:FixedBuild>
+</vuln:Remediation>
+<vuln:Remediation Type="Release Notes">
+<vuln:URL>https://learn.microsoft.com/en-us/azure/azure-linux/tutorial-azure-linux-upgrade</vuln:URL>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+<vuln:AffectedFiles/>
+<vuln:SubType>CBL-Mariner Releases</vuln:SubType>
+</vuln:Remediation>
+</vuln:Remediations>
+<vuln:Acknowledgments/>
+<vuln:RevisionHistory>
+<vuln:Revision>
+<cvrf:Number>2.0</cvrf:Number>
+<cvrf:Date>2026-02-26T14:36:13</cvrf:Date>
+<cvrf:Description><p>Information published.</p> </cvrf:Description>
+</vuln:Revision>
+<vuln:Revision>
+<cvrf:Number>1.0</cvrf:Number>
+<cvrf:Date>2026-02-26T01:01:32</cvrf:Date>
+<cvrf:Description><p>Information published.</p> </cvrf:Description>
+</vuln:Revision>
+</vuln:RevisionHistory>
+</vuln:Vulnerability>
+<vuln:Vulnerability Ordinal="1">
+<vuln:Title>libtiff up to v4.7.1 was discovered to contain a stack overflow via the readSeparateStripsIntoBuffer function.</vuln:Title>
+<vuln:Notes>
+<vuln:Note Title="Description" Type="Description" Ordinal="0"/>
+<vuln:Note Title="Mariner" Type="Tag" Ordinal="20">Mariner</vuln:Note>
+<vuln:Note Title="mitre" Type="CNA" Ordinal="30">mitre</vuln:Note>
+<vuln:Note Title="Customer Action Required" Type="Other" Ordinal="40">Yes</vuln:Note>
+</vuln:Notes>
+<vuln:CVE>CVE-2025-61144</vuln:CVE>
+<vuln:CWE ID="CWE-119">Improper Restriction of Operations within the Bounds of a Memory Buffer</vuln:CWE>
+<vuln:ProductStatuses>
+<vuln:Status Type="Known Affected">
+<vuln:ProductID>20747-17084</vuln:ProductID>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:Status>
+</vuln:ProductStatuses>
+<vuln:Threats>
+<vuln:Threat Type="Impact">
+<vuln:Description/>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+</vuln:Threat>
+<vuln:Threat Type="Impact">
+<vuln:Description/>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:Threat>
+<vuln:Threat Type="Severity">
+<vuln:Description>Critical</vuln:Description>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+</vuln:Threat>
+<vuln:Threat Type="Severity">
+<vuln:Description>Critical</vuln:Description>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:Threat>
+</vuln:Threats>
+<vuln:CVSSScoreSets>
+<vuln:ScoreSet>
+<vuln:BaseScore>9.8</vuln:BaseScore>
+<vuln:TemporalScore>9.8</vuln:TemporalScore>
+<vuln:Vector>CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</vuln:Vector>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+</vuln:ScoreSet>
+<vuln:ScoreSet>
+<vuln:BaseScore>9.8</vuln:BaseScore>
+<vuln:TemporalScore>9.8</vuln:TemporalScore>
+<vuln:Vector>CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</vuln:Vector>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+</vuln:ScoreSet>
+</vuln:CVSSScoreSets>
+<vuln:Remediations>
+<vuln:Remediation Type="Vendor Fix">
+<vuln:Description>CBL-Mariner Releases</vuln:Description>
+<vuln:URL/>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+<vuln:AffectedFiles/>
+<vuln:RestartRequired>No</vuln:RestartRequired>
+<vuln:SubType>Security Update</vuln:SubType>
+<vuln:FixedBuild>4.6.0-12</vuln:FixedBuild>
+</vuln:Remediation>
+<vuln:Remediation Type="Release Notes">
+<vuln:URL>https://learn.microsoft.com/en-us/azure/azure-linux/tutorial-azure-linux-upgrade</vuln:URL>
+<vuln:ProductID>20747-17084</vuln:ProductID>
+<vuln:ProductID>20696-17086</vuln:ProductID>
+<vuln:AffectedFiles/>
+<vuln:SubType>CBL-Mariner Releases</vuln:SubType>
+</vuln:Remediation>
+</vuln:Remediations>
+<vuln:Acknowledgments/>
+<vuln:RevisionHistory>
+<vuln:Revision>
+<cvrf:Number>1.0</cvrf:Number>
+<cvrf:Date>2026-02-26T01:01:40</cvrf:Date>
+<cvrf:Description><p>Information published.</p> </cvrf:Description>
+</vuln:Revision>
+<vuln:Revision>
+<cvrf:Number>2.0</cvrf:Number>
+<cvrf:Date>2026-02-26T14:36:23</cvrf:Date>
+<cvrf:Description><p>Information published.</p> </cvrf:Description>
+</vuln:Revision>
+</vuln:RevisionHistory>
+</vuln:Vulnerability>
+</cvrf:cvrfdoc>

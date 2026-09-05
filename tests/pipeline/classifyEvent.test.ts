@@ -124,6 +124,69 @@ describe('classifyEvent -- CISA KEV (CVE-2026-59822, BerriAI LiteLLM, vraie entr
   });
 });
 
+describe('classifyEvent -- MSRC (CVE-2025-61144, libtiff, score CVSS 9.8, vraie entree)', () => {
+  it('categorise "vulnerability", severite "critical" derivee de la bande CVSS (>= 9.0)', () => {
+    const result = classifyEvent({
+      sourceName: 'microsoft_msrc',
+      url: 'https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-61144',
+      title: 'CVE-2025-61144 - libtiff up to v4.7.1 was discovered to contain a stack overflow via the readSeparateStripsIntoBuffer function.',
+      contentExcerpt:
+        'CVSS 9.8 — libtiff up to v4.7.1 was discovered to contain a stack overflow via the readSeparateStripsIntoBuffer function.',
+    });
+
+    expect(result.category).toBe('vulnerability');
+    expect(result.severity).toBe('critical');
+    expect(result.cves).toEqual(['CVE-2025-61144']);
+    expect(result.confidence).toBe('low');
+    expect(result.tags).toEqual(['microsoft_msrc', 'vulnerability']);
+  });
+});
+
+describe('classifyEvent -- MSRC (CVE-2025-61143, libtiff, score CVSS 5.5, vraie entree)', () => {
+  it('severite "medium" derivee de la bande CVSS (4.0-6.9)', () => {
+    const result = classifyEvent({
+      sourceName: 'microsoft_msrc',
+      url: 'https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-61143',
+      title: 'CVE-2025-61143 - libtiff up to v4.7.1 was discovered to contain a NULL pointer dereference via the component libtiff/tif_open.c.',
+      contentExcerpt:
+        'CVSS 5.5 — libtiff up to v4.7.1 was discovered to contain a NULL pointer dereference via the component libtiff/tif_open.c.',
+    });
+
+    expect(result.category).toBe('vulnerability');
+    expect(result.severity).toBe('medium');
+  });
+});
+
+describe('classifyEvent -- MSRC sans score CVSS exploitable', () => {
+  it('retombe sur "low" plutot que de deviner (pas de detection de phrase pour MSRC)', () => {
+    const result = classifyEvent({
+      sourceName: 'microsoft_msrc',
+      url: 'https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-00000',
+      title: 'CVE-2026-00000 - Une entree hypothetique sans score CVSS publie',
+      contentExcerpt: 'Aucun score CVSS disponible pour cette entree.',
+    });
+
+    expect(result.category).toBe('vulnerability');
+    expect(result.severity).toBe('low');
+  });
+});
+
+describe('classifyEvent -- CERT-FR mentionnant "CVSS" dans son propre texte (non-regression)', () => {
+  it('ne bascule pas sur la bande CVSS -- la logique MSRC est restreinte a microsoft_msrc', () => {
+    const result = classifyEvent({
+      sourceName: 'certfr',
+      url: 'https://www.cert.ssi.gouv.fr/alerte/CERTFR-2026-ALE-999/',
+      title: 'Vulnerabilite critique dans un produit (score CVSS eleve)',
+      contentExcerpt: 'Le score CVSS 9.8 associe a cette vulnerabilite en fait une priorite absolue.',
+    });
+
+    // Doit suivre la logique CERT-FR habituelle (categorie "alert" -> "high"
+    // par defaut), pas la bande CVSS qui aurait donne "critical".
+    expect(result.category).toBe('alert');
+    expect(result.severity).toBe('high');
+  });
+});
+
 describe('classifyEvent -- source inconnue', () => {
   it('retombe sur la categorie "other" et la severite "low" sans planter', () => {
     const result = classifyEvent({
