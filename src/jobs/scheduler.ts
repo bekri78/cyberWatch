@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import type { Pool } from 'pg';
 import { certfrCollector } from '../collectors/certfr';
+import { cisaKevCollector } from '../collectors/cisaKev';
 import { runCollector } from './runCollector';
 
 interface Logger {
@@ -8,7 +9,7 @@ interface Logger {
   error: (obj: unknown, msg?: string) => void;
 }
 
-const COLLECTORS = [certfrCollector];
+const COLLECTORS = [certfrCollector, cisaKevCollector];
 
 /**
  * Cycle periodique de collecte, independant des appels API clients

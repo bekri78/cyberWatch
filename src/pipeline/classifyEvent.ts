@@ -32,6 +32,7 @@ function classifyCategory(sourceName: string, url: string): string {
     if (url.includes('/alerte/')) return 'alert';
     if (url.includes('/cti/')) return 'threat_intel';
   }
+  if (sourceName === 'cisa_kev') return 'vulnerability';
   return 'other';
 }
 
@@ -70,6 +71,22 @@ export function classifyEvent(input: ClassificationInput): Classification {
   const haystack = `${input.title}\n${input.contentExcerpt ?? ''}`;
   const cves = extractCves(haystack);
   const category = classifyCategory(input.sourceName, input.url);
+
+  // CISA KEV : l'appartenance au catalogue EST la definition d'une
+  // exploitation active confirmee (Known Exploited Vulnerabilities) --
+  // contrairement a CERT-FR, il n'y a pas de formule textuelle fiable a
+  // chercher dans la prose anglaise de CISA, donc on force 'critical'
+  // directement plutot que de deviner via un pattern regex fragile.
+  if (input.sourceName === 'cisa_kev') {
+    return {
+      category,
+      severity: 'critical',
+      confidence: 'low',
+      cves,
+      tags: buildTags(input.sourceName, category),
+    };
+  }
+
   const activeExploitation = ACTIVE_EXPLOITATION_PATTERN.test(haystack);
   const severity = classifySeverity(category, cves.length > 0, activeExploitation);
 

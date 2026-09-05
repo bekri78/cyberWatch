@@ -90,6 +90,40 @@ describe('classifyEvent -- cti CERT-FR (CERTFR-2026-CTI-004, campagne Turla)', (
   });
 });
 
+describe('classifyEvent -- CISA KEV (CVE-2026-85046, Google Chromium V8, vraie entree)', () => {
+  it('categorise "vulnerability", severite "critical" imposee (appartenance au catalogue KEV = exploitation active confirmee)', () => {
+    const result = classifyEvent({
+      sourceName: 'cisa_kev',
+      url: 'https://nvd.nist.gov/vuln/detail/CVE-2026-85046',
+      title: 'CVE-2026-85046 - Google Chromium V8 Type Confusion Vulnerability',
+      contentExcerpt:
+        'Google Chromium V8 contains a type confusion vulnerability that allows a remote attacker to execute arbitrary code inside the sandbox via a crafted HTML page.',
+    });
+
+    expect(result.category).toBe('vulnerability');
+    expect(result.severity).toBe('critical');
+    expect(result.cves).toEqual(['CVE-2026-85046']);
+    expect(result.confidence).toBe('low');
+    expect(result.tags).toEqual(['cisa_kev', 'vulnerability']);
+  });
+});
+
+describe('classifyEvent -- CISA KEV (CVE-2026-59822, BerriAI LiteLLM, vraie entree)', () => {
+  it('severite "critical" meme sans mot-cle explicite d\'exploitation dans le texte (le catalogue KEV suffit)', () => {
+    const result = classifyEvent({
+      sourceName: 'cisa_kev',
+      url: 'https://nvd.nist.gov/vuln/detail/CVE-2026-59822',
+      title: 'CVE-2026-59822 - BerriAI LiteLLM Improper Authentication Vulnerability',
+      contentExcerpt:
+        'BerriAI LiteLLM contains an improper authentication vulnerability in the MCP Streamable HTTP endpoint that could allow an unauthenticated attacker to establish an authenticated MCP session using an arbitrary Bearer token.',
+    });
+
+    expect(result.category).toBe('vulnerability');
+    expect(result.severity).toBe('critical');
+    expect(result.cves).toEqual(['CVE-2026-59822']);
+  });
+});
+
 describe('classifyEvent -- source inconnue', () => {
   it('retombe sur la categorie "other" et la severite "low" sans planter', () => {
     const result = classifyEvent({
