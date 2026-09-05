@@ -3,6 +3,7 @@ import type { Pool } from 'pg';
 import { certfrCollector } from '../collectors/certfr';
 import { cisaKevCollector } from '../collectors/cisaKev';
 import { gdeltCollector } from '../collectors/gdelt';
+import { googleNewsFrCollector } from '../collectors/googleNewsFr';
 import { msrcCollector } from '../collectors/msrc';
 import { runCollector } from './runCollector';
 
@@ -11,7 +12,7 @@ interface Logger {
   error: (obj: unknown, msg?: string) => void;
 }
 
-const COLLECTORS = [certfrCollector, cisaKevCollector, msrcCollector, gdeltCollector];
+const COLLECTORS = [certfrCollector, cisaKevCollector, msrcCollector, gdeltCollector, googleNewsFrCollector];
 
 /**
  * Cycle periodique de collecte, independant des appels API clients

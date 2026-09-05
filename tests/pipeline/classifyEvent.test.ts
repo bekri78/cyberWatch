@@ -231,6 +231,33 @@ describe('classifyEvent -- GDELT (vraie ligne thehindu.com, fraude cryptomonnaie
   });
 });
 
+describe('classifyEvent -- google_news_fr (recherche mots-cles FR, cf. migration 011)', () => {
+  it('categorise "attack" (meme nature que gdelt : incident reel rapporte par la presse)', () => {
+    const result = classifyEvent({
+      sourceName: 'google_news_fr',
+      url: 'https://news.google.com/rss/articles/example-hopital-rouen',
+      title: "Une cyberattaque paralyse le système informatique d'un hôpital français",
+      contentExcerpt: 'Média : Le Monde',
+    });
+
+    expect(result.category).toBe('attack');
+    expect(result.severity).toBe('low'); // pas de CVE, pas de formule d'exploitation active
+    expect(result.tags).toEqual(['google_news_fr', 'attack']);
+    expect(result.countries).toEqual([]); // pas de champ geo structure pour cette source (cf. §46 etendu)
+  });
+
+  it('"activement exploitee" declenche bien la severite critique en francais (contrairement a gdelt, dont la prose est anglaise)', () => {
+    const result = classifyEvent({
+      sourceName: 'google_news_fr',
+      url: 'https://news.google.com/rss/articles/example-vulnerabilite-critique',
+      title: 'Une vulnérabilité critique activement exploitée touche des entreprises françaises',
+      contentExcerpt: 'Média : France Info',
+    });
+
+    expect(result.severity).toBe('critical');
+  });
+});
+
 describe('classifyEvent -- pays non peuple pour les sources sans champ geo structure (non-regression)', () => {
   it('countries reste [] pour certfr/cisa_kev/microsoft_msrc', () => {
     const certfr = classifyEvent({

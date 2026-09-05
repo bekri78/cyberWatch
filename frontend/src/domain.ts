@@ -41,7 +41,7 @@ export const CATEGORY_ICONS: Record<string, string> = {
   other: 'file',
 };
 
-/** name -> {label, color} pour les 6 sources reellement seedees en base. */
+/** name -> {label, color} pour les 7 sources reellement seedees en base. */
 export const SOURCE_META: Record<string, { label: string; color: string }> = {
   certfr: { label: 'CERT-FR', color: '#5e6ad2' },
   cisa_kev: { label: 'CISA KEV', color: '#7a7fad' },
@@ -49,6 +49,9 @@ export const SOURCE_META: Record<string, { label: string; color: string }> = {
   bleepingcomputer: { label: 'BleepingComputer', color: '#f76b15' },
   hackernews: { label: 'The Hacker News', color: '#27a644' },
   gdelt: { label: 'GDELT', color: '#8a8f98' },
+  // Recherche Google Actualites en francais (cf. migration backend 011) --
+  // comble le trou laisse par gdelt sur les incidents francophones.
+  google_news_fr: { label: 'Google Actualités FR', color: '#ea4335' },
 };
 
 /** Le 1er tag est toujours le nom de la source (cf. classifyEvent.buildTags). */

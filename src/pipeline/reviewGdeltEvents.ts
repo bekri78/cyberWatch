@@ -24,17 +24,23 @@ export interface ReviewResult {
 // que de vider tout le backlog d'un coup a chaque tick.
 const BATCH_SIZE = 25;
 
+// Sources dont le filtre d'entree est un filtre de recall (theme GDELT
+// large, ou recherche par mots-cles Google Actualites) plutot qu'un flux
+// institutionnel dedie -- toutes deux produisent un taux de faux positifs
+// documente (cf. migration 008 pour gdelt -- articles boursiers/
+// geopolitiques/RH tagges 'attack' a tort ; google_news_fr par construction,
+// une recherche par mots-cles remonte aussi des tribunes/annonces produit/
+// conferences sans rapport avec un incident reel, cf. migration 011).
+// CERT-FR/CISA KEV/MSRC restent hors scope : flux institutionnels dedies a
+// la cybersecurite, aucun faux positif de ce type n'y a jamais ete
+// observe -- cette restriction est une decision de perimetre, pas une
+// limitation technique (le meme pipeline fonctionnerait sur n'importe
+// quelle source).
+const REVIEWED_SOURCES = ['gdelt', 'google_news_fr'] as const;
+
 /**
- * Phase 5 : relecture IA (DeepSeek) des evenements promus depuis gdelt.
- *
- * Restreint volontairement a gdelt : c'est la seule source dont le filtre
- * thematique produit un taux de faux positifs confirme en production (cf.
- * migration 008 -- articles boursiers/geopolitiques/RH tagges 'attack' a
- * tort). CERT-FR/CISA KEV/MSRC sont des flux institutionnels dedies a la
- * cybersecurite : aucun faux positif de ce type n'y a jamais ete observe,
- * donc pas de cout IA inutile dessus pour l'instant -- cette restriction
- * est une decision de perimetre, pas une limitation technique (le meme
- * pipeline fonctionnerait sur n'importe quelle source).
+ * Phase 5 : relecture IA (DeepSeek) des evenements promus depuis les
+ * sources a fort taux de faux positifs (cf. REVIEWED_SOURCES ci-dessus).
  *
  * Ne fait jamais planter l'appelant : un evenement dont l'appel DeepSeek
  * echoue (timeout, quota, reponse malformee) est simplement laisse
@@ -47,10 +53,10 @@ export async function reviewGdeltEvents(pool: Pool, apiKey: string, log: Logger)
      FROM cyber_events ce
      JOIN raw_items ri ON ri.cyber_event_id = ce.id
      JOIN sources s ON s.id = ri.source_id
-     WHERE s.name = 'gdelt' AND ce.ai_generated = false
+     WHERE s.name = ANY($2::text[]) AND ce.ai_generated = false
      ORDER BY ce.created_at ASC
      LIMIT $1`,
-    [BATCH_SIZE],
+    [BATCH_SIZE, REVIEWED_SOURCES],
   );
 
   let reviewed = 0;

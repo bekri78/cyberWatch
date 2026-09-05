@@ -58,6 +58,9 @@ function classifyCategory(sourceName: string, url: string): string {
   // mondiale), pas une divulgation de vulnerabilite -- categorie distincte
   // volontairement, cf. §37.
   if (sourceName === 'gdelt') return 'attack';
+  // google_news_fr : meme nature que gdelt (incident reel rapporte par la
+  // presse, ici francophone, cf. migration 011) -- meme categorie.
+  if (sourceName === 'google_news_fr') return 'attack';
   return 'other';
 }
 
@@ -155,22 +158,25 @@ export function classifyEvent(input: ClassificationInput): Classification {
     };
   }
 
-  // gdelt retombe volontairement ici (pas de branche dediee) : contrairement
-  // a MSRC (score CVSS numerique) ou CISA KEV (appartenance = exploitation
-  // confirmee), le GKG ne fournit aucun signal deterministe fiable de
-  // severite technique -- ACTIVE_EXPLOITATION_PATTERN ne matchera jamais sa
-  // prose anglaise, donc severite = 'medium' si un CVE est mentionne (rare),
-  // sinon 'low'. Le raffinement reel est laisse a la relecture IA (Phase 5,
-  // pas encore branchee sur cette source -- cf. §41) plutot que d'inventer
-  // une heuristique fragile (ex: le score de ton V1.5TONE ne mesure que la
-  // negativite du style redactionnel, pas la gravite technique).
+  // gdelt et google_news_fr retombent volontairement ici (pas de branche
+  // dediee) : contrairement a MSRC (score CVSS numerique) ou CISA KEV
+  // (appartenance = exploitation confirmee), aucune des deux ne fournit de
+  // signal deterministe fiable de severite technique -- severite =
+  // 'medium' si un CVE est mentionne (rare), sinon 'low'. Le raffinement
+  // reel est laisse a la relecture IA (Phase 5, cf. reviewGdeltEvents.ts
+  // qui couvre desormais aussi google_news_fr). Note : contrairement a la
+  // prose anglaise de gdelt (ou ACTIVE_EXPLOITATION_PATTERN ne matchait
+  // jamais), google_news_fr est en francais et peut reellement declencher
+  // ce pattern si un titre reprend la formule "activement exploitee".
   const activeExploitation = ACTIVE_EXPLOITATION_PATTERN.test(haystack);
   const severity = classifySeverity(category, cves.length > 0, activeExploitation);
 
   // countries : uniquement gdelt sait le fournir aujourd'hui (V1LOCATIONS
   // reel, cf. extractCountries dans gdelt/normalize.ts). CERT-FR/CISA/MSRC
-  // n'ont pas de champ geo structure -- laisse a [] plutot que de deviner un
-  // pays a partir du texte libre.
+  // et google_news_fr n'ont pas de champ geo structure fiable -- laisse a
+  // [] plutot que de deviner un pays (ex: France) a partir de la seule
+  // locale de recherche, qui ne garantit pas que l'article parle bien de
+  // la France.
   const countries = input.sourceName === 'gdelt' ? extractGdeltCountries(input.contentExcerpt) : [];
 
   return {

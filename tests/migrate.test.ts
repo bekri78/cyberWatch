@@ -54,10 +54,11 @@ describe('runMigrations', () => {
       '008_add_ai_relevance.sql',
       '009_create_situation_reports.sql',
       '010_restructure_situation_reports.sql',
+      '011_seed_google_news_fr_source.sql',
     ]);
     expect(result.skipped).toEqual([]);
     // BEGIN + SQL + INSERT INTO schema_migrations + COMMIT, par migration
-    expect((client.query as any).mock.calls.length).toBe(10 * 4);
+    expect((client.query as any).mock.calls.length).toBe(11 * 4);
   });
 
   it('ignore les migrations deja appliquees (idempotence)', async () => {
@@ -78,8 +79,9 @@ describe('runMigrations', () => {
       '008_add_ai_relevance.sql',
       '009_create_situation_reports.sql',
       '010_restructure_situation_reports.sql',
+      '011_seed_google_news_fr_source.sql',
     ]);
-    expect((client.query as any).mock.calls.length).toBe(8 * 4);
+    expect((client.query as any).mock.calls.length).toBe(9 * 4);
   });
 
   it('ne pose aucune migration en double si tout est deja applique', async () => {
@@ -94,12 +96,13 @@ describe('runMigrations', () => {
       '008_add_ai_relevance.sql',
       '009_create_situation_reports.sql',
       '010_restructure_situation_reports.sql',
+      '011_seed_google_news_fr_source.sql',
     ]);
 
     const result = await runMigrations(pool);
 
     expect(result.applied).toEqual([]);
-    expect(result.skipped.length).toBe(10);
+    expect(result.skipped.length).toBe(11);
   });
 
   it('fait un rollback et propage l\'erreur si une migration echoue', async () => {

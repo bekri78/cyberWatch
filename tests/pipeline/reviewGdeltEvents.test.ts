@@ -23,7 +23,7 @@ function makePendingRow(overrides: Record<string, unknown> = {}) {
 function makeFakePool(pendingRows: ReturnType<typeof makePendingRow>[]) {
   const updateCalls: unknown[][] = [];
   const query = vi.fn(async (sql: string, params: unknown[] = []) => {
-    if (sql.includes("WHERE s.name = 'gdelt'")) {
+    if (sql.includes('WHERE s.name = ANY($2::text[])')) {
       return { rows: pendingRows };
     }
     if (sql.includes('UPDATE cyber_events')) {
@@ -127,12 +127,13 @@ describe('reviewGdeltEvents', () => {
     );
   });
 
-  it('ne relit que les evenements gdelt non encore relus (filtre delegue a la requete SQL)', async () => {
+  it('ne relit que les evenements gdelt/google_news_fr non encore relus (filtre delegue a la requete SQL)', async () => {
     const { pool } = makeFakePool([]);
     await reviewGdeltEvents(pool, 'fake-key', log);
 
     const selectCall = (pool.query as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!;
-    expect(selectCall[0]).toMatch(/s\.name = 'gdelt'/);
+    expect(selectCall[0]).toMatch(/s\.name = ANY\(\$2::text\[\]\)/);
     expect(selectCall[0]).toMatch(/ce\.ai_generated = false/);
+    expect(selectCall[1][1]).toEqual(['gdelt', 'google_news_fr']);
   });
 });
