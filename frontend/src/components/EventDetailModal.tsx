@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import type { CyberEvent } from '../api/types';
 import { CATEGORY_LABELS, SEVERITY_LABELS, severityClass, sourceFromTags } from '../domain';
 import { Icon } from './Icon';
+import { publicationUrl, qualificationLabel } from '../qualification';
 
 function formatDateTime(iso: string | null): string {
   if (!iso) return 'inconnue';
@@ -72,7 +73,7 @@ function CveGroup({ cves }: { cves: string[] }) {
 
 export function EventDetailModal({ event, onClose }: { event: CyberEvent; onClose: () => void }) {
   const source = sourceFromTags(event.tags);
-  const showAiStatus = event.tags[0] === 'gdelt';
+  const provisional = event.qualificationStatus === 'pending' || event.qualificationStatus === 'failed';
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -109,20 +110,10 @@ export function EventDetailModal({ event, onClose }: { event: CyberEvent; onClos
               </span>
               <span style={{ color: source.color }}>{source.label}</span>
               <span>·</span>
-              <span>{CATEGORY_LABELS[event.category] ?? event.category}</span>
+              <span>{provisional ? 'Catégorie provisoire' : (CATEGORY_LABELS[event.category] ?? event.category)}</span>
               <span>·</span>
-              <span>Confiance {event.confidence}</span>
-              {showAiStatus && (
-                <>
-                  <span>·</span>
-                  <span
-                    className={`inline-flex items-center gap-1 ${event.aiGenerated ? 'text-accent' : 'text-quaternary'}`}
-                  >
-                    <Icon name={event.aiGenerated ? 'brain' : 'clock'} size={12} />
-                    {event.aiGenerated ? 'Verifie par IA' : 'Revue IA en attente'}
-                  </span>
-                </>
-              )}
+              <span>Confiance : {SEVERITY_LABELS[event.confidence] ?? event.confidence}</span>
+              <span>· {qualificationLabel(event)}</span>
             </div>
           </div>
           <button
@@ -136,6 +127,20 @@ export function EventDetailModal({ event, onClose }: { event: CyberEvent; onClos
         </div>
 
         <div className="flex flex-col gap-4 p-5">
+          {provisional && <p className="text-sm text-secondary">Information non qualifiée : catégorie et sévérité provisoires.</p>}
+          <section aria-label="Publications sources" className="flex flex-col gap-2">
+            <h3 className="text-sm font-semibold text-primary">Publications sources</h3>
+            {(event.publications ?? []).length === 0 && <p className="text-sm text-tertiary">Aucun lien source disponible.</p>}
+            {(event.publications ?? []).map((publication, index) => {
+              const href = publicationUrl(publication.url);
+              return <div key={`${publication.url}-${index}`} className="text-sm text-secondary">
+                {href ? <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent underline">
+                  {publication.title}<span className="sr-only"> (nouvel onglet)</span>
+                </a> : <span>{publication.title} — lien indisponible</span>}
+                <p className="text-xs text-tertiary">{sourceFromTags([publication.source]).label} · {formatDateTime(publication.publishedAt)}</p>
+              </div>;
+            })}
+          </section>
           {(event.description ?? event.summary) && (
             <p className="text-[13.5px] leading-relaxed text-secondary">{event.description ?? event.summary}</p>
           )}

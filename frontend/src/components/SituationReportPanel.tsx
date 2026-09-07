@@ -217,6 +217,11 @@ export function SituationReportPanel({ loading, report }: { loading: boolean; re
         </span>
       </div>
 
+      <p className="mt-2 text-xs text-tertiary">
+        {report.eventCount} publications · du {formatDateTime(report.windowStart)} au {formatDateTime(report.windowEnd)}.
+        {' '}{report.qualifiedInputs ? 'Corpus qualifié ; synthèse automatique à vérifier dans les sources.'
+          : 'Rapport antérieur au filtre de qualification : il peut inclure des informations non relues.'}
+      </p>
       <p className="mt-2.5 text-[13.5px] leading-relaxed text-secondary">{report.summary}</p>
 
       {sections.aRetenir.length > 0 && (

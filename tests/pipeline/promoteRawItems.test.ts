@@ -27,7 +27,8 @@ function makeFakePool(unpromotedRows: ReturnType<typeof makeUnpromotedRow>[]) {
     }
     return { rows: [] };
   });
-  return { pool: { query } as unknown as Pool, insertCalls };
+  const release = vi.fn();
+  return { pool: { connect: async () => ({ query, release }) } as unknown as Pool, insertCalls, query, release };
 }
 
 describe('promoteRawItems', () => {
@@ -90,5 +91,25 @@ describe('promoteRawItems', () => {
 
     const [title, summary] = insertCalls[0]!;
     expect(summary).toBe(title);
+  });
+
+  it('réserve les lignes sur une connexion et valide avant de la libérer', async () => {
+    const { pool, query, release } = makeFakePool([makeUnpromotedRow()]);
+    await promoteRawItems(pool);
+    const statements = query.mock.calls.map(([sql]) => sql);
+    expect(statements[0]).toBe('BEGIN');
+    expect(statements[1]).toContain('FOR UPDATE OF ri SKIP LOCKED');
+    expect(statements.at(-1)).toBe('COMMIT');
+    expect(release).toHaveBeenCalledOnce();
+  });
+
+  it('annule le lot et libère la connexion si une insertion échoue', async () => {
+    const { pool, query, release } = makeFakePool([makeUnpromotedRow()]);
+    query.mockImplementationOnce(async () => ({ rows: [] }))
+      .mockImplementationOnce(async () => ({ rows: [makeUnpromotedRow()] }))
+      .mockRejectedValueOnce(new Error('échec insertion'));
+    await expect(promoteRawItems(pool)).rejects.toThrow('échec insertion');
+    expect(query).toHaveBeenLastCalledWith('ROLLBACK');
+    expect(release).toHaveBeenCalledOnce();
   });
 });

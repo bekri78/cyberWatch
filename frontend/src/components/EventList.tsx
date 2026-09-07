@@ -3,13 +3,10 @@ import type { CyberEvent } from '../api/types';
 import { CATEGORY_LABELS, relativeTime, severityClass, sourceFromTags, SEVERITY_LABELS } from '../domain';
 import { EventDetailModal } from './EventDetailModal';
 import { Icon } from './Icon';
+import { qualificationLabel } from '../qualification';
 
 function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: CyberEvent) => void }) {
   const source = sourceFromTags(event.tags);
-  // La revue IA (Phase 5 DeepSeek) ne s'applique reellement qu'aux
-  // evenements GDELT (cf. reviewGdeltEvents.ts cote backend) -- pour les
-  // autres sources ai_generated reste toujours false et n'a rien a signaler.
-  const showAiStatus = event.tags[0] === 'gdelt';
 
   return (
     <div
@@ -33,20 +30,10 @@ function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: Cy
         <div className="cw-event-title">{event.title}</div>
         <div className="cw-event-meta">
           <span style={{ color: source.color }}>{source.label}</span>
-          {showAiStatus && (
-            <span
-              className={`inline-flex items-center ${event.aiGenerated ? 'text-accent' : 'text-quaternary'}`}
-              title={
-                event.aiGenerated
-                  ? 'Pertinence verifiee par IA (DeepSeek)'
-                  : 'En attente de revue IA (DeepSeek) -- prochain passage planifie'
-              }
-            >
-              <Icon name={event.aiGenerated ? 'brain' : 'clock'} size={11} />
-            </span>
-          )}
+          <span>· {qualificationLabel(event)}</span>
           <span>·</span>
-          <span>{CATEGORY_LABELS[event.category] ?? event.category}</span>
+          <span>{event.qualificationStatus === 'pending' || event.qualificationStatus === 'failed'
+            ? 'Catégorie provisoire' : (CATEGORY_LABELS[event.category] ?? event.category)}</span>
           <span>·</span>
           <span>{relativeTime(event.publishedAt ?? event.createdAt)}</span>
           {event.countries.length > 0 && (

@@ -55,7 +55,8 @@ export async function reviewGdeltEvents(pool: Pool, apiKey: string, log: Logger)
      JOIN raw_items ri ON ri.cyber_event_id = ce.id
      JOIN sources s ON s.id = ri.source_id
      WHERE s.name = ANY($2::text[]) AND ce.ai_generated = false
-     ORDER BY ce.created_at ASC
+       AND ce.qualification_status IN ('pending', 'failed')
+     ORDER BY ce.review_attempted_at ASC NULLS FIRST, ce.created_at ASC
      LIMIT $1`,
     [BATCH_SIZE, REVIEWED_SOURCES],
   );
@@ -81,7 +82,8 @@ export async function reviewGdeltEvents(pool: Pool, apiKey: string, log: Logger)
          SET ai_generated = true, is_relevant = $1, severity = $2, confidence = $3,
              score_pertinence_cyber = $4, score_impact = $5, score_interet_strategique = $6,
              score_fiabilite_source = $7, score_nouveaute = $8, score_total = $9, review_tier = $10,
-             updated_at = now()
+             qualification_status = CASE WHEN $1 THEN 'qualified' ELSE 'rejected' END,
+             review_attempted_at = now(), review_reasoning = $12, updated_at = now()
          WHERE id = $11`,
         [
           review.isRelevant,
@@ -95,6 +97,7 @@ export async function reviewGdeltEvents(pool: Pool, apiKey: string, log: Logger)
           review.scoreTotal,
           review.tier,
           row.id,
+          review.reasoning,
         ],
       );
 
@@ -103,6 +106,10 @@ export async function reviewGdeltEvents(pool: Pool, apiKey: string, log: Logger)
       if (!review.isRelevant) markedIrrelevant++;
     } catch (err) {
       failed++;
+      await pool.query(
+        `UPDATE cyber_events SET qualification_status = 'failed', review_attempted_at = now(), updated_at = now()
+         WHERE id = $1 AND ai_generated = false`, [row.id],
+      );
       log.error({ eventId: row.id, err }, 'Relecture IA DeepSeek echouee pour cet evenement, retentee au prochain passage');
     }
   }

@@ -7,6 +7,7 @@ import type {
 } from '../../lib/ai/deepseekClient';
 
 interface SituationReportRow {
+  qualified_inputs: boolean;
   id: string;
   summary: string;
   event_count: number;
@@ -32,6 +33,7 @@ export interface SituationReportSections {
 }
 
 export interface SituationReport {
+  qualifiedInputs: boolean;
   id: string;
   /** Synthese executive courte (2 a 4 phrases). */
   summary: string;
@@ -45,6 +47,7 @@ export interface SituationReport {
 
 function toApiReport(row: SituationReportRow): SituationReport {
   return {
+    qualifiedInputs: row.qualified_inputs ?? false,
     id: row.id,
     summary: row.summary,
     sections: row.sections,
@@ -88,8 +91,8 @@ export interface InsertSituationReportInput {
  */
 export async function insertSituationReport(pool: Pool, input: InsertSituationReportInput): Promise<void> {
   await pool.query(
-    `INSERT INTO situation_reports (summary, key_points, sections, event_count, window_start, window_end, model)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    `INSERT INTO situation_reports (summary, key_points, sections, event_count, window_start, window_end, model, qualified_inputs)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, true)`,
     [
       input.summary,
       JSON.stringify([]),

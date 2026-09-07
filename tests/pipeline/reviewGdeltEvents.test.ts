@@ -137,10 +137,9 @@ describe('reviewGdeltEvents', () => {
     const result = await reviewGdeltEvents(pool, 'fake-key', log);
 
     expect(result).toEqual({ reviewed: 1, markedIrrelevant: 0, failed: 1 });
-    // seul le 2eme evenement (succes) genere un UPDATE -- le 1er (echec)
-    // reste tel quel, retente au prochain passage planifie.
-    expect(updateCalls).toHaveLength(1);
-    expect(updateCalls[0]![10]).toBe('event-4'); // eventId est desormais le 11e parametre (cf. migration 012)
+    expect(updateCalls).toHaveLength(2);
+    expect(updateCalls[0]).toEqual(['event-3']);
+    expect(updateCalls[1]![10]).toBe('event-4');
     expect(log.error).toHaveBeenCalledOnce();
   });
 

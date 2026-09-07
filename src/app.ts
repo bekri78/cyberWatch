@@ -5,6 +5,7 @@ import { healthRoutes } from './routes/health';
 import { eventsRoutes } from './routes/events';
 import { situationReportRoutes } from './routes/situationReport';
 import { syncRoutes } from './routes/sync';
+import { overviewRoutes } from './routes/overview';
 
 /**
  * pool est injecte plutot qu'importe directement dans les routes qui en
@@ -26,6 +27,7 @@ export function buildApp(pool: Pool): FastifyInstance {
   app.register(eventsRoutes, { prefix: '/api/v1' });
   app.register(situationReportRoutes, { prefix: '/api/v1' });
   app.register(syncRoutes, { prefix: '/api/v1' });
+  app.register(overviewRoutes, { prefix: '/api/v1' });
 
   // Alias racine pour les plateformes qui sondent /health par defaut
   // (Railway : aucun chemin de healthcheck personnalise n'est configure

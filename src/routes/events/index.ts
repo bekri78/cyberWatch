@@ -28,6 +28,7 @@ export const eventsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
             category: { type: 'string' },
             severity: { type: 'string' },
             tag: { type: 'string' },
+            qualification: { type: 'string', enum: ['qualified', 'pending', 'failed'], default: 'qualified' },
           },
         },
         response: {
@@ -44,7 +45,8 @@ export const eventsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
       },
     },
     async (request, reply) => {
-      const { limit, cursor, category, severity, tag } = request.query as {
+      const { limit, cursor, category, severity, tag, qualification } = request.query as {
+        qualification: 'qualified' | 'pending' | 'failed';
         limit: number;
         cursor?: string;
         category?: string;
@@ -59,6 +61,7 @@ export const eventsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
           category,
           severity,
           tag,
+          qualification,
         });
         return page;
       } catch (err) {

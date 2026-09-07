@@ -5,6 +5,8 @@
  * API -- cette page n'affiche que de la vraie donnee.
  */
 export interface CyberEvent {
+  qualificationStatus?: 'pending' | 'qualified' | 'failed' | 'rejected';
+  publications?: { source: string; title: string; url: string; publishedAt: string | null }[];
   id: string;
   title: string;
   summary: string;
@@ -25,6 +27,19 @@ export interface CyberEvent {
   mitreTechniques: string[];
   tags: string[];
   aiGenerated: boolean;
+}
+
+export interface Overview {
+  windowStart: string;
+  windowEnd: string;
+  total: number;
+  critical: number;
+  high: number;
+  countries: number;
+  sources: number;
+  pending: number;
+  failed: number;
+  oldestPendingAt: string | null;
 }
 
 export interface EventsPage {
@@ -84,6 +99,7 @@ export interface SituationReportSections {
  * signale pour cette periode, ce n'est pas une erreur).
  */
 export interface SituationReport {
+  qualifiedInputs?: boolean;
   id: string;
   summary: string;
   sections: SituationReportSections;

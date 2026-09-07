@@ -5,17 +5,14 @@ import { Layout } from '../components/Layout';
 import { ErrorState, LoadingState } from '../components/RequestState';
 import { SourceBreakdown } from '../components/SourceBreakdown';
 import { SituationReportPanel } from '../components/SituationReportPanel';
-import { PostureBanner } from '../components/PostureBanner';
+import { QualityOverview } from '../components/QualityOverview';
 import { SOURCE_META } from '../domain';
 import { useDiversifiedEvents } from '../hooks/useDiversifiedEvents';
 import { useRecentEvents } from '../hooks/useRecentEvents';
 import { useSituationReport } from '../hooks/useSituationReport';
-import { buildIndicators, derivePosture } from '../posture';
 
 export function SituationPage() {
-  // Fenetre brute (top 100 recence) : reflete le vrai volume/gravite reels
-  // pour la posture -- la dominance GDELT y est une information reelle, pas
-  // un biais a corriger.
+  // État du catalogue qualifié. Les indicateurs ont leur propre agrégation serveur.
   const { loading, error, events, reload } = useRecentEvents(100);
 
   // Echantillon equilibre par source (cf. useDiversifiedEvents) : evite que
@@ -34,9 +31,7 @@ export function SituationPage() {
     [diversified.events, sourceFilter],
   );
 
-  const posture = derivePosture(events, events.length);
-  const indicators = buildIndicators(events);
-  const activeSourceCount = Object.keys(SOURCE_META).length - diversified.emptySources.length;
+  const activeSourceCount = Object.values(diversified.countsBySource).filter((count) => count > 0).length;
 
   const status = loading ? undefined : error ? 'API injoignable' : `${events.length} evenements charges`;
 
@@ -46,8 +41,10 @@ export function SituationPage() {
       {!loading && error && <ErrorState message={error} onRetry={reload} />}
       {!loading && !error && (
         <>
-          <PostureBanner posture={posture} indicators={indicators} />
-          <SituationReportPanel loading={situationReport.loading} report={situationReport.report} />
+          <QualityOverview />
+          {situationReport.error
+            ? <ErrorState message={situationReport.error} onRetry={situationReport.reload} />
+            : <SituationReportPanel loading={situationReport.loading} report={situationReport.report} />}
           <section>
             <div className="cw-section-head">
               <div>
@@ -57,9 +54,9 @@ export function SituationPage() {
                 </div>
                 <h2 className="cw-section-title">Derniers evenements</h2>
                 <p className="cw-section-desc">
-                  Un echantillon recent de chaque source active ({activeSourceCount} sur {Object.keys(SOURCE_META).length}{' '}
-                  enregistrees), pour que le volume GDELT ne masque pas CERT-FR/CISA KEV/MSRC. Cliquez une source pour
-                  filtrer la liste.
+                  Publications qualifiées les plus récentes par source, toutes dates confondues
+                  {' '}({activeSourceCount} source{activeSourceCount > 1 ? 's représentées' : ' représentée'} sur {Object.keys(SOURCE_META).length} enregistrées).
+                  {' '}Les compteurs portent sur cet échantillon, distinct des indicateurs sur 24 heures.
                 </p>
               </div>
             </div>
@@ -73,6 +70,7 @@ export function SituationPage() {
                   counts={diversified.countsBySource}
                   cappedSources={diversified.cappedSources}
                   emptySources={diversified.emptySources}
+                  failedSources={diversified.failedSources}
                   total={diversified.events.length}
                   activeFilter={sourceFilter}
                   onFilterChange={setSourceFilter}

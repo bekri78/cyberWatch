@@ -61,6 +61,7 @@ const sectionsSchema = {
 const situationReportSchema = {
   type: 'object',
   properties: {
+    qualifiedInputs: { type: 'boolean' },
     id: { type: 'string' },
     summary: { type: 'string' },
     sections: sectionsSchema,

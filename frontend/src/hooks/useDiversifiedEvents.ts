@@ -10,6 +10,7 @@ export interface DiversifiedEventsState {
   events: CyberEvent[];
   /** Sources reellement interrogees qui n'ont renvoye aucun evenement (ex: bleepingcomputer/hackernews, sans collecteur implemente). */
   emptySources: string[];
+  failedSources: string[];
   /**
    * Nombre reel d'evenements renvoyes par source AVANT fusion/deduplication
    * (donc avant d'etre tronque par perSourceLimit sur l'affichage) -- sert a
@@ -36,6 +37,7 @@ function eventTimestamp(event: CyberEvent): number {
 export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsState {
   const [events, setEvents] = useState<CyberEvent[]>([]);
   const [emptySources, setEmptySources] = useState<string[]>([]);
+  const [failedSources, setFailedSources] = useState<string[]>([]);
   const [countsBySource, setCountsBySource] = useState<Record<string, number>>({});
   const [cappedSources, setCappedSources] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,13 +56,14 @@ export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsStat
 
       const merged = new Map<string, CyberEvent>();
       const empty: string[] = [];
+      const failed: string[] = [];
       const counts: Record<string, number> = {};
       const capped: string[] = [];
       let anySucceeded = false;
 
       results.forEach((result, i) => {
         const tag = sourceTags[i];
-        if (result.status !== 'fulfilled') return;
+        if (result.status !== 'fulfilled') { failed.push(tag); return; }
         anySucceeded = true;
         counts[tag] = result.value.items.length;
         if (result.value.items.length === 0) {
@@ -83,6 +86,7 @@ export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsStat
         setCountsBySource(counts);
         setCappedSources(capped);
       }
+      setFailedSources(failed);
       setLoading(false);
     });
 
@@ -96,6 +100,7 @@ export function useDiversifiedEvents(perSourceLimit = 15): DiversifiedEventsStat
     error,
     events,
     emptySources,
+    failedSources,
     countsBySource,
     cappedSources,
     reload: () => setAttempt((a) => a + 1),

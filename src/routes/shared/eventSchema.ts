@@ -6,6 +6,13 @@
 export const eventSchema = {
   type: 'object',
   properties: {
+    qualificationStatus: { type: 'string', enum: ['qualified', 'pending', 'failed', 'rejected'] },
+    publications: { type: 'array', items: {
+      type: 'object', properties: {
+        source: { type: 'string' }, title: { type: 'string' }, url: { type: 'string' },
+        publishedAt: { type: ['string', 'null'] },
+      }, required: ['source', 'title', 'url', 'publishedAt'],
+    } },
     id: { type: 'string' },
     title: { type: 'string' },
     summary: { type: 'string' },

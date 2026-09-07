@@ -2,6 +2,8 @@ import type { Pool } from 'pg';
 import { decodeCursor, encodeCursor, type Cursor } from '../../lib/pagination/cursor';
 
 interface CyberEventRow {
+  qualification_status: QualificationStatus;
+  publications: Publication[];
   id: string;
   title: string;
   summary: string;
@@ -26,7 +28,24 @@ interface CyberEventRow {
   review_tier: string | null;
 }
 
+export type QualificationStatus = 'pending' | 'qualified' | 'rejected' | 'failed';
+export interface Publication {
+  source: string;
+  title: string;
+  url: string;
+  publishedAt: string | null;
+}
+
+const SELECT_EVENTS = `SELECT cyber_events.*, COALESCE((
+  SELECT jsonb_agg(jsonb_build_object('source', s.name, 'title', ri.title,
+    'url', ri.url, 'publishedAt', ri.published_at) ORDER BY ri.collected_at, ri.id)
+  FROM raw_items ri JOIN sources s ON s.id = ri.source_id
+  WHERE ri.cyber_event_id = cyber_events.id
+), '[]'::jsonb) AS publications FROM cyber_events`;
+
 export interface CyberEvent {
+  qualificationStatus: QualificationStatus;
+  publications: Publication[];
   id: string;
   title: string;
   summary: string;
@@ -55,6 +74,8 @@ export interface CyberEvent {
 
 function toApiEvent(row: CyberEventRow): CyberEvent {
   return {
+    qualificationStatus: row.qualification_status,
+    publications: row.publications ?? [],
     id: row.id,
     title: row.title,
     summary: row.summary,
@@ -81,6 +102,7 @@ function toApiEvent(row: CyberEventRow): CyberEvent {
 }
 
 export interface ListEventsOptions {
+  qualification?: 'qualified' | 'pending' | 'failed';
   limit: number;
   cursor?: Cursor;
   category?: string;
@@ -106,7 +128,10 @@ export async function listEvents(pool: Pool, options: ListEventsOptions): Promis
   // Condition litterale (pas de parametre bind) : elle ne s'applique pas
   // conditionnellement, donc ne decale pas la numerotation $1/$2/... des
   // autres filtres.
-  const conditions: string[] = ['is_relevant = true'];
+  const qualification = options.qualification ?? 'qualified';
+  // Enum fermé avant interpolation, y compris pour les appelants internes.
+  if (!['qualified', 'pending', 'failed'].includes(qualification)) throw new Error('Qualification invalide');
+  const conditions: string[] = ['is_relevant = true', `qualification_status = '${qualification}'`];
   const params: unknown[] = [];
 
   if (options.category) {
@@ -135,7 +160,7 @@ export async function listEvents(pool: Pool, options: ListEventsOptions): Promis
   params.push(options.limit);
 
   const { rows } = await pool.query<CyberEventRow>(
-    `SELECT * FROM cyber_events
+    `${SELECT_EVENTS}
      ${where}
      ORDER BY COALESCE(published_at, created_at) DESC, id DESC
      LIMIT $${params.length}`,
@@ -158,7 +183,7 @@ export async function getEventById(pool: Pool, id: string): Promise<CyberEvent |
   // meme par id direct -- pas de page admin pour le consulter autrement
   // (cf. decision utilisateur), donc pas de raison d'exposer un lien mort.
   const { rows } = await pool.query<CyberEventRow>(
-    'SELECT * FROM cyber_events WHERE id = $1 AND is_relevant = true',
+    `${SELECT_EVENTS} WHERE id = $1 AND is_relevant = true AND qualification_status = 'qualified'`,
     [id],
   );
   const row = rows[0];
@@ -180,7 +205,7 @@ export async function syncEvents(pool: Pool, options: SyncEventsOptions): Promis
   // Meme filtre que listEvents (cf. commentaire ci-dessus) : un client qui
   // ne consommerait que /sync ne doit jamais recevoir un evenement ecarte
   // par la relecture IA.
-  const conditions: string[] = ['is_relevant = true'];
+  const conditions: string[] = ['is_relevant = true', "qualification_status = 'qualified'"];
   const params: unknown[] = [];
 
   if (options.cursor) {
@@ -192,7 +217,7 @@ export async function syncEvents(pool: Pool, options: SyncEventsOptions): Promis
   params.push(options.limit);
 
   const { rows } = await pool.query<CyberEventRow>(
-    `SELECT * FROM cyber_events
+    `${SELECT_EVENTS}
      ${where}
      ORDER BY updated_at ASC, id ASC
      LIMIT $${params.length}`,

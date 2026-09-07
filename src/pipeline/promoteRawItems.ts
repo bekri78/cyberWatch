@@ -26,7 +26,7 @@ function buildSummary(title: string, excerpt: string | null): string {
  * consolidee, avec une classification purement deterministe (cf.
  * classifyEvent -- pas d'appel IA ici, cf. Phase 3/4 vs Phase 5).
  *
- * Un raw_item = un cyber_event pour l'instant (une seule source active,
+ * Un raw_item = un cyber_event pour l'instant (avant regroupement,
  * cf. Phase 3). La fusion multi-sources (meme evenement rapporte par
  * plusieurs sources) est laissee a une phase ulterieure -- le schema
  * (raw_items.cyber_event_id nullable, plusieurs raw_items possibles par
@@ -37,51 +37,67 @@ function buildSummary(title: string, excerpt: string | null): string {
  * qui pointe dessus.
  */
 export async function promoteRawItems(pool: Pool): Promise<PromotionResult> {
-  const { rows } = await pool.query<UnpromotedRawItemRow>(
-    `SELECT ri.id, s.name AS source_name, ri.url, ri.title, ri.published_at, ri.content_excerpt
-     FROM raw_items ri
-     JOIN sources s ON s.id = ri.source_id
-     WHERE ri.cyber_event_id IS NULL
-     ORDER BY ri.collected_at ASC`,
-  );
-
+  const client = await pool.connect();
   let promoted = 0;
+  try {
+    // Transactions bornées : chaque ligne est réservée sur la même connexion.
+    // Deux collecteurs concurrents traitent des lots disjoints.
+    while (true) {
+      await client.query('BEGIN');
+      const { rows } = await client.query<UnpromotedRawItemRow>(
+        `SELECT ri.id, s.name AS source_name, ri.url, ri.title, ri.published_at, ri.content_excerpt
+         FROM raw_items ri
+         JOIN sources s ON s.id = ri.source_id
+         WHERE ri.cyber_event_id IS NULL
+         ORDER BY ri.collected_at ASC, ri.id ASC
+         LIMIT 100
+         FOR UPDATE OF ri SKIP LOCKED`,
+      );
 
-  for (const row of rows) {
-    const classification = classifyEvent({
-      sourceName: row.source_name,
-      url: row.url,
-      title: row.title,
-      contentExcerpt: row.content_excerpt,
-    });
+      for (const row of rows) {
+        const classification = classifyEvent({
+          sourceName: row.source_name,
+          url: row.url,
+          title: row.title,
+          contentExcerpt: row.content_excerpt,
+        });
 
-    const summary = buildSummary(row.title, row.content_excerpt);
+        const summary = buildSummary(row.title, row.content_excerpt);
 
-    await pool.query(
-      `WITH new_event AS (
-         INSERT INTO cyber_events
-           (title, summary, description, category, severity, confidence, published_at, cves, tags, countries, ai_generated)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false)
-         RETURNING id
-       )
-       UPDATE raw_items SET cyber_event_id = (SELECT id FROM new_event) WHERE id = $11`,
-      [
-        row.title,
-        summary,
-        row.content_excerpt,
-        classification.category,
-        classification.severity,
-        classification.confidence,
-        row.published_at,
-        classification.cves,
-        classification.tags,
-        classification.countries,
-        row.id,
-      ],
-    );
+        await client.query(
+          `WITH new_event AS (
+             INSERT INTO cyber_events
+               (title, summary, description, category, severity, confidence, published_at, cves, tags, countries, ai_generated, qualification_status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, false, $12)
+             RETURNING id
+           )
+           UPDATE raw_items SET cyber_event_id = (SELECT id FROM new_event) WHERE id = $11`,
+          [
+            row.title,
+            summary,
+            row.content_excerpt,
+            classification.category,
+            classification.severity,
+            classification.confidence,
+            row.published_at,
+            classification.cves,
+            classification.tags,
+            classification.countries,
+            row.id,
+            ['certfr', 'cisa_kev', 'microsoft_msrc'].includes(row.source_name) ? 'qualified' : 'pending',
+          ],
+        );
 
-    promoted++;
+        promoted++;
+      }
+      await client.query('COMMIT');
+      if (rows.length < 100) break;
+    }
+    return { promoted };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
   }
-
-  return { promoted };
 }

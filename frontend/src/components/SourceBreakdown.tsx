@@ -8,6 +8,7 @@ interface SourceBreakdownProps {
   cappedSources: string[];
   /** Sources interrogees sans collecteur reel implemente (toujours 0). */
   emptySources: string[];
+  failedSources: string[];
   /** Total apres fusion/deduplication, pour le chip "Toutes les sources". */
   total: number;
   activeFilter: string | null;
@@ -29,6 +30,7 @@ export function SourceBreakdown({
   counts,
   cappedSources,
   emptySources,
+  failedSources,
   total,
   activeFilter,
   onFilterChange,
@@ -55,6 +57,7 @@ export function SourceBreakdown({
         const meta = SOURCE_META[tag];
         const count = counts[tag] ?? 0;
         const isEmpty = emptySources.includes(tag);
+        const isFailed = failedSources.includes(tag);
         const isCapped = cappedSources.includes(tag);
         const active = activeFilter === tag;
 
@@ -62,9 +65,9 @@ export function SourceBreakdown({
           <button
             key={tag}
             type="button"
-            disabled={isEmpty}
+            disabled={isEmpty || isFailed}
             onClick={() => onFilterChange(active ? null : tag)}
-            title={isEmpty ? 'Aucun collecteur implemente pour cette source -- toujours vide' : undefined}
+            title={isFailed ? 'Chargement de cette source en échec' : isEmpty ? 'Aucune publication qualifiée renvoyée' : undefined}
             className={cn(
               CHIP_BASE,
               isEmpty && 'cursor-not-allowed border-border-subtle text-quaternary opacity-45',
@@ -78,7 +81,7 @@ export function SourceBreakdown({
             <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: meta.color }} />
             {meta.label}
             <span className="text-quaternary">
-              · {isEmpty ? '0' : count}
+              · {isFailed ? 'indisponible' : isEmpty ? '0' : count}
               {isCapped ? '+' : ''}
             </span>
           </button>

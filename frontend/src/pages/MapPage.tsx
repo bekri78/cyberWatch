@@ -26,11 +26,11 @@ export function MapPage() {
             Localisation
           </div>
           <div className="cw-section-title" style={{ marginBottom: 12 }}>
-            Evenements geolocalises
+            Pays cités dans la veille qualifiée
           </div>
           <p className="cw-section-desc" style={{ marginBottom: 14 }}>
-            Seule la source GDELT fournit une localisation reelle (champ V1LOCATIONS) pour l'instant -- les
-            autres sources n'ont pas de champ geographique structure. Survolez un point pour le detail.
+            Les points représentent des pays mentionnés dans les publications GDELT, pas des lieux d’attaque confirmés.
+            Les autres sources restent accessibles dans la vue Situation. Survolez un point pour le détail.
           </p>
           <WorldMap events={events} height={560} />
         </div>

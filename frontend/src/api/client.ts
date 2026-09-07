@@ -1,4 +1,16 @@
-import type { EventsPage, SituationReport } from './types';
+import type { EventsPage, SituationReport, Overview } from './types';
+
+export async function fetchOverview(): Promise<Overview> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/overview`);
+  if (!response.ok) throw new ApiError(`Indicateurs indisponibles (${response.status})`, response.status);
+  return response.json();
+}
+
+export async function fetchUnqualified(qualification: 'pending' | 'failed'): Promise<EventsPage> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/events?limit=20&qualification=${qualification}`);
+  if (!response.ok) throw new ApiError(`File de qualification indisponible (${response.status})`, response.status);
+  return response.json();
+}
 
 /**
  * URL du vrai backend Railway. Surchageable via VITE_API_BASE_URL (fichier
