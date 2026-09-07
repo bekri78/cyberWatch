@@ -111,4 +111,61 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
     const orphan = await db.query<{ count: number }>('SELECT count(*)::int AS count FROM cyber_events ce WHERE NOT EXISTS (SELECT 1 FROM raw_items ri WHERE ri.cyber_event_id = ce.id)');
     expect(orphan.rows[0]!.count).toBe(0);
   });
+
+  it('P1 : agrège toute la période et pagine sans doublons sur les captures réelles', async () => {
+    const feed = await new Parser().parseString(readFileSync(join(__dirname, '../collectors/certfr-fixtures/avis-feed-real.xml'), 'utf8'));
+    await saveRawItems(pool, await getSourceIdByName(pool, 'certfr'), feed.items.map(normalizeEntry));
+    await promoteRawItems(pool);
+    const until = new Date(Math.max(...feed.items.map((item) => new Date(item.isoDate!).getTime()))).toISOString();
+    const url = `/api/v1/exploration?period=30d&until=${encodeURIComponent(until)}&limit=2`;
+    const response = await app.inject(url);
+    expect(response.statusCode, response.body).toBe(200);
+    const first = response.json();
+    expect(first.total).toBeGreaterThan(2);
+    expect(first.items).toHaveLength(2);
+    expect(first.timeline.reduce((sum: number, bin: { count: number }) => sum + bin.count, 0)).toBe(first.total);
+    expect(first.items[0].publications[0].url).toMatch(/^https:\/\//);
+    expect(first.items[0]).not.toHaveProperty('scoreTotal');
+    const ids = first.items.map((item: { id: string }) => item.id);
+    let cursor = first.nextCursor;
+    while (cursor) {
+      const page = (await app.inject(`${url}&cursor=${cursor}`)).json();
+      expect(page.total).toBe(first.total);
+      expect(page.timeline).toEqual(first.timeline);
+      ids.push(...page.items.map((item: { id: string }) => item.id));
+      cursor = page.nextCursor;
+    }
+    expect(new Set(ids).size).toBe(first.total);
+    expect(ids).not.toContain(gdeltId);
+    const unknown = (await app.inject(`${url}&location=unknown`)).json();
+    expect(unknown.total).toBe(first.unknown);
+    expect(unknown.countries).toEqual([]);
+    expect((await app.inject(`${url}&country=NoSuchCountry`)).json().total).toBe(0);
+    expect((await app.inject(`${url}&q=NoSuchPublication`)).json().total).toBe(0);
+    expect((await app.inject(`${url}&source=gdelt`)).json().total).toBe(0);
+    const invalid = Buffer.from(JSON.stringify({ sortValue: until, id: 'invalid' })).toString('base64url');
+    expect((await app.inject(`${url}&cursor=${invalid}`)).statusCode).toBe(400);
+    expect((await app.inject('/api/v1/exploration?period=invalid')).statusCode).toBe(400);
+  });
+
+  it('P1 : relie les pays réellement extraits au flux après qualification', async () => {
+    await db.query("UPDATE cyber_events SET qualification_status = 'qualified' WHERE id = $1", [gdeltId]);
+    try {
+      const event = (await getEventById(pool, gdeltId))!;
+      expect(event.countries.length).toBeGreaterThan(0);
+      const query = new URLSearchParams({ period: '24h', until: event.publishedAt!, source: 'gdelt' });
+      const response = await app.inject(`/api/v1/exploration?${query}`);
+      expect(response.statusCode, response.body).toBe(200);
+      expect(response.json().countries.map((item: { country: string }) => item.country).sort()).toEqual([...new Set(event.countries)].sort());
+      query.set('country', event.countries[0]!);
+      const filtered = (await app.inject(`/api/v1/exploration?${query}`)).json();
+      expect(filtered.total).toBe(1);
+      expect(filtered.items[0].id).toBe(gdeltId);
+      expect(filtered.unknown).toBe(0);
+      query.set('location', 'unknown');
+      expect((await app.inject(`/api/v1/exploration?${query}`)).json().total).toBe(0);
+    } finally {
+      await db.query("UPDATE cyber_events SET qualification_status = 'pending' WHERE id = $1", [gdeltId]);
+    }
+  });
 });

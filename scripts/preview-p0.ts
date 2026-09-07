@@ -27,9 +27,20 @@ async function main() {
     .split('\n').map((line) => normalizeGkgLine(line.trim())).filter((item) => item !== null);
   await saveRawItems(pool, await getSourceIdByName(pool, 'gdelt'), gdeltItems);
   await promoteRawItems(pool);
+  // Option de vérification visuelle : copie exacte du rapport public, en mémoire uniquement.
+  if (process.argv.includes('--public-report')) {
+    const response = await fetch('https://cyberwatch-production-7503.up.railway.app/api/v1/situation-report');
+    if (!response.ok) throw new Error(`Rapport public : HTTP ${response.status}`);
+    const payload = await response.json() as { report: import('../src/database/repositories/situationReports').SituationReport | null };
+    const report = payload.report;
+    if (report) await db.query(`INSERT INTO situation_reports
+      (summary, sections, event_count, window_start, window_end, model, generated_at, qualified_inputs, key_points)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'[]'::jsonb)`, [report.summary, JSON.stringify(report.sections), report.eventCount,
+      report.windowStart, report.windowEnd, report.model, report.generatedAt, report.qualifiedInputs ?? false]);
+  }
   const app = buildApp(pool);
   await app.listen({ host: '127.0.0.1', port: 3100 });
-  console.log('Aperçu P0 : captures réelles historiques, aucune connexion à la production.');
+  console.log('Aperçu local : captures historiques en mémoire.' + (process.argv.includes('--public-report') ? ' Rapport public copié en lecture seule.' : ' Aucun appel à la production.'));
   for (const signal of ['SIGINT', 'SIGTERM'] as const) {
     process.on(signal, () => { void app.close().then(() => db.close()).then(() => process.exit(0)); });
   }

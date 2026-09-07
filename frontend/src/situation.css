@@ -1,0 +1,43 @@
+.st-workspace { max-width: 1460px; margin: auto; }
+.st-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 30px; }
+.st-heading h1 { font-size: clamp(24px, 2.4vw, 34px); letter-spacing: -.04em; font-weight: 580; margin: 10px 0; }
+.st-heading p { color: #9baabd; font-size: 13px; line-height: 1.7; }
+.st-heading a { flex-shrink: 0; text-decoration: none; }
+.st-brief { padding: 28px; border: 1px solid #35435c; border-radius: 14px; background: linear-gradient(120deg, #1b2539, #111923 75%); margin-bottom: 24px; }
+.st-brief h2 { font-size: 25px; letter-spacing: -.03em; margin: 16px 0 8px; font-weight: 560; }
+.st-summary { font-size: 16px; line-height: 1.85; color: #d1dbea; max-width: 960px; margin: 20px 0 24px; }
+.st-highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.st-highlights .st-report-card { background: #0c131b55; border: 0; border-radius: 8px; padding: 18px; }
+.st-report-card a { color: #bac8ff; text-decoration: underline; overflow-wrap: anywhere; }
+.st-highlights .st-card-context { border: 0; padding-top: 10px; }
+.st-card-context summary { cursor: pointer; font-size: 11px; }
+.st-card-context .text-quaternary { color: #a2b2ca; }
+.st-brief details { border-top: 1px solid #344157; padding-top: 18px; }
+.st-brief summary { color: #b7c6ed; padding: 5px 0; }
+.st-metrics { margin-bottom: 32px; }
+.st-metrics .cw-panel { background: transparent; border: 0; padding: 8px 0 20px; border-bottom: 1px solid #293443; border-radius: 0; }
+.st-metrics .cw-section-title { font-size: 13px; color: #b4c0d1; }
+.st-metrics .cw-section-desc { font-size: 10px; line-height: 1.7; max-width: 950px; }
+.st-metrics .cw-indicators { display: flex; flex-wrap: wrap; gap: 25px; }
+.st-metrics .cw-indicator { padding: 0; background: none; border: 0; min-width: 100px; }
+.st-metrics .cw-indicator-value { font-size: 24px; color: #dde6f3; }
+.st-metrics .cw-indicator-label { font-size: 9px; color: #98a8bd; }
+.st-publications .cw-section-title { font-size: 23px; letter-spacing: -.025em; }
+.st-publications .cw-section-desc { max-width: 800px; font-size: 11px; line-height: 1.8; }
+.st-priorities { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin: 20px 0; }
+.st-priorities button { padding: 16px; text-align: left; border: 1px solid #2a3749; border-radius: 9px; background: #111923; }
+.st-priorities button[aria-pressed=true] { border-color: #859ac7; background: #202d43; }
+.st-priorities strong { display: block; font-size: 12px; font-weight: 550; margin-bottom: 7px; }
+.st-priorities span { display: block; font-size: 10px; color: #a5b4c9; line-height: 1.65; }
+.st-publications .cw-panel { border: 0; background: transparent; }
+.st-publications .cw-event-row { padding: 18px 12px; border-bottom: 1px solid #263242; border-radius: 0; }
+.st-publications .cw-event-title { font-size: 14px; line-height: 1.65; }
+.st-publications .cw-event-meta { font-size: 10px; margin-top: 8px; line-height: 1.8; }
+.st-publications .cw-event-stripe { opacity: .45; }
+.st-more { display: flex; justify-content: center; gap: 10px; align-items: center; color: #bccbff; padding: 16px; font-size: 12px; }
+.st-quality { margin-top: 35px; border-top: 1px solid #2b384a; padding-top: 22px; }
+.st-quality > summary { cursor: pointer; font-size: 13px; color: #b7c5d8; padding-bottom: 20px; }
+.st-quality > summary span { font-size: 11px; color: #8e9eb4; margin-left: 15px; }
+.st-detail .ex-detail { position: fixed; top: 56px; bottom: 0; right: 0; width: min(490px,calc(100vw - 56px)); display: flex; flex-direction: column; border-left: 1px solid #3c4b63; }
+@media(max-width:1000px) { .st-highlights { grid-template-columns: 1fr; }.st-priorities { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .st-heading { align-items: flex-start; flex-direction: column; gap: 12px; }.st-brief { padding: 20px 16px; }.st-summary { font-size: 14px; }.st-quality > summary span { display: block; margin: 8px 0 0; }.st-publications .cw-event-row { padding: 16px 6px; }.st-priorities button { padding: 12px; } }

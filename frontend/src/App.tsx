@@ -1,6 +1,7 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { MapPage } from './pages/MapPage';
+import { lazy, Suspense } from 'react';
 import { SituationPage } from './pages/SituationPage';
+const ExplorationPage = lazy(() => import('./pages/ExplorationPage'));
 
 /**
  * HashRouter (pas BrowserRouter) : GitHub Pages ne sait pas reecrire une
@@ -14,7 +15,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/situation" replace />} />
         <Route path="/situation" element={<SituationPage />} />
-        <Route path="/carte" element={<MapPage />} />
+        <Route path="/carte" element={<Navigate to="/exploration" replace />} />
+        <Route path="/exploration" element={<Suspense fallback={<p className="p-6 text-secondary">Chargement de l’exploration…</p>}><ExplorationPage /></Suspense>} />
       </Routes>
     </HashRouter>
   );

@@ -7,11 +7,13 @@ export function Layout({
   subtitle,
   status,
   children,
+  wide = false,
 }: {
   title: string;
   subtitle?: string;
   status?: string;
   children: ReactNode;
+  wide?: boolean;
 }) {
   return (
     <div className="flex h-screen overflow-hidden bg-marketing">
@@ -19,7 +21,7 @@ export function Layout({
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header title={title} subtitle={subtitle} status={status} />
         <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto flex max-w-[1180px] flex-col gap-[26px] px-[26px] pt-[22px] pb-12 max-[760px]:px-3.5 max-[760px]:pt-4 max-[760px]:pb-10">
+          <div className={wide ? 'w-full' : 'mx-auto flex max-w-[1180px] flex-col gap-[26px] px-[26px] pt-[22px] pb-12 max-[760px]:px-3.5 max-[760px]:pt-4 max-[760px]:pb-10'}>
             {children}
           </div>
         </div>

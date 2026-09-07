@@ -55,7 +55,7 @@ function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: Cy
   );
 }
 
-export function EventList({ events, limit = 8 }: { events: CyberEvent[]; limit?: number }) {
+export function EventList({ events, limit = 8, onSelect }: { events: CyberEvent[]; limit?: number; onSelect?: (event: CyberEvent) => void }) {
   const visible = events.slice(0, limit);
   const [selected, setSelected] = useState<CyberEvent | null>(null);
 
@@ -73,7 +73,7 @@ export function EventList({ events, limit = 8 }: { events: CyberEvent[]; limit?:
     <>
       <div className="cw-panel" style={{ padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
         {visible.map((event) => (
-          <EventRow key={event.id} event={event} onSelect={setSelected} />
+          <EventRow key={event.id} event={event} onSelect={onSelect ?? setSelected} />
         ))}
       </div>
       {selected && <EventDetailModal event={selected} onClose={() => setSelected(null)} />}

@@ -5,6 +5,7 @@ import type {
   SituationReport,
   VulnerabiliteItem,
 } from '../api/types';
+import { publicationUrl } from '../qualification';
 import { relativeTime } from '../domain';
 import { Icon } from './Icon';
 import { LoadingState } from './RequestState';
@@ -77,20 +78,23 @@ function SectionHeader({ icon, label, count }: { icon: Parameters<typeof Icon>[0
 
 function ARetenirCard({ item }: { item: ARetenirItem }) {
   return (
-    <div className="rounded-[10px] border border-border-standard bg-[var(--s1)] p-3.5">
+    <div className="st-report-card rounded-[10px] border border-border-standard bg-[var(--s1)] p-3.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-[13px] font-semibold text-primary">{item.titre}</span>
         <CriticiteBadge criticite={item.criticite} />
       </div>
       {item.concerne && <div className="mt-1 text-[11.5px] text-tertiary">Concerne : {item.concerne}</div>}
       <p className="mt-2 text-[12.5px] leading-relaxed text-secondary">{item.situation}</p>
+      <details className="st-card-context">
+      <summary>Pourquoi c’est important · sources</summary>
       <p className="mt-1.5 text-[12.5px] leading-relaxed text-secondary">
         <span className="font-medium text-tertiary">Évaluation — </span>
         {item.evaluation}
       </p>
       {item.sources.length > 0 && (
-        <div className="mt-2 text-[10.5px] text-quaternary">Source(s) : {item.sources.join(', ')}</div>
+        <div className="mt-2 text-[10.5px] text-quaternary">Sources : {item.sources.map((source, i) => { const url = publicationUrl(source); return <span key={i}>{i > 0 && ' · '}{url ? <a href={url} target="_blank" rel="noopener noreferrer">Consulter la source {i + 1}</a> : source}</span>; })}</div>
       )}
+      </details>
     </div>
   );
 }
@@ -192,8 +196,7 @@ export function SituationReportPanel({ loading, report }: { loading: boolean; re
           <Icon name="brain" size={22} color="var(--accent)" />
           <div className="cw-empty-title">Compte rendu automatique : en attente</div>
           <p className="cw-empty-desc">
-            Aucun compte rendu n'a encore ete genere par DeepSeek (premier passage planifie a venir, ou generation
-            desactivee cote serveur). Cette page n'affiche que des donnees reellement collectees.
+            La synthèse n’est pas encore disponible. Vous pouvez déjà parcourir les publications collectées ci-dessous et consulter leurs sources.
           </p>
         </div>
       </div>
@@ -203,11 +206,11 @@ export function SituationReportPanel({ loading, report }: { loading: boolean; re
   const { sections } = report;
 
   return (
-    <div className="cw-panel" style={{ borderColor: 'rgba(113,112,255,0.3)', padding: 20 }}>
+    <section className="st-brief" aria-label="Ce qu’il faut retenir">
       <div className="flex items-start justify-between gap-3">
         <div className="cw-section-eyebrow">
           <Icon name="brain" size={13} color="var(--accent)" />
-          Compte rendu de situation
+          SYNTHÈSE DE LA VEILLE
         </div>
         <span
           className="shrink-0 text-[11px] text-quaternary"
@@ -217,17 +220,22 @@ export function SituationReportPanel({ loading, report }: { loading: boolean; re
         </span>
       </div>
 
+      <h2>Ce qu’il faut retenir</h2>
       <p className="mt-2 text-xs text-tertiary">
         {report.eventCount} publications · du {formatDateTime(report.windowStart)} au {formatDateTime(report.windowEnd)}.
-        {' '}{report.qualifiedInputs ? 'Corpus qualifié ; synthèse automatique à vérifier dans les sources.'
+        {' '}{report.qualifiedInputs ? 'Corpus qualifié · synthèse automatique.'
           : 'Rapport antérieur au filtre de qualification : il peut inclure des informations non relues.'}
       </p>
-      <p className="mt-2.5 text-[13.5px] leading-relaxed text-secondary">{report.summary}</p>
+      <p className="st-summary">{report.summary}</p>
+      {sections.aRetenir.length > 0 && <div className="st-highlights">{sections.aRetenir.slice(0, 3).map((item, i) => <ARetenirCard key={i} item={item} />)}</div>}
 
-      {sections.aRetenir.length > 0 && (
+      <details className="mt-4">
+      <summary className="cursor-pointer text-sm text-accent">Approfondir · détails techniques et contexte</summary>
+
+      {sections.aRetenir.length > 3 && (
         <div className="mt-4 flex flex-col gap-2.5">
           <SectionHeader icon="alert" label="À retenir" count={sections.aRetenir.length} />
-          {sections.aRetenir.map((item, i) => (
+          {sections.aRetenir.slice(3).map((item, i) => (
             <ARetenirCard key={i} item={item} />
           ))}
         </div>
@@ -282,6 +290,7 @@ export function SituationReportPanel({ loading, report }: { loading: boolean; re
           <BulletList items={sections.pointsASurveiller} />
         </div>
       )}
-    </div>
+      </details>
+    </section>
   );
 }

@@ -1,4 +1,10 @@
-import type { EventsPage, SituationReport, Overview } from './types';
+import type { EventsPage, SituationReport, Overview, ExplorationResult } from './types';
+
+export async function fetchExploration(params: URLSearchParams, signal: AbortSignal): Promise<ExplorationResult> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/exploration?${params}`, { signal });
+  if (!response.ok) throw new ApiError(`Exploration indisponible (${response.status}). Réessayez dans un instant.`, response.status);
+  return response.json();
+}
 
 export async function fetchOverview(): Promise<Overview> {
   const response = await fetch(`${API_BASE_URL}/api/v1/overview`);

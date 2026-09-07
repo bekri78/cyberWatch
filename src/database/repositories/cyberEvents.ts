@@ -1,7 +1,7 @@
 import type { Pool } from 'pg';
 import { decodeCursor, encodeCursor, type Cursor } from '../../lib/pagination/cursor';
 
-interface CyberEventRow {
+export interface CyberEventRow {
   qualification_status: QualificationStatus;
   publications: Publication[];
   id: string;
@@ -72,7 +72,7 @@ export interface CyberEvent {
   reviewTier: string | null;
 }
 
-function toApiEvent(row: CyberEventRow): CyberEvent {
+export function toApiEvent(row: CyberEventRow): CyberEvent {
   return {
     qualificationStatus: row.qualification_status,
     publications: row.publications ?? [],
@@ -83,11 +83,11 @@ function toApiEvent(row: CyberEventRow): CyberEvent {
     category: row.category,
     severity: row.severity,
     confidence: row.confidence,
-    publishedAt: row.published_at ? row.published_at.toISOString() : null,
-    firstSeenAt: row.first_seen_at.toISOString(),
-    lastSeenAt: row.last_seen_at.toISOString(),
-    createdAt: row.created_at.toISOString(),
-    updatedAt: row.updated_at.toISOString(),
+    publishedAt: row.published_at ? new Date(row.published_at).toISOString() : null,
+    firstSeenAt: new Date(row.first_seen_at).toISOString(),
+    lastSeenAt: new Date(row.last_seen_at).toISOString(),
+    createdAt: new Date(row.created_at).toISOString(),
+    updatedAt: new Date(row.updated_at).toISOString(),
     countries: row.countries,
     organizations: row.organizations,
     sectors: row.sectors,

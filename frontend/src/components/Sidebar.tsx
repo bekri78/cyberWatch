@@ -4,7 +4,7 @@ import { Icon } from './Icon';
 
 const NAV = [
   { path: '/situation', label: 'Situation', icon: 'brain' as const, enabled: true },
-  { path: '/carte', label: 'Carte', icon: 'globe' as const, enabled: true },
+  { path: '/exploration', label: 'Exploration', icon: 'globe' as const, enabled: true },
   { path: '/assistant', label: 'Assistant', icon: 'sparkles' as const, enabled: false },
 ];
 
@@ -49,7 +49,7 @@ export function Sidebar() {
           );
 
           return item.enabled ? (
-            <Link key={item.path} to={item.path} className={className}>
+            <Link key={item.path} to={item.path} className={className} aria-label={item.label} aria-current={active ? 'page' : undefined}>
               {content}
             </Link>
           ) : (

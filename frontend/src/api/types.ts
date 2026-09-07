@@ -47,6 +47,17 @@ export interface EventsPage {
   nextCursor: string | null;
 }
 
+export interface ExplorationResult extends EventsPage {
+  total: number;
+  unknown: number;
+  high: number;
+  countries: { country: string; count: number; high: number }[];
+  countryOptions: string[];
+  timeline: { bucket: number; count: number }[];
+  windowStart: string;
+  windowEnd: string;
+}
+
 export interface ARetenirItem {
   titre: string;
   criticite: 'CRITIQUE' | 'ELEVEE' | 'MODEREE';
