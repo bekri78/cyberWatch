@@ -10,14 +10,13 @@ import { SOURCE_META } from '../domain';
 import { useDiversifiedEvents } from '../hooks/useDiversifiedEvents';
 import { EventDetailPanel } from '../components/EventDetailPanel';
 import type { CyberEvent } from '../api/types';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '../exploration.css';
 import '../situation.css';
 import { useSituationReport } from '../hooks/useSituationReport';
 
 export function SituationPage() {
   // État du catalogue qualifié. Les indicateurs ont leur propre agrégation serveur.
-  const navigate = useNavigate();
   const [selected, setSelected] = useState<CyberEvent | null>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
   const [priority, setPriority] = useState('all');
@@ -89,7 +88,7 @@ export function SituationPage() {
             )}
           </section>
           <details className="st-quality"><summary>Couverture et qualité de collecte <span>Consulter les publications en attente et les erreurs</span></summary><QualityOverview mode="queue" /></details>
-          {selected && <div className="st-detail"><EventDetailPanel event={selected} onClose={close} onCountry={(country) => navigate(`/exploration?country=${encodeURIComponent(country)}`)} /></div>}
+          {selected && <div className="st-detail"><EventDetailPanel event={selected} onClose={close} /></div>}
       </div>
     </Layout>
   );

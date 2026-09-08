@@ -39,8 +39,6 @@ export default function ExplorationPage() {
   function reset() { setSearch({ period }); setDraft(''); setSelected(null); }
   function closeDetail() { setSelected(null); selectedButton.current?.focus(); }
   const selectedVisible = selected && data?.items.some((item) => item.id === selected.id) ? selected : null;
-  const bins = Array.from({ length: 24 }, (_, i) => data?.timeline.find((b) => b.bucket === i)?.count ?? 0);
-  const maximum = Math.max(1, ...bins);
   const windowLabel = data ? `${new Date(data.windowStart).toLocaleDateString('fr-FR')} — ${new Date(data.windowEnd).toLocaleDateString('fr-FR')}` : 'Chargement de la période';
   return <Layout title="Exploration" subtitle="Carte et publications qualifiées" wide>
     <div className="ex-workspace">
@@ -70,14 +68,7 @@ export default function ExplorationPage() {
           <div className="ex-panel-head"><div><Icon name="globe" size={15} /><h2>{country || 'Répartition mondiale'}</h2></div><span>PAYS CITÉS</span></div>
           <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap countries={data?.countries ?? []} selected={country} onSelect={(name) => change('country', name === country ? '' : name)} /></Suspense>
           <div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
-          <p className="ex-map-note">Pastilles au centre des pays cités. Elles ne représentent pas des lieux d’attaque confirmés.</p>
-          <div className="ex-timeline"><div className="ex-timeline-heading"><span><Icon name="activity" size={14} />Rythme des publications</span><small>24 intervalles · selon la date de publication*</small></div>
-            <div className="ex-bars" aria-label="Histogramme des publications">{bins.map((count,i) => {
-              const date = data ? new Date(new Date(data.windowStart).getTime() + i * (new Date(data.windowEnd).getTime() - new Date(data.windowStart).getTime()) / 24).toLocaleString('fr-FR') : '';
-              return <div className="ex-bar-slot" key={i} tabIndex={0} aria-label={`${date} : ${count} publications`} title={`${date} : ${count} publications`}><span style={{ height: `${count ? Math.max(5, count / maximum * 100) : 2}%` }} /></div>;
-            })}</div><div className="ex-timeline-dates"><span>{data && new Date(data.windowStart).toLocaleDateString('fr-FR')}</span><span>{data && new Date(data.windowEnd).toLocaleDateString('fr-FR')}</span></div>
-            <p className="ex-note">* Date de collecte utilisée si la date de publication est inconnue.</p>
-          </div>
+          <p className="ex-map-note">Zoomez ou cliquez sur un groupe pour séparer les pays. Les nombres additionnent les publications par pays : une publication citant plusieurs pays peut être comptée plusieurs fois dans un groupe.</p>
         </section>
         <section className="ex-feed" aria-label="Flux des publications">
           <div className="ex-panel-head"><div><Icon name="feed" size={15} /><h2>Le flux</h2></div><span>PLUS RÉCENT D’ABORD</span></div>
@@ -94,7 +85,7 @@ export default function ExplorationPage() {
           </div>
           <footer className="ex-feed-footer">{data ? `${data.items.length} sur ${data.total} publications` : '—'}<span>{data ? `${data.unknown} sans pays cité` : ''}</span></footer>
         </section>
-        {selectedVisible && <EventDetailPanel event={selectedVisible} onClose={closeDetail} onCountry={(name) => change('country', name)} />}
+        {selectedVisible && <EventDetailPanel event={selectedVisible} onClose={closeDetail} />}
       </div>
     </div>
   </Layout>;
