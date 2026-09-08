@@ -78,7 +78,7 @@ function MapContent({ countries, selected, onSelect }: {
 
 export default function ExplorationMap(props: { countries: ExplorationResult['countries']; selected: string; onSelect: (country: string) => void }) {
   return <div className="ex-map-canvas">
-    <Map theme="dark" viewport={{ center: [12, 20], zoom: 0.65, bearing: 0, pitch: 0 }} minZoom={-2} maxZoom={7} scrollZoom={false}>
+    <Map theme="dark" viewport={{ center: [12, 20], zoom: 0.65, bearing: 0, pitch: 0 }} minZoom={-2} maxZoom={7} scrollZoom={true} touchZoomRotate={true} cooperativeGestures={false}>
       <MapContent {...props} />
     </Map>
   </div>;
