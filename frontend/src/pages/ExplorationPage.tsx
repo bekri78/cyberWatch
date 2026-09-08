@@ -14,7 +14,7 @@ const FILTERS = ['q', 'category', 'severity', 'source', 'country', 'location'] a
 export default function ExplorationPage() {
   const [search, setSearch] = useSearchParams();
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [feedOpen, setFeedOpen] = useState(() => window.innerWidth > 1000);
+  const [feedOpen, setFeedOpen] = useState(false);
   const [anchor, setAnchor] = useState(() => new Date().toISOString());
   const [selected, setSelected] = useState<CyberEvent | null>(null);
   const [draft, setDraft] = useState(search.get('q') ?? '');
@@ -41,7 +41,6 @@ export default function ExplorationPage() {
   function reset() { setSearch({ period }); setDraft(''); setSelected(null); }
   function closeDetail() { setSelected(null); selectedButton.current?.focus(); }
   const selectedVisible = selected && data?.items.some((item) => item.id === selected.id) ? selected : null;
-  const windowLabel = data ? `${new Date(data.windowStart).toLocaleDateString('fr-FR')} — ${new Date(data.windowEnd).toLocaleDateString('fr-FR')}` : 'Chargement de la période';
   return <Layout title="Exploration" subtitle="Carte et publications qualifiées" wide immersive>
     <div className="ex-workspace ex-immersive">
       <h1 className="sr-only">Exploration de la veille cyber</h1>
@@ -60,12 +59,6 @@ export default function ExplorationPage() {
         <label>Pays cité<select value={country} onChange={(e) => change('country', e.target.value)}><option value="">Tous les pays</option>{[...new Set([...(data?.countryOptions ?? []), ...(country ? [country] : [])])].map((name) => <option key={name}>{name}</option>)}</select></label>
       </div>
         <button type="button" className="ex-reset" disabled={!filterCount} onClick={reset}>Réinitialiser{filterCount > 0 && ` (${filterCount})`}</button>
-      </div>
-      <div className="ex-stats" aria-live="polite">
-        <div><strong>{loading ? '—' : data?.total ?? '—'}</strong><span>publications qualifiées</span></div>
-        <div><strong>{loading ? '—' : data?.countries.length ?? '—'}</strong><span>pays cités</span></div>
-        <div><strong>{loading ? '—' : data?.high ?? '—'}</strong><span>sévérités élevées / critiques</span></div>
-        <div className="ex-window"><Icon name="calendar" size={15} /><span>{windowLabel}<small>Comptages sur tous les résultats filtrés</small></span></div>
       </div>
       <button className="ex-button ex-feed-toggle" aria-expanded={feedOpen} aria-controls="exploration-feed" onClick={() => { setFeedOpen(!feedOpen); if (window.innerWidth <= 760) setFiltersOpen(false); }}><Icon name="feed" size={14} />{feedOpen ? 'Masquer le flux' : 'Publications'}{data && ` (${data.total})`}</button>
       {error && <div className="ex-error" role="alert">{error}<button onClick={() => setAnchor(new Date().toISOString())}>Réessayer</button></div>}
