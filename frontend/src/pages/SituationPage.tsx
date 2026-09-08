@@ -87,7 +87,6 @@ export function SituationPage() {
               </div>
             )}
           </section>
-          <details className="st-quality"><summary>Couverture et qualité de collecte <span>Consulter les publications en attente et les erreurs</span></summary><QualityOverview mode="queue" /></details>
           {selected && <div className="st-detail"><EventDetailPanel event={selected} onClose={close} /></div>}
       </div>
     </Layout>
