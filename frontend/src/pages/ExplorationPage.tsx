@@ -27,7 +27,7 @@ export default function ExplorationPage() {
     FILTERS.forEach((key) => { const value = search.get(key); if (value) p.set(key, value); });
     return p;
   }, [search, anchor, period]);
-  const { data, loading, more, error, loadMore } = useExploration(params);
+  const { data, countries, loading, more, error, loadMore } = useExploration(params);
   const country = search.get('country') ?? '';
   const location = search.get('location') ?? 'all';
   const filterCount = FILTERS.filter((key) => search.get(key) && search.get(key) !== 'all').length;
@@ -65,7 +65,13 @@ export default function ExplorationPage() {
       <div className="ex-grid" aria-busy={loading}>
         <section className="ex-map-section" aria-label="Carte des pays cités">
 
-          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap countries={data?.countries ?? []} selected={country} onSelect={(name) => change('country', name === country ? '' : name)} /></Suspense>
+          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap countries={countries} selected={country} onSelect={(name) => {
+            change('country', name);
+            if (name) {
+              setFeedOpen(true);
+              if (window.innerWidth <= 760) setFiltersOpen(false);
+            }
+          }} /></Suspense>
           <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
           <p className="ex-map-note">Zoomez ou cliquez sur un groupe pour séparer les pays. Les nombres additionnent les publications par pays : une publication citant plusieurs pays peut être comptée plusieurs fois dans un groupe.</p>
           </details>

@@ -29,6 +29,8 @@ const API_BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
   'https://cyberwatch-production-7503.up.railway.app';
 
+export const MAP_TILE_URL = `${API_BASE_URL.replace(/\/$/, '')}/api/v1/map/tiles/{z}/{x}/{y}.png`;
+
 export class ApiError extends Error {
   readonly status?: number;
 

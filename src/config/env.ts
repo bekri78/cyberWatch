@@ -25,6 +25,7 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL est obligatoire depuis la Phase 2'),
   DEEPSEEK_API_KEY: z.string().optional(),
+  MAP_KEY: z.string().trim().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

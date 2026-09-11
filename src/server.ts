@@ -6,7 +6,7 @@ import { runInitialAiReview, startAiReviewScheduler } from './jobs/aiReviewSched
 import { runInitialCollection, startScheduler } from './jobs/scheduler';
 import { runInitialSituationReport, startSituationReportScheduler } from './jobs/situationReportScheduler';
 
-const app = buildApp(pool);
+const app = buildApp(pool, { mapKey: env.MAP_KEY });
 
 async function prepareDatabase(): Promise<void> {
   const { applied, skipped } = await runMigrations(pool);

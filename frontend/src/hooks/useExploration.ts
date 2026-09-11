@@ -5,6 +5,8 @@ import type { ExplorationResult } from '../api/types';
 export function useExploration(params: URLSearchParams) {
   const key = params.toString();
   const [data, setData] = useState<ExplorationResult | null>(null);
+  // Keep the last map visible while the newly selected feed is loading.
+  const [countries, setCountries] = useState<ExplorationResult['countries']>([]);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,8 +18,8 @@ export function useExploration(params: URLSearchParams) {
     moreController.current?.abort();
     setLoading(true); setData(null); setError(null); setMore(false);
     fetchExploration(new URLSearchParams(key), controller.signal)
-      .then((result) => { if (!controller.signal.aborted) setData(result); })
-      .catch((err: Error) => { if (!controller.signal.aborted) setError(err.message); })
+      .then((result) => { if (!controller.signal.aborted) { setData(result); setCountries(result.countries); } })
+      .catch((err: Error) => { if (!controller.signal.aborted) { setError(err.message); setCountries([]); } })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => { controller.abort(); moreController.current?.abort(); };
   }, [key]);
@@ -35,5 +37,5 @@ export function useExploration(params: URLSearchParams) {
     } catch (err) { if (!controller.signal.aborted && activeKey.current === key) setError((err as Error).message); }
     finally { if (moreController.current === controller) moreController.current = null; if (!controller.signal.aborted) setMore(false); }
   }
-  return { data, loading, more, error, loadMore };
+  return { data, countries, loading, more, error, loadMore };
 }

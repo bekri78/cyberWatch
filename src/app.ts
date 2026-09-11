@@ -7,6 +7,7 @@ import { situationReportRoutes } from './routes/situationReport';
 import { syncRoutes } from './routes/sync';
 import { overviewRoutes } from './routes/overview';
 import { explorationRoutes } from './routes/exploration';
+import { mapRoutes } from './routes/map';
 
 /**
  * pool est injecte plutot qu'importe directement dans les routes qui en
@@ -14,7 +15,7 @@ import { explorationRoutes } from './routes/exploration';
  * valide (cf. src/types/fastify.d.ts), et ca permet d'injecter un pool de
  * test dans les tests des autres routes sans toucher a database/client.ts.
  */
-export function buildApp(pool: Pool): FastifyInstance {
+export function buildApp(pool: Pool, options: { mapKey?: string } = {}): FastifyInstance {
   const app = Fastify({ logger: true });
   app.decorate('pool', pool);
 
@@ -30,6 +31,7 @@ export function buildApp(pool: Pool): FastifyInstance {
   app.register(syncRoutes, { prefix: '/api/v1' });
   app.register(overviewRoutes, { prefix: '/api/v1' });
   app.register(explorationRoutes, { prefix: '/api/v1' });
+  app.register(mapRoutes, { prefix: '/api/v1', mapKey: options.mapKey });
 
   // Alias racine pour les plateformes qui sondent /health par defaut
   // (Railway : aucun chemin de healthcheck personnalise n'est configure
