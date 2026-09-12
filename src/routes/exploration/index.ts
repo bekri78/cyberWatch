@@ -20,6 +20,9 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
   app.get('/exploration', {
     schema: { response: { 200: { type: 'object', additionalProperties: true, properties: {
       items: { type: 'array', items: eventSchema },
+      mapItems: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'title', 'countries', 'severity'], properties: {
+        id: { type: 'string' }, title: { type: 'string' }, countries: { type: 'array', items: { type: 'string' } }, severity: { type: 'string' },
+      } } },
     } }, 400: { type: 'object', properties: { message: { type: 'string' } } } }, querystring: { type: 'object', additionalProperties: false, properties: {
       limit: { type: 'integer', minimum: 1, maximum: 100, default: 50 },
       period: { type: 'string', enum: ['24h', '7d', '30d'], default: '7d' },
@@ -48,6 +51,7 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
     const { rows } = await app.pool.query<{
       total: number; unknown: number; high: number; countries: { country: string; count: number; high: number }[];
       countryOptions: string[]; timeline: { bucket: number; count: number }[]; items: CyberEventRow[];
+      mapItems: { id: string; title: string; countries: string[]; severity: string }[];
     }>(`
       WITH base AS MATERIALIZED (
         SELECT ce.*, COALESCE(published_at, created_at) AS event_date
@@ -71,6 +75,9 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
       SELECT (SELECT count(*)::int FROM filtered) AS total,
         (SELECT count(*)::int FROM filtered WHERE cardinality(countries) = 0) AS unknown,
         (SELECT count(*)::int FROM filtered WHERE severity IN ('high','critical')) AS high,
+        COALESCE((SELECT jsonb_agg(jsonb_build_object(
+          'id', id, 'title', title, 'countries', countries, 'severity', severity
+        ) ORDER BY id) FROM filtered WHERE cardinality(countries) > 0), '[]'::jsonb) AS "mapItems",
         COALESCE((SELECT jsonb_agg(c ORDER BY c.count DESC, c.country) FROM (
           SELECT country, count(DISTINCT id)::int AS count,
             count(DISTINCT id) FILTER (WHERE severity IN ('high','critical'))::int AS high

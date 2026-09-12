@@ -1,28 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
-import { COUNTRY_CENTROIDS } from '../countryCentroids';
-import type { ExplorationResult } from '../api/types';
+import type { MapPublication } from '../api/types';
 import { MAP_TILE_URL } from '../api/client';
 import { explorationClusterOptions } from './explorationClusters';
+import { publicationPoints } from './explorationPoints';
 
-type Country = ExplorationResult['countries'][number];
-type CountryMarker = L.Marker & { publicationCount: number; highCount: number; selected: boolean };
-const ALIASES: Record<string, string> = { USA: 'United States', 'United States of America': 'United States', UK: 'United Kingdom', Turkey: 'Türkiye' };
-
-function coordinates(country: string): L.LatLngTuple | null {
-  return COUNTRY_CENTROIDS[country] ?? COUNTRY_CENTROIDS[ALIASES[country] ?? ''] ?? null;
-}
+type PublicationMarker = L.Marker & { highCount: number; selected: boolean; sourcePoint: L.LatLngTuple };
 
 function markerIcon(count: number, high: number, label: string, clustered: boolean, selected = false) {
-  const size = Math.min(58, 29 + Math.log2(count + 1) * 5);
+  const size = clustered ? 36 : 14;
   const content = document.createElement('div');
   content.className = `ex-country-marker ${clustered ? 'ex-country-cluster' : ''} ${high > 0 ? 'ex-country-marker--high' : ''} ${selected ? 'is-selected' : ''}`;
   content.style.width = `${size}px`;
   content.style.height = `${size}px`;
-  content.textContent = String(count);
+  content.textContent = clustered ? String(count) : '';
   const caption = document.createElement('span');
   caption.className = 'ex-country-label';
   caption.textContent = label;
@@ -38,13 +32,15 @@ function labelMarker(marker: L.Marker, label: string, selected?: boolean) {
   if (selected !== undefined) element.setAttribute('aria-pressed', String(selected));
 }
 
-export default function ExplorationMap({ countries, selected, onSelect }: {
-  countries: Country[]; selected: string; onSelect: (country: string) => void;
+export default function ExplorationMap({ items, country, selected, onSelect, onReset }: {
+  items: MapPublication[]; country: string; selected: string;
+  onSelect: (id: string) => void; onReset: () => void;
 }) {
+  const points = useMemo(() => publicationPoints(items, country), [items, country]);
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
-  const markers = useRef(new Map<string, CountryMarker>());
+  const markers = useRef(new Map<string, PublicationMarker>());
   const onSelectRef = useRef(onSelect);
   useEffect(() => { onSelectRef.current = onSelect; }, [onSelect]);
   const [mapError, setMapError] = useState(false);
@@ -71,15 +67,15 @@ export default function ExplorationMap({ countries, selected, onSelect }: {
       ...explorationClusterOptions,
       animate: !reducedMotion,
       iconCreateFunction: (cluster) => {
-        const children = cluster.getAllChildMarkers() as CountryMarker[];
-        const count = children.reduce((total, marker) => total + marker.publicationCount, 0);
+        const children = cluster.getAllChildMarkers() as PublicationMarker[];
+        const count = cluster.getChildCount();
         const high = children.reduce((total, marker) => total + marker.highCount, 0);
-        const label = `${children.length} pays · ${count} mentions de publications, zoomer ou déployer`;
+        const label = `${count} publications, zoomer ou déployer`;
         // Leaflet replaces cluster elements during zoom; apply the accessible
         // label on each add as well as after a refresh.
         cluster.options.title = label;
         cluster.options.alt = label;
-        return markerIcon(count, high, `${children.length} pays · zoomer`, true);
+        return markerIcon(count, high, `${count} publications · zoomer`, true);
       },
     }).addTo(map);
     mapRef.current = map;
@@ -102,45 +98,50 @@ export default function ExplorationMap({ countries, selected, onSelect }: {
   useEffect(() => {
     const clusters = clusterRef.current;
     if (!clusters) return;
-    const nextCountries = new Set(countries.map((item) => item.country));
-    for (const [country, marker] of markers.current) {
-      if (!nextCountries.has(country)) {
+    const nextIds = new Set(points.map((item) => item.id));
+    for (const [id, marker] of markers.current) {
+      if (!nextIds.has(id)) {
         clusters.removeLayer(marker);
-        markers.current.delete(country);
+        markers.current.delete(id);
       }
     }
-    for (const item of countries) {
-      const point = coordinates(item.country);
-      if (!point) continue;
-      const label = `${item.country} : ${item.count} publications, ouvrir le flux`;
-      let marker = markers.current.get(item.country);
-      const icon = markerIcon(item.count, item.high, item.country, false, selected === item.country);
+    for (const item of points) {
+      const point = item.point;
+      const high = ['high', 'critical'].includes(item.severity) ? 1 : 0;
+      const label = `${item.title} — ${item.country}, ouvrir la publication`;
+      let marker = markers.current.get(item.id);
+      const icon = markerIcon(1, high, item.title, false, selected === item.id);
       if (!marker) {
-        marker = L.marker(point, { icon, title: label, alt: label, keyboard: true, bubblingMouseEvents: false }) as CountryMarker;
-        marker.on('click', () => onSelectRef.current(item.country));
+        marker = L.marker(point, { icon, title: label, alt: label, keyboard: true, bubblingMouseEvents: false }) as PublicationMarker;
+        marker.on('click', () => onSelectRef.current(item.id));
         marker.on('add', () => labelMarker(marker!, marker!.options.title ?? label, marker!.selected));
-        markers.current.set(item.country, marker);
-        marker.publicationCount = item.count;
-        marker.highCount = item.high;
-        marker.selected = selected === item.country;
+        markers.current.set(item.id, marker);
+        marker.highCount = high;
+        marker.selected = selected === item.id;
+        marker.sourcePoint = point;
         clusters.addLayer(marker);
       } else {
+        if (!L.latLng(marker.sourcePoint).equals(point)) {
+          clusters.removeLayer(marker);
+          marker.setLatLng(point);
+          marker.sourcePoint = point;
+          clusters.addLayer(marker);
+        }
         marker.setIcon(icon);
       }
-      marker.publicationCount = item.count;
-      marker.highCount = item.high;
+      marker.highCount = high;
       marker.options.title = label;
       marker.options.alt = label;
-      marker.selected = selected === item.country;
-      labelMarker(marker, label, selected === item.country);
+      marker.selected = selected === item.id;
+      labelMarker(marker, label, selected === item.id);
     }
     clusters.refreshClusters();
-  }, [countries, selected]);
+  }, [points, selected]);
 
   function resetWorld() {
     const map = mapRef.current;
     if (!map) return;
-    onSelectRef.current('');
+    onReset();
     const zoom = Math.max(0, Math.min(2, Math.floor(Math.log2(Math.max(256, map.getSize().x) / 256))));
     map.setView([20, 12], zoom, { animate: false });
   }

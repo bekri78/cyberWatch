@@ -1,4 +1,10 @@
-import type { EventsPage, SituationReport, Overview, ExplorationResult } from './types';
+import type { CyberEvent, EventsPage, SituationReport, Overview, ExplorationResult } from './types';
+
+export async function fetchEvent(id: string, signal: AbortSignal): Promise<CyberEvent> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/events/${encodeURIComponent(id)}`, { signal });
+  if (!response.ok) throw new ApiError(`Publication indisponible (${response.status}).`, response.status);
+  return response.json();
+}
 
 export async function fetchExploration(params: URLSearchParams, signal: AbortSignal): Promise<ExplorationResult> {
   const response = await fetch(`${API_BASE_URL}/api/v1/exploration?${params}`, { signal });

@@ -123,6 +123,9 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
     const first = response.json();
     expect(first.total).toBeGreaterThan(2);
     expect(first.items).toHaveLength(2);
+    expect(first.mapItems.length).toBeLessThanOrEqual(first.total);
+    expect(new Set(first.mapItems.map((item: { id: string }) => item.id)).size).toBe(first.mapItems.length);
+    expect(first.mapItems.every((item: { countries: string[] }) => item.countries.length > 0)).toBe(true);
     expect(first.timeline.reduce((sum: number, bin: { count: number }) => sum + bin.count, 0)).toBe(first.total);
     expect(first.items[0].publications[0].url).toMatch(/^https:\/\//);
     expect(first.items[0]).not.toHaveProperty('scoreTotal');
@@ -132,6 +135,7 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
       const page = (await app.inject(`${url}&cursor=${cursor}`)).json();
       expect(page.total).toBe(first.total);
       expect(page.timeline).toEqual(first.timeline);
+      expect(page.mapItems).toEqual(first.mapItems);
       ids.push(...page.items.map((item: { id: string }) => item.id));
       cursor = page.nextCursor;
     }
@@ -157,6 +161,7 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
       const response = await app.inject(`/api/v1/exploration?${query}`);
       expect(response.statusCode, response.body).toBe(200);
       expect(response.json().countries.map((item: { country: string }) => item.country).sort()).toEqual([...new Set(event.countries)].sort());
+      expect(response.json().mapItems).toEqual([{ id: gdeltId, title: event.title, countries: event.countries, severity: event.severity }]);
       query.set('country', event.countries[0]!);
       const filtered = (await app.inject(`/api/v1/exploration?${query}`)).json();
       expect(filtered.total).toBe(1);

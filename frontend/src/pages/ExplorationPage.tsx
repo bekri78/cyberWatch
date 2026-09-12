@@ -5,6 +5,7 @@ import { Icon } from '../components/Icon';
 import { EventDetailPanel } from '../components/EventDetailPanel';
 import { CATEGORY_LABELS, SEVERITY_LABELS, SOURCE_META, sourceFromTags } from '../domain';
 import type { CyberEvent } from '../api/types';
+import { fetchEvent } from '../api/client';
 import { useExploration } from '../hooks/useExploration';
 import '../exploration.css';
 
@@ -17,6 +18,9 @@ export default function ExplorationPage() {
   const [feedOpen, setFeedOpen] = useState(false);
   const [anchor, setAnchor] = useState(() => new Date().toISOString());
   const [selected, setSelected] = useState<CyberEvent | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const detailRequest = useRef<AbortController | null>(null);
   const [draft, setDraft] = useState(search.get('q') ?? '');
   const searchText = search.get('q') ?? '';
   useEffect(() => { setDraft(searchText); }, [searchText]);
@@ -27,7 +31,12 @@ export default function ExplorationPage() {
     FILTERS.forEach((key) => { const value = search.get(key); if (value) p.set(key, value); });
     return p;
   }, [search, anchor, period]);
-  const { data, countries, loading, more, error, loadMore } = useExploration(params);
+  const { data, mapItems, loading, more, error, loadMore } = useExploration(params);
+  const requestKey = params.toString();
+  useEffect(() => {
+    setSelected(null); setDetailLoading(false); setDetailError(null);
+    return () => { detailRequest.current?.abort(); };
+  }, [requestKey]);
   const country = search.get('country') ?? '';
   const location = search.get('location') ?? 'all';
   const filterCount = FILTERS.filter((key) => search.get(key) && search.get(key) !== 'all').length;
@@ -39,8 +48,27 @@ export default function ExplorationPage() {
     setSelected(null); setSearch(next);
   }
   function reset() { setSearch({ period }); setDraft(''); setSelected(null); }
-  function closeDetail() { setSelected(null); selectedButton.current?.focus(); }
-  const selectedVisible = selected && data?.items.some((item) => item.id === selected.id) ? selected : null;
+  function closeDetail() { detailRequest.current?.abort(); setDetailLoading(false); setSelected(null); selectedButton.current?.focus(); }
+  async function openPublication(id: string) {
+    if (loading) return;
+    detailRequest.current?.abort();
+    const controller = new AbortController();
+    detailRequest.current = controller;
+    setFeedOpen(true); setDetailError(null); setSelected(null);
+    if (window.innerWidth <= 760) setFiltersOpen(false);
+    const cached = data?.items.find(item => item.id === id);
+    if (cached) { setSelected(cached); setDetailLoading(false); return; }
+    setDetailLoading(true);
+    try {
+      const event = await fetchEvent(id, controller.signal);
+      if (!controller.signal.aborted) setSelected(event);
+    } catch (err) {
+      if (!controller.signal.aborted) setDetailError((err as Error).message);
+    } finally {
+      if (!controller.signal.aborted) setDetailLoading(false);
+    }
+  }
+  const selectedVisible = selected && (mapItems.some(item => item.id === selected.id) || data?.items.some(item => item.id === selected.id)) ? selected : null;
   return <Layout title="Exploration" subtitle="Carte et publications qualifiées" wide immersive>
     <div className="ex-workspace ex-immersive">
       <h1 className="sr-only">Exploration de la veille cyber</h1>
@@ -65,24 +93,20 @@ export default function ExplorationPage() {
       <div className="ex-grid" aria-busy={loading}>
         <section className="ex-map-section" aria-label="Carte des pays cités">
 
-          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap countries={countries} selected={country} onSelect={(name) => {
-            change('country', name);
-            if (name) {
-              setFeedOpen(true);
-              if (window.innerWidth <= 760) setFiltersOpen(false);
-            }
-          }} /></Suspense>
+          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} onSelect={openPublication} onReset={() => change('country', '')} /></Suspense>
           <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
-          <p className="ex-map-note">Zoomez ou cliquez sur un groupe pour séparer les pays. Les nombres additionnent les publications par pays : une publication citant plusieurs pays peut être comptée plusieurs fois dans un groupe.</p>
+          <p className="ex-map-note">Chaque point représente une publication. Cliquez sur un groupe pour le déployer ; à partir du zoom 8, les publications apparaissent individuellement. Une publication est comptée une seule fois, près du premier pays localisable cité ou du pays filtré. Les points sont légèrement écartés pour la lecture : ils ne localisent pas précisément un incident.</p>
           </details>
         </section>
         <section id="exploration-feed" hidden={!feedOpen} className="ex-feed" aria-label="Flux des publications">
           <div className="ex-panel-head"><div><Icon name="feed" size={15} /><h2>Le flux</h2></div><button className="ex-icon-button" aria-label="Masquer le flux" onClick={() => setFeedOpen(false)}><Icon name="close" size={14} /></button></div>
           <div className="ex-feed-tabs" role="group" aria-label="Couverture géographique">{[['all','Tout'],['cited','Pays cité'],['unknown','Sans pays cité']].map(([value,label]) => <button key={value} aria-pressed={location === value} onClick={() => change('location', value)}>{label}</button>)}</div>
           <div className="ex-feed-scroll">
+            {detailLoading && <p className="ex-empty" role="status">Chargement de la publication…</p>}
+            {detailError && <p className="ex-empty" role="alert">{detailError}</p>}
             {loading && <div className="ex-empty" role="status"><Icon name="refresh" size={24} /><h3>Chargement de la veille…</h3></div>}
             {!loading && data?.total === 0 && <div className="ex-empty"><Icon name="eye" size={24} /><h3>Aucune publication sur ce périmètre</h3><p>Élargissez la période ou retirez un filtre. L’absence de publication ne signifie pas une absence de risque.</p><button className="ex-button" onClick={reset}>Effacer les filtres</button></div>}
-            {data?.items.map((event) => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} aria-pressed={selectedVisible?.id === event.id} onClick={(e) => { selectedButton.current = e.currentTarget; setSelected(event); }}>
+            {data?.items.map((event) => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} aria-pressed={selectedVisible?.id === event.id} onClick={(e) => { selectedButton.current = e.currentTarget; void openPublication(event.id); }}>
               <div className="ex-event-top"><span>{sourceFromTags(event.tags).label}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span></div>
               <h3>{event.title}</h3><div className="ex-event-bottom"><span>{new Date(event.publishedAt ?? event.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} · {CATEGORY_LABELS[event.category] ?? event.category}</span><Icon name="arrowRight" size={14} /></div>
               <p className="ex-event-countries"><Icon name="mapPin" size={11} />{event.countries.length ? event.countries.slice(0,3).join(' · ') + (event.countries.length > 3 ? ` +${event.countries.length - 3}` : '') : 'Pays non documenté'}</p>

@@ -47,7 +47,10 @@ export interface EventsPage {
   nextCursor: string | null;
 }
 
+export type MapPublication = Pick<CyberEvent, 'id' | 'title' | 'countries' | 'severity'>;
+
 export interface ExplorationResult extends EventsPage {
+  mapItems: MapPublication[];
   total: number;
   unknown: number;
   high: number;
