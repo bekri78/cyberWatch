@@ -19,10 +19,10 @@ export function publicationPoints(items: MapPublication[], selectedCountry: stri
     const key = `${lat},${lng}`;
     const n = occupied.get(key) ?? 0;
     occupied.set(key, n + 1);
-    // OMGA display offsets let coincident country-level records split on zoom.
+    // Wider display offsets keep nearby country-level records legible on zoom.
     // No spider legs; these offsets are not incident coordinates.
     const angle = n * 137.5 * Math.PI / 180;
-    const radius = n === 0 ? 0 : 0.018 * Math.ceil(n / 6);
+    const radius = n === 0 ? 0 : 0.06 * Math.ceil(n / 6);
     return [{ ...item, country, point: [lat + radius * Math.cos(angle), lng + radius * Math.sin(angle)] as [number, number] }];
   });
 }

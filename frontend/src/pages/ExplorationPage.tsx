@@ -6,6 +6,7 @@ import { EventDetailPanel } from '../components/EventDetailPanel';
 import { CATEGORY_LABELS, SEVERITY_LABELS, SOURCE_META, sourceFromTags } from '../domain';
 import type { CyberEvent } from '../api/types';
 import { fetchEvent } from '../api/client';
+import { CLUSTER_FEED_LIMIT } from '../components/explorationClusters';
 import { useExploration } from '../hooks/useExploration';
 import '../exploration.css';
 
@@ -104,7 +105,7 @@ export default function ExplorationPage() {
 
           <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} onSelect={(id) => { setGroupIds(null); void openPublication(id); }} onGroupSelect={openGroup} onReset={() => { setGroupIds(null); change('country', ''); }} /></Suspense>
           <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
-          <p className="ex-map-note">Les publications proches sont regroupées. Cliquez sur un groupe pour zoomer ; le flux de droite affiche les publications du groupe. Les points sont légèrement espacés autour du pays cité pour rester accessibles au zoom ; ils ne donnent pas la position exacte de l’incident.</p>
+          <p className="ex-map-note">Les publications proches sont regroupées. Jusqu’à {CLUSTER_FEED_LIMIT} publications, cliquez sur un groupe pour tout lire dans le flux de droite. Au-delà, le clic zoome pour séparer le groupe. Les points sont légèrement espacés autour du pays cité pour rester accessibles au zoom ; ils ne donnent pas la position exacte de l’incident.</p>
           </details>
         </section>
         <section id="exploration-feed" hidden={!feedOpen} className="ex-feed" aria-label="Flux des publications">

@@ -66,13 +66,20 @@ describe('Exploration map interactions', () => {
     expect(markers()[0].textContent).toContain('Publication actualisée');
   });
 
-  it('splits a nearby cluster when clicked', async () => {
+  it.each([20, 21])('opens up to 20 publications in the feed and zooms larger groups (%i)', async (count) => {
     const select = vi.fn();
-    await act(async () => root.render(<ExplorationMap items={items} country="" onGroupSelect={select} onReset={() => {}} selected="" onSelect={() => {}} />));
-    expect(host.querySelector('.ex-country-cluster')).not.toBeNull();
+    const publications = Array.from({ length: count }, (_, n) => ({ ...items[0], id: `fr-${n}` }));
+    await act(async () => root.render(<ExplorationMap items={publications} country="" onGroupSelect={select} onReset={() => {}} selected="" onSelect={() => {}} />));
+    const center = map().getCenter();
     await act(async () => (host.querySelector('.ex-country-cluster') as HTMLElement).click());
-    expect(map().getZoom()).toBeGreaterThan(2);
-    expect(markers()).toHaveLength(2);
+    if (count === 20) {
+      expect(select).toHaveBeenCalledWith(expect.arrayContaining(publications.map(item => item.id)));
+      expect(map().getZoom()).toBe(3);
+      expect(map().getCenter()).toEqual(center);
+    } else {
+      expect(select).not.toHaveBeenCalled();
+      expect(map().getZoom()).toBeGreaterThan(3);
+    }
   });
 
   it('splits 63 Russia publications on zoom without spider legs or a popup', async () => {
@@ -106,7 +113,7 @@ describe('Exploration map interactions', () => {
     expect(feed.querySelector('.ex-load-more')).toBeNull();
     expect(host.querySelector('.leaflet-popup')).toBeNull();
     expect(fetchExploration).toHaveBeenCalledTimes(1);
-    expect(map().getZoom()).toBeGreaterThan(3);
+    expect(map().getZoom()).toBe(3);
   });
 
   it('opens a map publication outside the feed page without refiltering or resetting the map', async () => {

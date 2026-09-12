@@ -5,7 +5,7 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import type { MapPublication } from '../api/types';
 import { MAP_TILE_URL } from '../api/client';
-import { explorationClusterOptions } from './explorationClusters';
+import { CLUSTER_FEED_LIMIT, explorationClusterOptions } from './explorationClusters';
 import { publicationPoints } from './explorationPoints';
 
 type PublicationMarker = L.Marker & { highCount: number; selected: boolean; publicationId: string; sourcePoint: L.LatLngTuple };
@@ -72,7 +72,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
         const children = cluster.getAllChildMarkers() as PublicationMarker[];
         const count = cluster.getChildCount();
         const high = children.reduce((total, marker) => total + marker.highCount, 0);
-        const label = `${count} publications, ouvrir le flux`;
+        const label = `${count} publications, ${count <= CLUSTER_FEED_LIMIT ? 'ouvrir le flux' : 'zoomer'}`;
         // Leaflet replaces cluster elements during zoom; apply the accessible
         // label on each add as well as after a refresh.
         cluster.options.title = label;
@@ -83,13 +83,17 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
     clusters.on('clusterclick', (event: L.LeafletEvent & { layer: L.MarkerCluster }) => {
       const cluster = event.layer;
       const children = cluster.getAllChildMarkers() as PublicationMarker[];
-      onGroupSelectRef.current(children.map(marker => marker.publicationId));
+      if (children.length <= CLUSTER_FEED_LIMIT) {
+        onGroupSelectRef.current(children.map(marker => marker.publicationId));
+        return;
+      }
       const first = children[0].getLatLng();
       if (map.getZoom() < map.getMaxZoom() && children.some(marker => !marker.getLatLng().equals(first))) {
         cluster.zoomToBounds();
         return;
       }
-
+      // Still allow access if this group cannot be separated any further.
+      onGroupSelectRef.current(children.map(marker => marker.publicationId));
     });
     mapRef.current = map;
     clusterRef.current = clusters;
