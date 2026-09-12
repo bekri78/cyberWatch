@@ -73,17 +73,24 @@ describe('Exploration map interactions', () => {
     expect(markers()).toHaveLength(2);
   });
 
-  it('counts individual publications in one country and separates them by zoom 8', async () => {
+  it('keeps coincident publications grouped at every zoom and opens a list without spider legs', async () => {
     const select = vi.fn();
     const publications = Array.from({ length: 23 }, (_, n) => ({ id: `fr-${n}`, title: `Publication ${n}`, countries: ['France'], severity: 'low' }));
     await act(async () => root.render(<ExplorationMap items={publications} country="" onReset={() => {}} selected="" onSelect={select} />));
     expect(host.querySelector('.ex-country-cluster')!.textContent).toContain('23');
-    map().setView([46, 2], 8, { animate: false });
-    expect(host.querySelector('.ex-country-cluster')).toBeNull();
-    expect(markers()).toHaveLength(23);
     const positions = publicationPoints(publications, '').map(item => item.point.join(','));
-    expect(new Set(positions).size).toBe(23);
-    for (const element of markers()) await act(async () => element.click());
+    expect(new Set(positions).size).toBe(1);
+    for (const zoom of [8, 20]) {
+      map().setView([46, 2], zoom, { animate: false });
+      expect(host.querySelector('.ex-country-cluster')).not.toBeNull();
+    }
+    for (let n = 0; n < 23; n++) {
+      await act(async () => (host.querySelector('.ex-country-cluster') as HTMLElement).click());
+      expect(host.querySelector('.leaflet-markercluster-spider-leg')).toBeNull();
+      const buttons = host.querySelectorAll<HTMLButtonElement>('.ex-cluster-list button');
+      expect(buttons).toHaveLength(23);
+      await act(async () => buttons[n].click());
+    }
     expect(new Set(select.mock.calls.map(([id]) => id)).size).toBe(23);
   });
 

@@ -95,7 +95,7 @@ export default function ExplorationPage() {
 
           <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} onSelect={openPublication} onReset={() => change('country', '')} /></Suspense>
           <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
-          <p className="ex-map-note">Chaque point représente une publication. Cliquez sur un groupe pour le déployer ; à partir du zoom 8, les publications apparaissent individuellement. Une publication est comptée une seule fois, près du premier pays localisable cité ou du pays filtré. Les points sont légèrement écartés pour la lecture : ils ne localisent pas précisément un incident.</p>
+          <p className="ex-map-note">Les publications proches sont regroupées. Cliquez sur un groupe pour zoomer ; celles au même endroit restent regroupées et s’ouvrent dans une liste. Le point indique le centre du pays cité, pas la position exacte de l’incident.</p>
           </details>
         </section>
         <section id="exploration-feed" hidden={!feedOpen} className="ex-feed" aria-label="Flux des publications">

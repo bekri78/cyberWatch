@@ -24,7 +24,7 @@ export const mapRoutes: FastifyPluginAsync<{ mapKey?: string }> = async (app, op
     if (!key || key === 'YOUR_KEY') {
       return reply.code(503).send({ error: 'Fond de carte indisponible : MAP_KEY non configurée.' });
     }
-    const url = new URL(`https://basemaps.cartocdn.com/rastertiles/voyager/${z}/${x}/${y}.png`);
+    const url = new URL(`https://basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png`);
     url.searchParams.set('key', key);
     try {
       const response = await fetch(url, { signal: AbortSignal.timeout(10_000), redirect: 'error' });

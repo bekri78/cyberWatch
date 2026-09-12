@@ -70,14 +70,37 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
         const children = cluster.getAllChildMarkers() as PublicationMarker[];
         const count = cluster.getChildCount();
         const high = children.reduce((total, marker) => total + marker.highCount, 0);
-        const label = `${count} publications, zoomer ou déployer`;
+        const label = `${count} publications, zoomer ou consulter la liste`;
         // Leaflet replaces cluster elements during zoom; apply the accessible
         // label on each add as well as after a refresh.
         cluster.options.title = label;
         cluster.options.alt = label;
-        return markerIcon(count, high, `${count} publications · zoomer`, true);
+        return markerIcon(count, high, `${count} publications`, true);
       },
     }).addTo(map);
+    clusters.on('clusterclick', (event: L.LeafletEvent & { layer: L.MarkerCluster }) => {
+      const cluster = event.layer;
+      const children = cluster.getAllChildMarkers() as L.Marker[];
+      const first = children[0].getLatLng();
+      if (map.getZoom() < map.getMaxZoom() && children.some(marker => !marker.getLatLng().equals(first))) {
+        cluster.zoomToBounds();
+        return;
+      }
+      const list = document.createElement('div');
+      list.className = 'ex-cluster-list';
+      const heading = document.createElement('strong');
+      heading.textContent = `${children.length} publications`;
+      list.append(heading);
+      for (const marker of children) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = marker.options.title?.replace(/, ouvrir la publication$/, '') ?? 'Publication';
+        button.addEventListener('click', () => { map.closePopup(); marker.fire('click'); });
+        list.append(button);
+      }
+      L.popup({ maxWidth: 360, autoPan: false, className: 'ex-cluster-popup' })
+        .setLatLng(cluster.getLatLng()).setContent(list).openOn(map);
+    });
     mapRef.current = map;
     clusterRef.current = clusters;
     map.setZoom(Math.max(0, Math.min(2, Math.floor(Math.log2(Math.max(256, map.getSize().x) / 256)))));
@@ -98,6 +121,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
   useEffect(() => {
     const clusters = clusterRef.current;
     if (!clusters) return;
+    mapRef.current?.closePopup();
     const nextIds = new Set(points.map((item) => item.id));
     for (const [id, marker] of markers.current) {
       if (!nextIds.has(id)) {

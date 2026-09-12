@@ -22,7 +22,7 @@ describe('CARTO tiles through Railway', () => {
     expect(response.headers['cache-control']).toBe('public, max-age=86400');
     const url = fetchTile.mock.calls[0][0] as URL;
     expect(url.origin).toBe('https://basemaps.cartocdn.com');
-    expect(url.pathname).toBe('/rastertiles/voyager/4/8/5.png');
+    expect(url.pathname).toBe('/dark_all/4/8/5.png');
     expect(url.searchParams.get('key')).toBe('test key&reserved');
     expect(JSON.stringify(response.headers)).not.toContain('test key');
     expect(response.headers.location).toBeUndefined();

@@ -39,8 +39,8 @@
 .ex-leaflet-marker:focus-visible .ex-country-label { opacity: 1; }
 .ex-map-canvas > div:first-child { height: 100%; width: 100%; position: absolute; inset: 0; }
 .ex-map-placeholder { min-height: 280px; flex: 1; display: grid; place-items: center; color: var(--ex-muted); font-size: 12px; }
-.ex-country-marker { position: relative; border: 1px solid #a8b7ff; border-radius: 50%; background: #556196e8; box-shadow: 0 0 0 5px #7786c41a, 0 2px 6px #0006; color: #fff; font: 600 12px var(--font-mono); display: flex; align-items: center; justify-content: center; }
-.ex-country-marker--high { background: #ae632ddd; border-color: #efbb86; box-shadow: 0 0 0 5px #ef9f5020; }
+.ex-country-marker { position: relative; border: 1px solid #a8b7ff; border-radius: 50%; background: #556196e8; box-shadow: none; color: #fff; font: 600 12px var(--font-mono); display: flex; align-items: center; justify-content: center; }
+.ex-country-marker--high { background: #ae632ddd; border-color: #efbb86; box-shadow: none; }
 .ex-country-marker:hover, .ex-country-marker.is-selected { outline: 2px solid #f4f6ff; outline-offset: 4px; z-index: 5; }
 .ex-country-label { position: absolute; top: calc(100% + 7px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #0a0e13e8; border-radius: 3px; padding: 3px 6px; font-size: 10px; opacity: 0; pointer-events: none; }
 .ex-country-marker:hover .ex-country-label, .ex-country-marker:focus-visible .ex-country-label, .ex-country-marker.is-selected .ex-country-label { opacity: 1; }
@@ -54,7 +54,7 @@
 .ex-map-legend i { width: 6px; height: 6px; background: #9eacf1; border-radius: 50%; }
 .ex-map-legend i.ex-orange { background: #e5a66c; }
 .ex-map-note { margin: 0; padding: 6px 15px 12px; font-size: 10px; line-height: 1.5; color: #8f9daf; }
-.ex-country-cluster { outline: 2px dashed #b8c6e088; outline-offset: 4px; }
+.ex-country-cluster { outline: none; }
 .ex-note { color: #91a0b3; font-size: 10px; line-height: 1.6; margin: 7px 0; }
 .ex-title-link { color: inherit; text-decoration: underline; text-decoration-color: #8194b766; text-underline-offset: 5px; }
 .ex-title-link:hover { color: #bdccff; text-decoration-color: currentColor; }
@@ -151,3 +151,8 @@
 }
 .ex-immersive .ex-filter-panel { overscroll-behavior: contain; }
 @media(max-width:760px) { .ex-immersive .ex-filter-panel { top: 170px; max-height: calc(100% - 270px); } }
+
+.ex-cluster-popup .leaflet-popup-content-wrapper, .ex-cluster-popup .leaflet-popup-tip { background: #111b27; color: #e2e8f0; }
+.ex-cluster-list { display: grid; gap: 8px; max-height: 280px; overflow-y: auto; }
+.ex-cluster-list button { text-align: left; background: #182637; color: #e2e8f0; border: 1px solid #334155; border-radius: 4px; padding: 8px; cursor: pointer; }
+.ex-cluster-list button:hover, .ex-cluster-list button:focus-visible { border-color: #22d3ee; }
