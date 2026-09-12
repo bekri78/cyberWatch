@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Icon } from '../components/Icon';
-import { EventDetailPanel } from '../components/EventDetailPanel';
 import { CATEGORY_LABELS, SEVERITY_LABELS, SOURCE_META, sourceFromTags } from '../domain';
 import type { CyberEvent } from '../api/types';
 import { fetchEvent } from '../api/client';
@@ -103,7 +102,7 @@ export default function ExplorationPage() {
       <div className="ex-grid" aria-busy={loading}>
         <section className="ex-map-section" aria-label="Carte des pays cités">
 
-          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} onSelect={(id) => { setGroupIds(null); void openPublication(id); }} onGroupSelect={openGroup} onReset={() => { setGroupIds(null); change('country', ''); }} /></Suspense>
+          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} popupEvent={selectedVisible} onPopupClose={closeDetail} onSelect={(id) => { setGroupIds(null); void openPublication(id); }} onGroupSelect={openGroup} onReset={() => { setGroupIds(null); change('country', ''); }} /></Suspense>
           <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
           <p className="ex-map-note">Les publications proches sont regroupées. Jusqu’à {CLUSTER_FEED_LIMIT} publications, cliquez sur un groupe pour tout lire dans le flux de droite. Au-delà, le clic zoome pour séparer le groupe. Les points sont légèrement espacés autour du pays cité pour rester accessibles au zoom ; ils ne donnent pas la position exacte de l’incident.</p>
           </details>
@@ -129,7 +128,6 @@ export default function ExplorationPage() {
           </div>
           <footer className="ex-feed-footer">{groupItems ? `${groupItems.length} publications du groupe` : data ? `${data.items.length} sur ${data.total} publications` : '—'}<span>{data ? `${data.unknown} sans pays cité` : ''}</span></footer>
         </section>
-        {selectedVisible && <EventDetailPanel event={selectedVisible} onClose={closeDetail} />}
       </div>
     </div>
   </Layout>;

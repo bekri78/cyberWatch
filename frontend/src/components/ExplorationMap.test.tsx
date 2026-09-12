@@ -118,7 +118,7 @@ describe('Exploration map interactions', () => {
 
   it('opens a map publication outside the feed page without refiltering or resetting the map', async () => {
     const result = { mapItems: items, countries: [], countryOptions: ['France', 'Germany'], items: [], total: 2, unknown: 0, nextCursor: null } as unknown as ExplorationResult;
-    const event = { ...items[0], summary: 'Résumé', description: null, category: 'attack', tags: ['gdelt'], cves: [], sectors: [], organizations: [], publishedAt: '2026-09-11', createdAt: '2026-09-11' } as unknown as CyberEvent;
+    const event = { ...items[0], publications: [{ source: 'GDELT', url: 'https://news.example/article', title: items[0].title, publishedAt: '2026-09-11' }], summary: 'Résumé', description: null, category: 'attack', tags: ['gdelt'], cves: [], sectors: [], organizations: [], publishedAt: '2026-09-11', createdAt: '2026-09-11' } as unknown as CyberEvent;
     let resolveEvent!: (event: CyberEvent) => void;
     fetchExploration.mockResolvedValue(result);
     fetchEvent.mockImplementation(() => new Promise(resolve => { resolveEvent = resolve; }));
@@ -134,7 +134,13 @@ describe('Exploration map interactions', () => {
     expect(markers()).toHaveLength(2);
     expect(host.querySelector('#exploration-feed')!.textContent).toContain('Chargement de la publication');
     await act(async () => resolveEvent(event));
-    expect(host.querySelector('[aria-label="Détail de la publication"]')!.textContent).toContain('Publication France');
+    expect(host.querySelector('[aria-label="Détail de la publication"]')).toBeNull();
+    const popup = host.querySelector('.ex-publication-popup')!;
+    expect(popup.textContent).toContain('Publication France');
+    expect(popup.textContent).toContain('news.example');
+    expect(popup.textContent).toContain('11/09/2026');
+    expect(popup.querySelector('h3 a')?.getAttribute('href')).toBe('https://news.example/article');
+    expect(popup.querySelector('h3 a')?.getAttribute('rel')).toBe('noopener noreferrer');
     expect(mapSpy).toHaveBeenCalledTimes(1);
     expect(map().getZoom()).toBe(7);
     expect(markers()).toHaveLength(2);

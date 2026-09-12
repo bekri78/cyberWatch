@@ -151,3 +151,13 @@
 }
 .ex-immersive .ex-filter-panel { overscroll-behavior: contain; }
 @media(max-width:760px) { .ex-immersive .ex-filter-panel { top: 170px; max-height: calc(100% - 270px); } }
+
+.ex-publication-popup .leaflet-popup-content-wrapper, .ex-publication-popup .leaflet-popup-tip { background: #101722; color: #dfe7f1; border-radius: 3px; }
+.ex-publication-popup .leaflet-popup-content { margin: 18px 24px 16px 18px; max-width: min(420px, calc(100vw - 90px)); }
+.ex-publication-meta { display: flex; align-items: center; justify-content: space-between; gap: 16px; font: 11px var(--font-mono); color: #8394a8; }
+.ex-publication-meta span { border: 1px solid #344c79; color: #9bb8ff; background: #1b2a43; padding: 3px 6px; text-transform: uppercase; }
+.ex-publication-preview h3 { margin: 14px 0; font: 600 14px/1.6 var(--font-mono); overflow-wrap: anywhere; }
+.ex-publication-preview h3 a { color: #dfe7f1; text-decoration: none; }
+.ex-publication-preview h3 a:hover, .ex-publication-preview h3 a:focus-visible { color: #a8c8ff; text-decoration: underline; }
+.ex-publication-source { padding-top: 10px; border-top: 1px solid #1d2a3b; font: 11px var(--font-mono); color: #8da6bd; overflow-wrap: anywhere; }
+.ex-publication-popup .leaflet-popup-close-button { color: #9cafc3; }
