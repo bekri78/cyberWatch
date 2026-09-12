@@ -55,7 +55,7 @@ export default function ExplorationPage() {
     detailRequest.current?.abort();
     const controller = new AbortController();
     detailRequest.current = controller;
-    setFeedOpen(true); setDetailError(null); setSelected(null);
+    setDetailError(null); setSelected(null);
     if (window.innerWidth <= 760) setFiltersOpen(false);
     const cached = data?.items.find(item => item.id === id);
     if (cached) { setSelected(cached); setDetailLoading(false); return; }
@@ -102,7 +102,9 @@ export default function ExplorationPage() {
       <div className="ex-grid" aria-busy={loading}>
         <section className="ex-map-section" aria-label="Carte des pays cités">
 
-          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} popupEvent={selectedVisible} onPopupClose={closeDetail} onSelect={(id) => { setGroupIds(null); void openPublication(id); }} onGroupSelect={openGroup} onReset={() => { setGroupIds(null); change('country', ''); }} /></Suspense>
+          <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} popupEvent={selectedVisible} onPopupClose={closeDetail} onSelect={(id) => { void openPublication(id); }} onGroupSelect={openGroup} onReset={() => { setGroupIds(null); change('country', ''); }} /></Suspense>
+          {!feedOpen && detailLoading && <p className="ex-map-error" role="status">Chargement de la publication…</p>}
+          {!feedOpen && detailError && <p className="ex-map-error" role="alert">{detailError}</p>}
           <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
           <p className="ex-map-note">Les publications proches sont regroupées. Jusqu’à {CLUSTER_FEED_LIMIT} publications, cliquez sur un groupe pour tout lire dans le flux de droite. Au-delà, le clic zoome pour séparer le groupe. Les points sont légèrement espacés autour du pays cité pour rester accessibles au zoom ; ils ne donnent pas la position exacte de l’incident.</p>
           </details>

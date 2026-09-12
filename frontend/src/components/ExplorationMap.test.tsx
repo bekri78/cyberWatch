@@ -116,7 +116,7 @@ describe('Exploration map interactions', () => {
     expect(map().getZoom()).toBe(3);
   });
 
-  it('opens a map publication outside the feed page without refiltering or resetting the map', async () => {
+  it('opens only the popup for a map publication without opening the feed or resetting the map', async () => {
     const result = { mapItems: items, countries: [], countryOptions: ['France', 'Germany'], items: [], total: 2, unknown: 0, nextCursor: null } as unknown as ExplorationResult;
     const event = { ...items[0], publications: [{ source: 'GDELT', url: 'https://news.example/article', title: items[0].title, publishedAt: '2026-09-11' }], summary: 'Résumé', description: null, category: 'attack', tags: ['gdelt'], cves: [], sectors: [], organizations: [], publishedAt: '2026-09-11', createdAt: '2026-09-11' } as unknown as CyberEvent;
     let resolveEvent!: (event: CyberEvent) => void;
@@ -128,13 +128,14 @@ describe('Exploration map interactions', () => {
     map().setView([48, 4], 7, { animate: false });
     expect(host.querySelector<HTMLElement>('#exploration-feed')!.hidden).toBe(true);
     await act(async () => markers().find(e => e.getAttribute('aria-label')?.startsWith('Publication France'))!.click());
-    expect(host.querySelector<HTMLElement>('#exploration-feed')!.hidden).toBe(false);
+    expect(host.querySelector<HTMLElement>('#exploration-feed')!.hidden).toBe(true);
     expect(fetchEvent.mock.calls[0][0]).toBe('fr');
     expect(fetchExploration).toHaveBeenCalledTimes(1);
     expect(markers()).toHaveLength(2);
-    expect(host.querySelector('#exploration-feed')!.textContent).toContain('Chargement de la publication');
+    expect(host.querySelector('.ex-map-error')!.textContent).toContain('Chargement de la publication');
     await act(async () => resolveEvent(event));
     expect(host.querySelector('[aria-label="Détail de la publication"]')).toBeNull();
+    expect(host.querySelector<HTMLElement>('#exploration-feed')!.hidden).toBe(true);
     const popup = host.querySelector('.ex-publication-popup')!;
     expect(popup.textContent).toContain('Publication France');
     expect(popup.textContent).toContain('news.example');
