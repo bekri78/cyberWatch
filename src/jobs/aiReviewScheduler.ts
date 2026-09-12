@@ -1,3 +1,4 @@
+import { enrichCategories } from '../pipeline/enrichCategories';
 import { enrichTitleLocations } from '../pipeline/enrichTitleLocations';
 import cron from 'node-cron';
 import type { Pool } from 'pg';
@@ -37,6 +38,9 @@ async function runAiCycle(pool: Pool, apiKey: string, log: Logger) {
   running = true;
   try {
     try { await reviewGdeltEvents(pool, apiKey, log); }
-    finally { await enrichTitleLocations(pool, apiKey, log); }
+    finally {
+      try { await enrichTitleLocations(pool, apiKey, log); }
+      finally { await enrichCategories(pool, apiKey, log); }
+    }
   } finally { running = false; }
 }

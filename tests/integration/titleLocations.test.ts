@@ -1,3 +1,4 @@
+import { enrichCategories } from '../../src/pipeline/enrichCategories';
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -5,8 +6,8 @@ import type { Pool } from 'pg';
 import { afterAll, beforeAll, expect, it, vi } from 'vitest';
 import { enrichTitleLocations } from '../../src/pipeline/enrichTitleLocations';
 import { buildApp } from '../../src/app';
-const { locate } = vi.hoisted(() => ({ locate: vi.fn() }));
-vi.mock('../../src/lib/ai/deepseekClient', () => ({ locateTitleWithDeepseek: locate }));
+const { locate, categorize } = vi.hoisted(() => ({ locate: vi.fn(), categorize: vi.fn() }));
+vi.mock('../../src/lib/ai/deepseekClient', () => ({ locateTitleWithDeepseek: locate, categorizeWithDeepseek: categorize }));
 const db = new PGlite();
 const query = async (sql: string, params?: unknown[]) => db.query(sql, params);
 const pool = { query } as unknown as Pool;
@@ -56,3 +57,19 @@ it('enriches existing titles, keeps failures retryable, and exposes only located
   // Events remain stored even when excluded from the exploration view.
   expect((await query('SELECT count(*)::int AS count FROM cyber_events')).rows[0]).toEqual({ count: 7 });
 }, 30000);
+
+it('reclassifies existing publications with coherent tags without changing severity or relevance', async () => {
+  categorize.mockImplementation(async (title: string) => {
+    if (title === 'Timeout') throw new Error('API timeout');
+    return { category: title.includes('Windows') ? 'vulnerability' : 'data_breach', reasoning: 'Sujet principal du contenu' };
+  });
+  await enrichCategories(pool, 'test-key', log);
+  expect(categorize).toHaveBeenCalledTimes(6);
+  const row = (await query("SELECT category, tags, severity, is_relevant, category_reasoning FROM cyber_events WHERE title = 'Incident Lyon 1'")).rows[0];
+  expect(row).toMatchObject({ category: 'data_breach', tags: ['google_news_fr', 'data_breach'], severity: 'low', is_relevant: true, category_reasoning: 'Sujet principal du contenu' });
+  const page = (await app.inject('/api/v1/exploration?category=data_breach')).json();
+  expect(page.total).toBe(3);
+  expect(page.mapItems.every((item: { category: string }) => item.category === 'data_breach')).toBe(true);
+  await enrichCategories(pool, 'test-key', log);
+  expect(categorize).toHaveBeenCalledTimes(6);
+});

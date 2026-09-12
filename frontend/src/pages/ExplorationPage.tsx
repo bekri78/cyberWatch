@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Icon } from '../components/Icon';
-import { CATEGORY_LABELS, SEVERITY_LABELS, SOURCE_META, sourceFromTags } from '../domain';
+import { CATEGORY_LABELS, categoryColor, SEVERITY_LABELS, SOURCE_META, sourceFromTags } from '../domain';
 import type { CyberEvent } from '../api/types';
 import { fetchEvent } from '../api/client';
 import { CLUSTER_FEED_LIMIT } from '../components/explorationClusters';
@@ -104,7 +104,7 @@ export default function ExplorationPage() {
           <Suspense fallback={<div className="ex-map-placeholder">Chargement de la carte…</div>}><ExplorationMap items={mapItems} country={country} selected={selectedVisible?.id ?? ''} popupEvent={selectedVisible} onPopupClose={closeDetail} onSelect={(id) => { void openPublication(id); }} onGroupSelect={openGroup} onReset={() => { setGroupIds(null); change('country', ''); }} /></Suspense>
           {!feedOpen && detailLoading && <p className="ex-map-error" role="status">Chargement de la publication…</p>}
           {!feedOpen && detailError && <p className="ex-map-error" role="alert">{detailError}</p>}
-          <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend"><span><i />Publications</span><span><i className="ex-orange" />Au moins une sévérité élevée / critique</span></div>
+          <details className="ex-map-help"><summary>Légende et lecture de la carte</summary><div className="ex-map-legend">{Object.entries(CATEGORY_LABELS).map(([key, label]) => <span key={key}><i style={{ background: categoryColor(key) }} />{label}</span>)}<span>Groupe multicolore : plusieurs types</span></div>
           <p className="ex-map-note">Les publications proches sont regroupées. Jusqu’à {CLUSTER_FEED_LIMIT} publications, cliquez sur un groupe pour tout lire dans le flux de droite. Au-delà, le clic zoome pour séparer le groupe. Les points sont légèrement espacés autour du pays cité pour rester accessibles au zoom ; ils ne donnent pas la position exacte de l’incident.</p>
           </details>
         </section>
@@ -117,10 +117,10 @@ export default function ExplorationPage() {
             {detailError && <p className="ex-empty" role="alert">{detailError}</p>}
             {loading && <div className="ex-empty" role="status"><Icon name="refresh" size={24} /><h3>Chargement de la veille…</h3></div>}
             {!loading && data?.total === 0 && <div className="ex-empty"><Icon name="eye" size={24} /><h3>Aucune publication sur ce périmètre</h3><p>Élargissez la période ou retirez un filtre. L’absence de publication ne signifie pas une absence de risque.</p><button className="ex-button" onClick={reset}>Effacer les filtres</button></div>}
-            {groupItems?.map(event => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} onClick={(e) => { selectedButton.current = e.currentTarget; void openPublication(event.id); }}>
-              <h3>{event.title}</h3><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span><p className="ex-event-countries">{event.countries.join(' · ')}</p>
+            {groupItems?.map(event => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }} onClick={(e) => { selectedButton.current = e.currentTarget; void openPublication(event.id); }}>
+              <h3>{event.title}</h3><span style={{ color: categoryColor(event.category) }}>{CATEGORY_LABELS[event.category ?? 'other']}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span><p className="ex-event-countries">{event.countries.join(' · ')}</p>
             </button>)}
-            {!groupItems && data?.items.map((event) => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} aria-pressed={selectedVisible?.id === event.id} onClick={(e) => { selectedButton.current = e.currentTarget; void openPublication(event.id); }}>
+            {!groupItems && data?.items.map((event) => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }} aria-pressed={selectedVisible?.id === event.id} onClick={(e) => { selectedButton.current = e.currentTarget; void openPublication(event.id); }}>
               <div className="ex-event-top"><span>{sourceFromTags(event.tags).label}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span></div>
               <h3>{event.title}</h3><div className="ex-event-bottom"><span>{new Date(event.publishedAt ?? event.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} · {CATEGORY_LABELS[event.category] ?? event.category}</span><Icon name="arrowRight" size={14} /></div>
               <p className="ex-event-countries"><Icon name="mapPin" size={11} />{event.countries.length ? event.countries.slice(0,3).join(' · ') + (event.countries.length > 3 ? ` +${event.countries.length - 3}` : '') : 'Pays non documenté'}</p>

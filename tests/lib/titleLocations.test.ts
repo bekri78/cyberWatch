@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { locateTitleWithDeepseek } from '../../src/lib/ai/deepseekClient';
+import { categorizeWithDeepseek, locateTitleWithDeepseek } from '../../src/lib/ai/deepseekClient';
 import { resolveTitleLocations } from '../../src/lib/geo/resolveLocation';
 
 const candidate = { place: 'Lyon', countryCode: 'FR', precision: 'city', role: 'affected', confidence: 'high', evidence: 'hôpital à Lyon' };
@@ -37,4 +37,12 @@ describe('title locations', () => {
     fetch.mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: '{}' } }] })));
     await expect(locateTitleWithDeepseek('Titre', 'test-key')).rejects.toThrow('Invalid location');
   });
+});
+
+it('accepts only supported content categories with a justification', async () => {
+  const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ category: 'data_breach', reasoning: 'Le titre rapporte une exposition de donnees' }) } }] })));
+  vi.stubGlobal('fetch', fetch);
+  expect(await categorizeWithDeepseek('Fuite de donnees', '', 'test-key')).toMatchObject({ category: 'data_breach' });
+  fetch.mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: '{"category":"critical","reasoning":"x"}' } }] })));
+  await expect(categorizeWithDeepseek('Titre', '', 'test-key')).rejects.toThrow('Invalid category');
 });

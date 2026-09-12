@@ -6,17 +6,27 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import type { CyberEvent, MapPublication } from '../api/types';
 import { MAP_TILE_URL } from '../api/client';
 import { CLUSTER_FEED_LIMIT, explorationClusterOptions } from './explorationClusters';
-import { CATEGORY_LABELS, sourceFromTags } from '../domain';
+import { CATEGORY_LABELS, categoryColor, sourceFromTags } from '../domain';
 import { publicationUrl } from '../qualification';
 import { publicationPoints } from './explorationPoints';
 
-type PublicationMarker = L.Marker & { highCount: number; selected: boolean; publicationId: string; sourcePoint: L.LatLngTuple };
+type PublicationMarker = L.Marker & { category: string; selected: boolean; publicationId: string; sourcePoint: L.LatLngTuple };
 
-function markerIcon(count: number, high: number, label: string, clustered: boolean, selected = false) {
+function markerIcon(count: number, colors: string[], label: string, clustered: boolean, selected = false) {
   const size = clustered ? 36 : 14;
   const content = document.createElement('div');
-  content.className = `ex-country-marker ${clustered ? 'ex-country-cluster' : ''} ${high > 0 ? 'ex-country-marker--high' : ''} ${selected ? 'is-selected' : ''}`;
+  content.className = `ex-country-marker ${clustered ? 'ex-country-cluster' : ''}  ${selected ? 'is-selected' : ''}`;
   content.setAttribute('aria-label', label);
+  const distinct = [...new Set(colors)];
+  const color = distinct[0] ?? categoryColor('other');
+  content.style.borderColor = distinct.length === 1 ? color : '#cbd5e1';
+  let offset = 0;
+  const segments = distinct.map(c => {
+    const start = offset;
+    offset += colors.filter(value => value === c).length * 100 / colors.length;
+    return `${c}99 ${start}% ${offset}%`;
+  });
+  content.style.background = distinct.length <= 1 ? `${color}55` : `conic-gradient(${segments.join(',')})`;
   content.style.width = `${size}px`;
   content.style.height = `${size}px`;
   content.textContent = clustered ? String(count) : '';
@@ -78,13 +88,13 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
       iconCreateFunction: (cluster) => {
         const children = cluster.getAllChildMarkers() as PublicationMarker[];
         const count = cluster.getChildCount();
-        const high = children.reduce((total, marker) => total + marker.highCount, 0);
+        const colors = children.map(marker => categoryColor(marker.category)).sort();
         const label = `${count} publications, ${count <= CLUSTER_FEED_LIMIT ? 'ouvrir le flux' : 'zoomer'}`;
         // Leaflet replaces cluster elements during zoom; apply the accessible
         // label on each add as well as after a refresh.
         cluster.options.title = '';
         cluster.options.alt = label;
-        return markerIcon(count, high, `${count} publications`, true);
+        return markerIcon(count, colors, `${count} publications`, true);
       },
     }).addTo(map);
     clusters.on('clusterclick', (event: L.LeafletEvent & { layer: L.MarkerCluster }) => {
@@ -131,10 +141,10 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
     }
     for (const item of points) {
       const point = item.point;
-      const high = ['high', 'critical'].includes(item.severity) ? 1 : 0;
+      const category = item.category ?? 'other';
       const label = `${item.title} — ${item.country}, ouvrir la publication`;
       let marker = markers.current.get(item.id);
-      const icon = markerIcon(1, high, item.title, false, selected === item.id);
+      const icon = markerIcon(1, [categoryColor(category)], `${CATEGORY_LABELS[category] ?? CATEGORY_LABELS.other} · ${item.title}`, false, selected === item.id);
       if (!marker) {
         marker = L.marker(point, { icon, alt: label, keyboard: true, bubblingMouseEvents: false }) as PublicationMarker;
         marker.on('click', () => {
@@ -145,7 +155,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
         marker.on('add', () => labelMarker(marker!, marker!.options.alt ?? label, marker!.selected));
         markers.current.set(item.id, marker);
         marker.publicationId = item.id;
-        marker.highCount = high;
+        marker.category = category;
         marker.selected = selected === item.id;
         marker.sourcePoint = point;
         clusters.addLayer(marker);
@@ -158,7 +168,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
         }
         marker.setIcon(icon);
       }
-      marker.highCount = high;
+      marker.category = category;
       marker.options.title = '';
       marker.options.alt = label;
       marker.selected = selected === item.id;
@@ -176,6 +186,9 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
     const meta = document.createElement('div');
     meta.className = 'ex-publication-meta';
     const category = document.createElement('span');
+    category.style.color = categoryColor(popupEvent.category);
+    category.style.borderColor = categoryColor(popupEvent.category);
+    category.style.background = `${categoryColor(popupEvent.category)}22`;
     category.textContent = CATEGORY_LABELS[popupEvent.category] ?? popupEvent.category;
     const date = document.createElement('time');
     const published = popupEvent.publishedAt ?? popupEvent.createdAt;

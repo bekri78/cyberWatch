@@ -26,15 +26,24 @@ export const SEVERITY_COLORS: Record<string, string> = {
 };
 
 export const CATEGORY_LABELS: Record<string, string> = {
-  vulnerability: 'Vulnerabilite',
+  vulnerability: 'Vulnérabilité',
+  data_breach: 'Fuite de données',
+  espionage: 'Espionnage',
   alert: 'Alerte',
-  threat_intel: 'Renseignement',
-  attack: 'Attaque',
-  other: 'Autre',
+  threat_intel: 'Menace / campagne',
+  attack: 'Cyberattaque',
+  other: 'Autre / indéterminé',
 };
+
+export const CATEGORY_COLORS: Record<string, string> = {
+  attack: '#f87171', data_breach: '#fbbf24', vulnerability: '#60a5fa',
+  espionage: '#c084fc', threat_intel: '#2dd4bf', other: '#94a3b8', alert: '#fb923c',
+};
+export const categoryColor = (category?: string) => CATEGORY_COLORS[category ?? 'other'] ?? CATEGORY_COLORS.other;
 
 export const CATEGORY_ICONS: Record<string, string> = {
   vulnerability: 'bug',
+  data_breach: 'file', espionage: 'eye',
   alert: 'alert',
   threat_intel: 'satellite',
   attack: 'zap',

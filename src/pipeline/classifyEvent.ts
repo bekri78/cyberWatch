@@ -54,13 +54,9 @@ function classifyCategory(sourceName: string, url: string): string {
   }
   if (sourceName === 'cisa_kev') return 'vulnerability';
   if (sourceName === 'microsoft_msrc') return 'vulnerability';
-  // gdelt : incident reel (attaque/compromission rapportee dans la presse
-  // mondiale), pas une divulgation de vulnerabilite -- categorie distincte
-  // volontairement, cf. §37.
-  if (sourceName === 'gdelt') return 'attack';
-  // google_news_fr : meme nature que gdelt (incident reel rapporte par la
-  // presse, ici francophone, cf. migration 011) -- meme categorie.
-  if (sourceName === 'google_news_fr') return 'attack';
+  // Press feeds have no content category until DeepSeek reads the subject.
+  // A source or search keyword is never sufficient evidence of an attack.
+  if (sourceName === 'gdelt' || sourceName === 'google_news_fr') return 'other';
   return 'other';
 }
 

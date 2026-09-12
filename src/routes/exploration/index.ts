@@ -22,7 +22,7 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
     schema: { response: { 200: { type: 'object', additionalProperties: true, properties: {
       items: { type: 'array', items: eventSchema },
       mapItems: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'title', 'countries', 'severity'], properties: {
-        locations: { type: 'array', items: { type: 'object', additionalProperties: true } },
+        category: { type: 'string' }, locations: { type: 'array', items: { type: 'object', additionalProperties: true } },
         id: { type: 'string' }, title: { type: 'string' }, countries: { type: 'array', items: { type: 'string' } }, severity: { type: 'string' },
       } } },
     } }, 400: { type: 'object', properties: { message: { type: 'string' } } } }, querystring: { type: 'object', additionalProperties: false, properties: {
@@ -80,7 +80,7 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
         (SELECT count(*)::int FROM filtered WHERE cardinality(countries) = 0) AS unknown,
         (SELECT count(*)::int FROM filtered WHERE severity IN ('high','critical')) AS high,
         COALESCE((SELECT jsonb_agg(jsonb_build_object(
-          'id', id, 'title', title, 'countries', countries, 'severity', severity, 'locations', locations
+          'id', id, 'title', title, 'countries', countries, 'severity', severity, 'category', category, 'locations', locations
         ) ORDER BY id) FROM filtered WHERE cardinality(countries) > 0), '[]'::jsonb) AS "mapItems",
         COALESCE((SELECT jsonb_agg(c ORDER BY c.count DESC, c.country) FROM (
           SELECT country, count(DISTINCT id)::int AS count,

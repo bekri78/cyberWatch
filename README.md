@@ -57,3 +57,19 @@ articles existants est progressif. Une extraction sans lieu n'est pas répétée
 les échecs sont réessayés après une heure, trois tentatives maximum. Les positions
 GDELT existantes ne sont pas remplacées. Attribution et licences du référentiel :
 [src/lib/geo/README.md](src/lib/geo/README.md).
+
+## Catégories et couleurs de l'exploration
+
+DeepSeek classe le sujet principal du titre/extrait dans une catégorie validée :
+cyberattaque (rouge), fuite de données (jaune), vulnérabilité (bleu), espionnage
+(violet), menace/campagne (turquoise), autre/indéterminé (gris). Une publication
+ambiguë reste neutre. La gravité reste indépendante, affichée sous forme de texte.
+Le type historique « alerte » reste lisible en orange pendant son reclassement.
+Les clusters mixtes utilisent des secteurs proportionnels aux types présents.
+
+La migration 015 retire l'ancien défaut « attaque » des flux de presse.
+Le cycle IA reclasse jusqu'à 25 publications qualifiées par passage, avec priorité
+aux articles localisables des 30 derniers jours, et conserve une justification.
+Il met à jour catégorie et tags sans changer gravité ou pertinence. Trois tentatives
+maximum, espacées d'une heure en cas d'échec. Le traitement initial et les cycles
+suivants reprennent aussi les articles déjà collectés.

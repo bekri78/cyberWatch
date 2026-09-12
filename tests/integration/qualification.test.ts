@@ -159,7 +159,7 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
       const response = await app.inject(`/api/v1/exploration?${query}`);
       expect(response.statusCode, response.body).toBe(200);
       expect(response.json().countries.map((item: { country: string }) => item.country).sort()).toEqual([...new Set(event.countries)].sort());
-      expect(response.json().mapItems).toEqual([{ id: gdeltId, title: event.title, countries: event.countries, severity: event.severity, locations: [] }]);
+      expect(response.json().mapItems).toEqual([{ id: gdeltId, title: event.title, countries: event.countries, severity: event.severity, category: event.category, locations: [] }]);
       query.set('country', event.countries[0]!);
       const filtered = (await app.inject(`/api/v1/exploration?${query}`)).json();
       expect(filtered.total).toBe(1);

@@ -58,10 +58,11 @@ describe('runMigrations', () => {
       '012_add_relevance_scoring.sql',
       '013_qualification.sql',
       '014_title_locations.sql',
+      '015_content_categories.sql',
     ]);
     expect(result.skipped).toEqual([]);
     // BEGIN + SQL + INSERT INTO schema_migrations + COMMIT, par migration
-    expect((client.query as any).mock.calls.length).toBe(14 * 4);
+    expect((client.query as any).mock.calls.length).toBe(15 * 4);
   });
 
   it('ignore les migrations deja appliquees (idempotence)', async () => {
@@ -86,8 +87,9 @@ describe('runMigrations', () => {
       '012_add_relevance_scoring.sql',
       '013_qualification.sql',
       '014_title_locations.sql',
+      '015_content_categories.sql',
     ]);
-    expect((client.query as any).mock.calls.length).toBe(12 * 4);
+    expect((client.query as any).mock.calls.length).toBe(13 * 4);
   });
 
   it('ne pose aucune migration en double si tout est deja applique', async () => {
@@ -106,12 +108,13 @@ describe('runMigrations', () => {
       '012_add_relevance_scoring.sql',
       '013_qualification.sql',
       '014_title_locations.sql',
+      '015_content_categories.sql',
     ]);
 
     const result = await runMigrations(pool);
 
     expect(result.applied).toEqual([]);
-    expect(result.skipped.length).toBe(14);
+    expect(result.skipped.length).toBe(15);
   });
 
   it('fait un rollback et propage l\'erreur si une migration echoue', async () => {

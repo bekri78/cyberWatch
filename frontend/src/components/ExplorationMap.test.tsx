@@ -121,6 +121,15 @@ describe('Exploration map interactions', () => {
     expect(map().getZoom()).toBe(3);
   });
 
+  it('colors markers by category regardless of severity and uses multiple colors for mixed groups', async () => {
+    const publications = [{ ...items[0], category: 'vulnerability', severity: 'critical' }, { ...items[1], category: 'data_breach', severity: 'low' }];
+    await act(async () => root.render(<ExplorationMap items={publications} country="" onGroupSelect={() => {}} onReset={() => {}} selected="" onSelect={() => {}} />));
+    expect(host.querySelector<HTMLElement>('.ex-country-cluster')!.style.background).toContain('conic-gradient');
+    map().setView([48, 4], 7, { animate: false });
+    const france = markers().find(e => e.getAttribute('aria-label')?.startsWith('Publication France'))!;
+    expect(france.querySelector<HTMLElement>('.ex-country-marker')!.style.borderColor).toBe('rgb(96, 165, 250)');
+  });
+
   it('places the period controls inside the feed and ignores obsolete location URLs', async () => {
     fetchExploration.mockResolvedValue({ mapItems: [], countries: [], countryOptions: [], items: [], total: 0, unknown: 0, nextCursor: null });
     await act(async () => root.render(<MemoryRouter initialEntries={['/exploration?period=24h&location=unknown']}><ExplorationPage /></MemoryRouter>));

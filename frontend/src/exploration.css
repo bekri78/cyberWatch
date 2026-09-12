@@ -40,7 +40,6 @@
 .ex-map-canvas > div:first-child { height: 100%; width: 100%; position: absolute; inset: 0; }
 .ex-map-placeholder { min-height: 280px; flex: 1; display: grid; place-items: center; color: var(--ex-muted); font-size: 12px; }
 .ex-country-marker { position: relative; border: 1px solid #a8b7ff; border-radius: 50%; background: #556196e8; box-shadow: none; color: #fff; font: 600 12px var(--font-mono); display: flex; align-items: center; justify-content: center; }
-.ex-country-marker--high { background: #ae632ddd; border-color: #efbb86; box-shadow: none; }
 .ex-country-marker:hover, .ex-country-marker.is-selected { outline: 2px solid #f4f6ff; outline-offset: 4px; z-index: 5; }
 .ex-country-label { position: absolute; top: calc(100% + 7px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #0a0e13e8; border-radius: 3px; padding: 3px 6px; font-size: 10px; opacity: 0; pointer-events: none; }
 .ex-country-marker:hover .ex-country-label, .ex-country-marker:focus-visible .ex-country-label { opacity: 1; }
@@ -52,7 +51,6 @@
 .ex-map-legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 10px 15px 3px; font-size: 10px; color: #a9b5c7; }
 .ex-map-legend span { display: flex; align-items: center; gap: 6px; }
 .ex-map-legend i { width: 6px; height: 6px; background: #9eacf1; border-radius: 50%; }
-.ex-map-legend i.ex-orange { background: #e5a66c; }
 .ex-map-note { margin: 0; padding: 6px 15px 12px; font-size: 10px; line-height: 1.5; color: #8f9daf; }
 .ex-country-cluster { outline: none; }
 .ex-note { color: #91a0b3; font-size: 10px; line-height: 1.6; margin: 7px 0; }
@@ -71,8 +69,6 @@
 .ex-event.is-selected { background: #202c40; box-shadow: inset 3px 0 #a5b3ff; }
 .ex-event-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 10px; color: #a0b0c5; }
 .ex-severity { font-size: 9px; border: 1px solid #5a68813b; padding: 2px 5px; border-radius: 4px; background: #7c8cab10; color: #a6b4cc; }
-.ex-severity--high { color: #f1b989; background: #b5682020; border-color: #d68f4140; }
-.ex-severity--critical { color: #f5a4a4; background: #d3514520; border-color: #db6b6140; }
 .ex-event h3 { font-size: 13px; line-height: 1.55; margin: 8px 0 10px; font-weight: 540; }
 .ex-event-bottom { display: flex; justify-content: space-between; align-items: center; color: #94a2b5; font-size: 10px; }
 .ex-event-countries { display: flex; align-items: center; gap: 4px; color: #8ea0b9; font-size: 10px; margin: 7px 0 0; }

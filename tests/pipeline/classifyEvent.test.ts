@@ -216,7 +216,7 @@ describe('classifyEvent -- avis CERT-FR sans editeur industriel (non-regression)
 });
 
 describe('classifyEvent -- GDELT (vraie ligne thehindu.com, fraude cryptomonnaie/cybercriminalite)', () => {
-  it('categorise "attack" (pas "vulnerability" : incident reel, pas une divulgation)', () => {
+  it('reste neutre tant que le sujet du contenu n’est pas classifie', () => {
     const result = classifyEvent({
       sourceName: 'gdelt',
       url: 'https://www.thehindu.com/news/cities/chennai/ed-arrests-two-in-40-crore-hashpe-cryptocurrency-fraud/article71429252.ece',
@@ -224,15 +224,15 @@ describe('classifyEvent -- GDELT (vraie ligne thehindu.com, fraude cryptomonnaie
       contentExcerpt: 'Pays: India — Organisations: cyber crime police — Personnes: hitesh kumar — Themes GDELT: CYBER_ATTACK, WB_2457_CYBER_CRIME',
     });
 
-    expect(result.category).toBe('attack');
+    expect(result.category).toBe('other');
     expect(result.severity).toBe('low'); // pas de CVE, pas de branche dediee (cf. §41)
-    expect(result.tags).toEqual(['gdelt', 'attack']);
+    expect(result.tags).toEqual(['gdelt', 'other']);
     expect(result.countries).toEqual(['India']);
   });
 });
 
 describe('classifyEvent -- google_news_fr (recherche mots-cles FR, cf. migration 011)', () => {
-  it('categorise "attack" (meme nature que gdelt : incident reel rapporte par la presse)', () => {
+  it('reste neutre avant classification du contenu', () => {
     const result = classifyEvent({
       sourceName: 'google_news_fr',
       url: 'https://news.google.com/rss/articles/example-hopital-rouen',
@@ -240,9 +240,9 @@ describe('classifyEvent -- google_news_fr (recherche mots-cles FR, cf. migration
       contentExcerpt: 'Média : Le Monde',
     });
 
-    expect(result.category).toBe('attack');
+    expect(result.category).toBe('other');
     expect(result.severity).toBe('low'); // pas de CVE, pas de formule d'exploitation active
-    expect(result.tags).toEqual(['google_news_fr', 'attack']);
+    expect(result.tags).toEqual(['google_news_fr', 'other']);
     expect(result.countries).toEqual([]); // pas de champ geo structure pour cette source (cf. §46 etendu)
   });
 
