@@ -43,7 +43,7 @@
 .ex-country-marker--high { background: #ae632ddd; border-color: #efbb86; box-shadow: none; }
 .ex-country-marker:hover, .ex-country-marker.is-selected { outline: 2px solid #f4f6ff; outline-offset: 4px; z-index: 5; }
 .ex-country-label { position: absolute; top: calc(100% + 7px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #0a0e13e8; border-radius: 3px; padding: 3px 6px; font-size: 10px; opacity: 0; pointer-events: none; }
-.ex-country-marker:hover .ex-country-label, .ex-country-marker:focus-visible .ex-country-label, .ex-country-marker.is-selected .ex-country-label { opacity: 1; }
+.ex-country-marker:hover .ex-country-label, .ex-country-marker:focus-visible .ex-country-label { opacity: 1; }
 .ex-map-controls { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; z-index: 5; border: 1px solid #3e4857; border-radius: 7px; overflow: hidden; background: #141b25ed; }
 .ex-map-controls button { width: 32px; height: 32px; color: #e6eaf5; font-size: 18px; border-bottom: 1px solid var(--ex-line); }
 .ex-map-controls button:last-child { border: 0; }
@@ -161,3 +161,5 @@
 .ex-publication-preview h3 a:hover, .ex-publication-preview h3 a:focus-visible { color: #a8c8ff; text-decoration: underline; }
 .ex-publication-source { padding-top: 10px; border-top: 1px solid #1d2a3b; font: 11px var(--font-mono); color: #8da6bd; overflow-wrap: anywhere; }
 .ex-publication-popup .leaflet-popup-close-button { color: #9cafc3; }
+
+.ex-map-popup-open .ex-country-label { display: none; }

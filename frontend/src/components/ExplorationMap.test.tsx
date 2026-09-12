@@ -53,7 +53,10 @@ describe('Exploration map interactions', () => {
     map().setView([48, 4], 7, { animate: false });
     const center = map().getCenter();
     const france = markers().find(e => e.getAttribute('aria-label')?.startsWith('Publication France'))!;
+    expect(france.hasAttribute('title')).toBe(false);
+    expect(france.querySelectorAll('.ex-country-label')).toHaveLength(1);
     await act(async () => france.click());
+    expect(france.querySelector<HTMLElement>('.ex-country-label')!.hidden).toBe(true);
     expect(select).toHaveBeenCalledWith('fr');
     await act(async () => root.render(<ExplorationMap items={[{ ...items[0], title: "Publication actualisée" }]} country="" onGroupSelect={select} onReset={() => {}} selected="fr" onSelect={select} />));
     resize();
@@ -63,6 +66,8 @@ describe('Exploration map interactions', () => {
     expect(map().project(map().getCenter()).distanceTo(map().project(center))).toBeLessThan(1);
     expect(markers()).toHaveLength(1);
     expect(markers()[0].getAttribute('aria-pressed')).toBe('true');
+    expect(markers()[0].hasAttribute('title')).toBe(false);
+    expect(markers()[0].querySelector<HTMLElement>('.ex-country-label')!.hidden).toBe(true);
     expect(markers()[0].textContent).toContain('Publication actualisée');
   });
 
@@ -136,6 +141,7 @@ describe('Exploration map interactions', () => {
     await act(async () => resolveEvent(event));
     expect(host.querySelector('[aria-label="Détail de la publication"]')).toBeNull();
     expect(host.querySelector<HTMLElement>('#exploration-feed')!.hidden).toBe(true);
+    expect(host.querySelector('.ex-map-popup-open')).not.toBeNull();
     const popup = host.querySelector('.ex-publication-popup')!;
     expect(popup.textContent).toContain('Publication France');
     expect(popup.textContent).toContain('news.example');

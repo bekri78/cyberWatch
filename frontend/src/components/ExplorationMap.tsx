@@ -16,12 +16,14 @@ function markerIcon(count: number, high: number, label: string, clustered: boole
   const size = clustered ? 36 : 14;
   const content = document.createElement('div');
   content.className = `ex-country-marker ${clustered ? 'ex-country-cluster' : ''} ${high > 0 ? 'ex-country-marker--high' : ''} ${selected ? 'is-selected' : ''}`;
+  content.setAttribute('aria-label', label);
   content.style.width = `${size}px`;
   content.style.height = `${size}px`;
   content.textContent = clustered ? String(count) : '';
   const caption = document.createElement('span');
   caption.className = 'ex-country-label';
   caption.textContent = label;
+  caption.hidden = selected;
   content.append(caption);
   return L.divIcon({ html: content, className: 'ex-leaflet-marker', iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
 }
@@ -30,7 +32,7 @@ function labelMarker(marker: L.Marker, label: string, selected?: boolean) {
   const element = marker.getElement();
   if (!element) return;
   element.setAttribute('aria-label', label);
-  element.title = label;
+  element.removeAttribute('title');
   if (selected !== undefined) element.setAttribute('aria-pressed', String(selected));
 }
 
@@ -80,7 +82,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
         const label = `${count} publications, ${count <= CLUSTER_FEED_LIMIT ? 'ouvrir le flux' : 'zoomer'}`;
         // Leaflet replaces cluster elements during zoom; apply the accessible
         // label on each add as well as after a refresh.
-        cluster.options.title = label;
+        cluster.options.title = '';
         cluster.options.alt = label;
         return markerIcon(count, high, `${count} publications`, true);
       },
@@ -134,9 +136,13 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
       let marker = markers.current.get(item.id);
       const icon = markerIcon(1, high, item.title, false, selected === item.id);
       if (!marker) {
-        marker = L.marker(point, { icon, title: label, alt: label, keyboard: true, bubblingMouseEvents: false }) as PublicationMarker;
-        marker.on('click', () => onSelectRef.current(item.id));
-        marker.on('add', () => labelMarker(marker!, marker!.options.title ?? label, marker!.selected));
+        marker = L.marker(point, { icon, alt: label, keyboard: true, bubblingMouseEvents: false }) as PublicationMarker;
+        marker.on('click', () => {
+          const caption = marker!.getElement()?.querySelector<HTMLElement>('.ex-country-label');
+          if (caption) caption.hidden = true;
+          onSelectRef.current(item.id);
+        });
+        marker.on('add', () => labelMarker(marker!, marker!.options.alt ?? label, marker!.selected));
         markers.current.set(item.id, marker);
         marker.publicationId = item.id;
         marker.highCount = high;
@@ -153,7 +159,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
         marker.setIcon(icon);
       }
       marker.highCount = high;
-      marker.options.title = label;
+      marker.options.title = '';
       marker.options.alt = label;
       marker.selected = selected === item.id;
       labelMarker(marker, label, selected === item.id);
@@ -207,7 +213,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
     map.setView([20, 12], zoom, { animate: false });
   }
 
-  return <div className="ex-map-canvas">
+  return <div className={`ex-map-canvas ${popupEvent ? 'ex-map-popup-open' : ''}`}>
     <div ref={container} className="ex-leaflet-map" />
     <div className="ex-map-controls" aria-label="Navigation de la carte">
       <button type="button" onClick={() => mapRef.current?.zoomIn()} aria-label="Zoom avant">+</button>
