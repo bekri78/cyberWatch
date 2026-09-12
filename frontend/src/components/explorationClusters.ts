@@ -1,6 +1,6 @@
 import type { MarkerClusterGroupOptions } from 'leaflet';
 
-// WorldMap event radii; coincident publications stay grouped without spider legs.
+// WorldMap event radii; nearby publications split progressively without spider legs.
 export const explorationClusterOptions: MarkerClusterGroupOptions = {
   maxClusterRadius: (zoom: number) => {
     if (zoom <= 3) return 60;

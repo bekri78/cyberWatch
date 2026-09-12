@@ -48,13 +48,14 @@ function markers() { return [...host.querySelectorAll<HTMLElement>('.ex-leaflet-
 describe('Exploration map interactions', () => {
   it('keeps the same map, center and zoom through selection, data updates and resize', async () => {
     const select = vi.fn();
-    await act(async () => root.render(<ExplorationMap items={items} country="" onReset={() => {}} selected="" onSelect={select} />));
+    await act(async () => root.render(<ExplorationMap items={items} country="" onGroupSelect={select} onReset={() => {}} selected="" onSelect={select} />));
+    expect(map().getZoom()).toBe(3);
     map().setView([48, 4], 7, { animate: false });
     const center = map().getCenter();
     const france = markers().find(e => e.getAttribute('aria-label')?.startsWith('Publication France'))!;
     await act(async () => france.click());
     expect(select).toHaveBeenCalledWith('fr');
-    await act(async () => root.render(<ExplorationMap items={[{ ...items[0], title: "Publication actualisée" }]} country="" onReset={() => {}} selected="fr" onSelect={select} />));
+    await act(async () => root.render(<ExplorationMap items={[{ ...items[0], title: "Publication actualisée" }]} country="" onGroupSelect={select} onReset={() => {}} selected="fr" onSelect={select} />));
     resize();
     expect(mapSpy).toHaveBeenCalledTimes(1);
     expect(map().getZoom()).toBe(7);
@@ -66,32 +67,46 @@ describe('Exploration map interactions', () => {
   });
 
   it('splits a nearby cluster when clicked', async () => {
-    await act(async () => root.render(<ExplorationMap items={items} country="" onReset={() => {}} selected="" onSelect={() => {}} />));
+    const select = vi.fn();
+    await act(async () => root.render(<ExplorationMap items={items} country="" onGroupSelect={select} onReset={() => {}} selected="" onSelect={() => {}} />));
     expect(host.querySelector('.ex-country-cluster')).not.toBeNull();
     await act(async () => (host.querySelector('.ex-country-cluster') as HTMLElement).click());
     expect(map().getZoom()).toBeGreaterThan(2);
     expect(markers()).toHaveLength(2);
   });
 
-  it('keeps coincident publications grouped at every zoom and opens a list without spider legs', async () => {
+  it('splits 63 Russia publications on zoom without spider legs or a popup', async () => {
     const select = vi.fn();
-    const publications = Array.from({ length: 23 }, (_, n) => ({ id: `fr-${n}`, title: `Publication ${n}`, countries: ['France'], severity: 'low' }));
-    await act(async () => root.render(<ExplorationMap items={publications} country="" onReset={() => {}} selected="" onSelect={select} />));
-    expect(host.querySelector('.ex-country-cluster')!.textContent).toContain('23');
-    const positions = publicationPoints(publications, '').map(item => item.point.join(','));
-    expect(new Set(positions).size).toBe(1);
-    for (const zoom of [8, 20]) {
-      map().setView([46, 2], zoom, { animate: false });
-      expect(host.querySelector('.ex-country-cluster')).not.toBeNull();
-    }
-    for (let n = 0; n < 23; n++) {
-      await act(async () => (host.querySelector('.ex-country-cluster') as HTMLElement).click());
-      expect(host.querySelector('.leaflet-markercluster-spider-leg')).toBeNull();
-      const buttons = host.querySelectorAll<HTMLButtonElement>('.ex-cluster-list button');
-      expect(buttons).toHaveLength(23);
-      await act(async () => buttons[n].click());
-    }
-    expect(new Set(select.mock.calls.map(([id]) => id)).size).toBe(23);
+    const publications = Array.from({ length: 63 }, (_, n) => ({ id: `ru-${n}`, title: `Publication ${n}`, countries: ['Russia'], severity: 'low' }));
+    const points = publicationPoints(publications, '');
+    expect(points).toHaveLength(63);
+    expect(new Set(points.map(item => item.point.join(','))).size).toBe(63);
+    expect(publicationPoints([...publications].reverse(), '')).toEqual(points);
+    await act(async () => root.render(<ExplorationMap items={publications} country="" onGroupSelect={select} onReset={() => {}} selected="" onSelect={select} />));
+    map().setView(points[0].point, 3, { animate: false });
+    expect(host.querySelector('.ex-country-cluster')!.textContent).toContain('63');
+    map().setView(points[0].point, 8, { animate: false });
+    expect(host.querySelectorAll('.ex-leaflet-marker').length).toBeGreaterThan(1);
+    map().setView(points[0].point, 12, { animate: false });
+    expect(host.querySelector('.ex-country-cluster')).toBeNull();
+    expect(host.querySelector('.leaflet-markercluster-spider-leg')).toBeNull();
+    expect(host.querySelector('.leaflet-popup')).toBeNull();
+  });
+
+  it('opens all group publications in the right feed even outside the loaded page', async () => {
+    const publications = [items[0], { ...items[0], id: 'fr2', title: 'Second article' }];
+    fetchExploration.mockResolvedValue({ mapItems: publications, countries: [], countryOptions: [], items: [], total: 2, unknown: 0, nextCursor: 'next' });
+    await act(async () => root.render(<MemoryRouter initialEntries={['/exploration']}><ExplorationPage /></MemoryRouter>));
+    await act(async () => { await import('./ExplorationMap'); });
+    await act(async () => (host.querySelector('.ex-country-cluster') as HTMLElement).click());
+    const feed = host.querySelector<HTMLElement>('#exploration-feed')!;
+    expect(feed.hidden).toBe(false);
+    expect(feed.querySelectorAll('.ex-event')).toHaveLength(2);
+    expect(feed.textContent).toContain('Second article');
+    expect(feed.querySelector('.ex-load-more')).toBeNull();
+    expect(host.querySelector('.leaflet-popup')).toBeNull();
+    expect(fetchExploration).toHaveBeenCalledTimes(1);
+    expect(map().getZoom()).toBeGreaterThan(3);
   });
 
   it('opens a map publication outside the feed page without refiltering or resetting the map', async () => {
@@ -102,6 +117,7 @@ describe('Exploration map interactions', () => {
     fetchEvent.mockImplementation(() => new Promise(resolve => { resolveEvent = resolve; }));
     await act(async () => root.render(<MemoryRouter initialEntries={['/exploration']}><ExplorationPage /></MemoryRouter>));
     await act(async () => { await import('./ExplorationMap'); });
+    expect(map().getZoom()).toBe(3);
     map().setView([48, 4], 7, { animate: false });
     expect(host.querySelector<HTMLElement>('#exploration-feed')!.hidden).toBe(true);
     await act(async () => markers().find(e => e.getAttribute('aria-label')?.startsWith('Publication France'))!.click());

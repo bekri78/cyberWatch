@@ -8,7 +8,7 @@ import { MAP_TILE_URL } from '../api/client';
 import { explorationClusterOptions } from './explorationClusters';
 import { publicationPoints } from './explorationPoints';
 
-type PublicationMarker = L.Marker & { highCount: number; selected: boolean; sourcePoint: L.LatLngTuple };
+type PublicationMarker = L.Marker & { highCount: number; selected: boolean; publicationId: string; sourcePoint: L.LatLngTuple };
 
 function markerIcon(count: number, high: number, label: string, clustered: boolean, selected = false) {
   const size = clustered ? 36 : 14;
@@ -32,9 +32,9 @@ function labelMarker(marker: L.Marker, label: string, selected?: boolean) {
   if (selected !== undefined) element.setAttribute('aria-pressed', String(selected));
 }
 
-export default function ExplorationMap({ items, country, selected, onSelect, onReset }: {
+export default function ExplorationMap({ items, country, selected, onSelect, onGroupSelect, onReset }: {
   items: MapPublication[]; country: string; selected: string;
-  onSelect: (id: string) => void; onReset: () => void;
+  onSelect: (id: string) => void; onGroupSelect: (ids: string[]) => void; onReset: () => void;
 }) {
   const points = useMemo(() => publicationPoints(items, country), [items, country]);
   const container = useRef<HTMLDivElement>(null);
@@ -43,6 +43,8 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
   const markers = useRef(new Map<string, PublicationMarker>());
   const onSelectRef = useRef(onSelect);
   useEffect(() => { onSelectRef.current = onSelect; }, [onSelect]);
+  const onGroupSelectRef = useRef(onGroupSelect);
+  useEffect(() => { onGroupSelectRef.current = onGroupSelect; }, [onGroupSelect]);
   const [mapError, setMapError] = useState(false);
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
     // Same engine and cluster behaviour as OMGA (minitoring-cde).
     // Only this effect owns the map: filters and marker clicks never recreate it.
     const map = L.map(container.current, {
-      center: [20, 12], zoom: 2, minZoom: 0, maxZoom: 20,
+      center: [20, 12], zoom: 3, minZoom: 0, maxZoom: 20,
       zoomControl: false, doubleClickZoom: false, closePopupOnClick: false,
       zoomAnimation: !reducedMotion, fadeAnimation: !reducedMotion,
     });
@@ -70,7 +72,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
         const children = cluster.getAllChildMarkers() as PublicationMarker[];
         const count = cluster.getChildCount();
         const high = children.reduce((total, marker) => total + marker.highCount, 0);
-        const label = `${count} publications, zoomer ou consulter la liste`;
+        const label = `${count} publications, ouvrir le flux`;
         // Leaflet replaces cluster elements during zoom; apply the accessible
         // label on each add as well as after a refresh.
         cluster.options.title = label;
@@ -80,30 +82,18 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
     }).addTo(map);
     clusters.on('clusterclick', (event: L.LeafletEvent & { layer: L.MarkerCluster }) => {
       const cluster = event.layer;
-      const children = cluster.getAllChildMarkers() as L.Marker[];
+      const children = cluster.getAllChildMarkers() as PublicationMarker[];
+      onGroupSelectRef.current(children.map(marker => marker.publicationId));
       const first = children[0].getLatLng();
       if (map.getZoom() < map.getMaxZoom() && children.some(marker => !marker.getLatLng().equals(first))) {
         cluster.zoomToBounds();
         return;
       }
-      const list = document.createElement('div');
-      list.className = 'ex-cluster-list';
-      const heading = document.createElement('strong');
-      heading.textContent = `${children.length} publications`;
-      list.append(heading);
-      for (const marker of children) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = marker.options.title?.replace(/, ouvrir la publication$/, '') ?? 'Publication';
-        button.addEventListener('click', () => { map.closePopup(); marker.fire('click'); });
-        list.append(button);
-      }
-      L.popup({ maxWidth: 360, autoPan: false, className: 'ex-cluster-popup' })
-        .setLatLng(cluster.getLatLng()).setContent(list).openOn(map);
+
     });
     mapRef.current = map;
     clusterRef.current = clusters;
-    map.setZoom(Math.max(0, Math.min(2, Math.floor(Math.log2(Math.max(256, map.getSize().x) / 256)))));
+    map.setZoom(1 + Math.max(0, Math.min(2, Math.floor(Math.log2(Math.max(256, map.getSize().x) / 256)))));
     const resize = new ResizeObserver(() => {
       map.invalidateSize({ animate: false });
     });
@@ -121,7 +111,6 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
   useEffect(() => {
     const clusters = clusterRef.current;
     if (!clusters) return;
-    mapRef.current?.closePopup();
     const nextIds = new Set(points.map((item) => item.id));
     for (const [id, marker] of markers.current) {
       if (!nextIds.has(id)) {
@@ -140,6 +129,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
         marker.on('click', () => onSelectRef.current(item.id));
         marker.on('add', () => labelMarker(marker!, marker!.options.title ?? label, marker!.selected));
         markers.current.set(item.id, marker);
+        marker.publicationId = item.id;
         marker.highCount = high;
         marker.selected = selected === item.id;
         marker.sourcePoint = point;
@@ -166,7 +156,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onR
     const map = mapRef.current;
     if (!map) return;
     onReset();
-    const zoom = Math.max(0, Math.min(2, Math.floor(Math.log2(Math.max(256, map.getSize().x) / 256))));
+    const zoom = 1 + Math.max(0, Math.min(2, Math.floor(Math.log2(Math.max(256, map.getSize().x) / 256))));
     map.setView([20, 12], zoom, { animate: false });
   }
 

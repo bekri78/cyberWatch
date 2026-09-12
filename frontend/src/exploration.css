@@ -151,8 +151,3 @@
 }
 .ex-immersive .ex-filter-panel { overscroll-behavior: contain; }
 @media(max-width:760px) { .ex-immersive .ex-filter-panel { top: 170px; max-height: calc(100% - 270px); } }
-
-.ex-cluster-popup .leaflet-popup-content-wrapper, .ex-cluster-popup .leaflet-popup-tip { background: #111b27; color: #e2e8f0; }
-.ex-cluster-list { display: grid; gap: 8px; max-height: 280px; overflow-y: auto; }
-.ex-cluster-list button { text-align: left; background: #182637; color: #e2e8f0; border: 1px solid #334155; border-radius: 4px; padding: 8px; cursor: pointer; }
-.ex-cluster-list button:hover, .ex-cluster-list button:focus-visible { border-color: #22d3ee; }
