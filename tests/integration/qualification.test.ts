@@ -112,7 +112,7 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
     expect(orphan.rows[0]!.count).toBe(0);
   });
 
-  it('P1 : agrège toute la période et pagine sans doublons sur les captures réelles', async () => {
+  it('P1 : masque les captures CERT-FR non localisées dans l’exploration', async () => {
     const feed = await new Parser().parseString(readFileSync(join(__dirname, '../collectors/certfr-fixtures/avis-feed-real.xml'), 'utf8'));
     await saveRawItems(pool, await getSourceIdByName(pool, 'certfr'), feed.items.map(normalizeEntry));
     await promoteRawItems(pool);
@@ -121,14 +121,12 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
     const response = await app.inject(url);
     expect(response.statusCode, response.body).toBe(200);
     const first = response.json();
-    expect(first.total).toBeGreaterThan(2);
-    expect(first.items).toHaveLength(2);
+    expect(first.total).toBe(0);
+    expect(first.items).toHaveLength(0);
     expect(first.mapItems.length).toBeLessThanOrEqual(first.total);
     expect(new Set(first.mapItems.map((item: { id: string }) => item.id)).size).toBe(first.mapItems.length);
     expect(first.mapItems.every((item: { countries: string[] }) => item.countries.length > 0)).toBe(true);
     expect(first.timeline.reduce((sum: number, bin: { count: number }) => sum + bin.count, 0)).toBe(first.total);
-    expect(first.items[0].publications[0].url).toMatch(/^https:\/\//);
-    expect(first.items[0]).not.toHaveProperty('scoreTotal');
     const ids = first.items.map((item: { id: string }) => item.id);
     let cursor = first.nextCursor;
     while (cursor) {
@@ -161,7 +159,7 @@ describe('P0 — qualification et provenance PostgreSQL', () => {
       const response = await app.inject(`/api/v1/exploration?${query}`);
       expect(response.statusCode, response.body).toBe(200);
       expect(response.json().countries.map((item: { country: string }) => item.country).sort()).toEqual([...new Set(event.countries)].sort());
-      expect(response.json().mapItems).toEqual([{ id: gdeltId, title: event.title, countries: event.countries, severity: event.severity }]);
+      expect(response.json().mapItems).toEqual([{ id: gdeltId, title: event.title, countries: event.countries, severity: event.severity, locations: [] }]);
       query.set('country', event.countries[0]!);
       const filtered = (await app.inject(`/api/v1/exploration?${query}`)).json();
       expect(filtered.total).toBe(1);

@@ -1,0 +1,3752 @@
+{
+  "AW": {
+    "name": "Aruba",
+    "point": [
+      12.5,
+      -69.96666666
+    ],
+    "aliases": [
+      "Aruba",
+      "Arubais",
+      "Arubaise",
+      "Aruban"
+    ]
+  },
+  "AF": {
+    "name": "Afghanistan",
+    "point": [
+      33,
+      65
+    ],
+    "aliases": [
+      "Afghan",
+      "Afghane",
+      "Afghanistan",
+      "Islamic Republic of Afghanistan",
+      "République islamique d'Afghanistan"
+    ]
+  },
+  "AO": {
+    "name": "Angola",
+    "point": [
+      -12.5,
+      18.5
+    ],
+    "aliases": [
+      "Angola",
+      "Angolais",
+      "Angolaise",
+      "Angolan",
+      "Republic of Angola",
+      "République d'Angola"
+    ]
+  },
+  "AI": {
+    "name": "Anguilla",
+    "point": [
+      18.25,
+      -63.16666666
+    ],
+    "aliases": [
+      "Anguilla",
+      "Anguillan",
+      "Anguillane",
+      "Anguillian"
+    ]
+  },
+  "AX": {
+    "name": "Åland Islands",
+    "point": [
+      60.116667,
+      19.9
+    ],
+    "aliases": [
+      "Ahvenanmaa",
+      "Åland Islands",
+      "Ålandais",
+      "Ålandaise",
+      "Ålandish"
+    ]
+  },
+  "AL": {
+    "name": "Albania",
+    "point": [
+      41,
+      20
+    ],
+    "aliases": [
+      "Albanais",
+      "Albanaise",
+      "Albania",
+      "Albanian",
+      "Albanie",
+      "Republic of Albania",
+      "République d'Albanie"
+    ]
+  },
+  "AD": {
+    "name": "Andorra",
+    "point": [
+      42.5,
+      1.5
+    ],
+    "aliases": [
+      "Andorra",
+      "Andorran",
+      "Andorrane",
+      "Andorre",
+      "Principality of Andorra",
+      "Principauté d'Andorre"
+    ]
+  },
+  "AE": {
+    "name": "United Arab Emirates",
+    "point": [
+      24,
+      54
+    ],
+    "aliases": [
+      "Emirati",
+      "Emirien",
+      "Emirienne",
+      "United Arab Emirates",
+      "Émirats arabes unis"
+    ]
+  },
+  "AR": {
+    "name": "Argentina",
+    "point": [
+      -34,
+      -64
+    ],
+    "aliases": [
+      "Argentin",
+      "Argentina",
+      "Argentine",
+      "Argentine Republic",
+      "République argentine"
+    ]
+  },
+  "AM": {
+    "name": "Armenia",
+    "point": [
+      40,
+      45
+    ],
+    "aliases": [
+      "Armenia",
+      "Armenian",
+      "Arménie",
+      "Arménien",
+      "Arménienne",
+      "Republic of Armenia",
+      "République d'Arménie"
+    ]
+  },
+  "AS": {
+    "name": "American Samoa",
+    "point": [
+      -14.33333333,
+      -170
+    ],
+    "aliases": [
+      "American Samoa",
+      "American Samoan",
+      "Samoa américaines",
+      "Samoan",
+      "Samoane"
+    ]
+  },
+  "AQ": {
+    "name": "Antarctica",
+    "point": [
+      -90,
+      0
+    ],
+    "aliases": [
+      "Antarctica",
+      "Antarcticain",
+      "Antarcticaine",
+      "Antarctican",
+      "Antarctique"
+    ]
+  },
+  "TF": {
+    "name": "French Southern and Antarctic Lands",
+    "point": [
+      -49.25,
+      69.167
+    ],
+    "aliases": [
+      "Français",
+      "Française",
+      "French",
+      "French Southern and Antarctic Lands",
+      "Terres australes et antarctiques françaises",
+      "Territoire des Terres australes et antarctiques françaises",
+      "Territory of the French Southern and Antarctic Lands"
+    ]
+  },
+  "AG": {
+    "name": "Antigua and Barbuda",
+    "point": [
+      17.05,
+      -61.8
+    ],
+    "aliases": [
+      "Antigua -et-Barbuda",
+      "Antigua and Barbuda",
+      "Antigua-et-Barbuda",
+      "Antiguaise et barbudien",
+      "Antiguaise et barbudienne",
+      "Antiguan, Barbudan"
+    ]
+  },
+  "AU": {
+    "name": "Australia",
+    "point": [
+      -27,
+      133
+    ],
+    "aliases": [
+      "Australia",
+      "Australian",
+      "Australie",
+      "Australien",
+      "Australienne",
+      "Commonwealth of Australia"
+    ]
+  },
+  "AT": {
+    "name": "Austria",
+    "point": [
+      47.33333333,
+      13.33333333
+    ],
+    "aliases": [
+      "Austria",
+      "Austrian",
+      "Autriche",
+      "Autrichien",
+      "Autrichienne",
+      "Republic of Austria",
+      "République d'Autriche"
+    ]
+  },
+  "AZ": {
+    "name": "Azerbaijan",
+    "point": [
+      40.5,
+      47.5
+    ],
+    "aliases": [
+      "Azerbaijan",
+      "Azerbaijani",
+      "Azerbaïdjan",
+      "Azerbaïdjanais",
+      "Azerbaïdjanaise",
+      "Republic of Azerbaijan",
+      "République d'Azerbaïdjan"
+    ]
+  },
+  "BI": {
+    "name": "Burundi",
+    "point": [
+      -3.5,
+      30
+    ],
+    "aliases": [
+      "Burundais",
+      "Burundaise",
+      "Burundi",
+      "Burundian",
+      "Republic of Burundi",
+      "République du Burundi"
+    ]
+  },
+  "BE": {
+    "name": "Belgium",
+    "point": [
+      50.83333333,
+      4
+    ],
+    "aliases": [
+      "Belge",
+      "Belgian",
+      "Belgique",
+      "Belgium",
+      "Kingdom of Belgium",
+      "Royaume de Belgique"
+    ]
+  },
+  "BJ": {
+    "name": "Benin",
+    "point": [
+      9.5,
+      2.25
+    ],
+    "aliases": [
+      "Benin",
+      "Beninese",
+      "Bénin",
+      "Béninois",
+      "Béninoise",
+      "Republic of Benin",
+      "République du Bénin"
+    ]
+  },
+  "BF": {
+    "name": "Burkina Faso",
+    "point": [
+      13,
+      -2
+    ],
+    "aliases": [
+      "Burkina Faso",
+      "Burkinabe",
+      "Burkinabé",
+      "Burkinabée",
+      "République du Burkina"
+    ]
+  },
+  "BD": {
+    "name": "Bangladesh",
+    "point": [
+      24,
+      90
+    ],
+    "aliases": [
+      "Bangladais",
+      "Bangladaise",
+      "Bangladesh",
+      "Bangladeshi",
+      "La République populaire du Bangladesh",
+      "People's Republic of Bangladesh"
+    ]
+  },
+  "BG": {
+    "name": "Bulgaria",
+    "point": [
+      43,
+      25
+    ],
+    "aliases": [
+      "Bulgare",
+      "Bulgaria",
+      "Bulgarian",
+      "Bulgarie",
+      "Republic of Bulgaria",
+      "République de Bulgarie"
+    ]
+  },
+  "BH": {
+    "name": "Bahrain",
+    "point": [
+      26,
+      50.55
+    ],
+    "aliases": [
+      "Bahrain",
+      "Bahraini",
+      "Bahreïn",
+      "Bahreïnien",
+      "Bahreïnienne",
+      "Kingdom of Bahrain",
+      "Royaume de Bahreïn"
+    ]
+  },
+  "BS": {
+    "name": "Bahamas",
+    "point": [
+      24.25,
+      -76
+    ],
+    "aliases": [
+      "Bahamas",
+      "Bahamian",
+      "Bahamien",
+      "Bahamienne",
+      "Commonwealth des Bahamas",
+      "Commonwealth of the Bahamas"
+    ]
+  },
+  "BA": {
+    "name": "Bosnia and Herzegovina",
+    "point": [
+      44,
+      18
+    ],
+    "aliases": [
+      "Bosnia and Herzegovina",
+      "Bosnian, Herzegovinian",
+      "Bosnie-Herzégovine",
+      "Bosnie-et-Herzégovine",
+      "Bosnien",
+      "Bosnienne"
+    ]
+  },
+  "BL": {
+    "name": "Saint Barthélemy",
+    "point": [
+      18.5,
+      -63.41666666
+    ],
+    "aliases": [
+      "Barthéloméen",
+      "Barthéloméenne",
+      "Collectivity of Saint Barthélemy",
+      "Collectivité de Saint-Barthélemy",
+      "Saint Barthélemy",
+      "Saint Barthélemy Islander",
+      "Saint-Barthélemy"
+    ]
+  },
+  "SH": {
+    "name": "Saint Helena, Ascension and Tristan da Cunha",
+    "point": [
+      -15.95,
+      -5.72
+    ],
+    "aliases": [
+      "Saint Helena, Ascension and Tristan da Cunha",
+      "Saint Helenian",
+      "Sainte-Hélène, Ascension et Tristan da Cunha",
+      "Sainte-Hélènois",
+      "Sainte-Hélénoise"
+    ]
+  },
+  "BY": {
+    "name": "Belarus",
+    "point": [
+      53,
+      28
+    ],
+    "aliases": [
+      "Belarus",
+      "Belarusian",
+      "Biélorusse",
+      "Biélorussie",
+      "Republic of Belarus",
+      "République de Biélorussie"
+    ]
+  },
+  "BZ": {
+    "name": "Belize",
+    "point": [
+      17.25,
+      -88.75
+    ],
+    "aliases": [
+      "Belize",
+      "Belizean",
+      "Bélizien",
+      "Bélizienne"
+    ]
+  },
+  "BM": {
+    "name": "Bermuda",
+    "point": [
+      32.33333333,
+      -64.75
+    ],
+    "aliases": [
+      "Bermuda",
+      "Bermudes",
+      "Bermudian",
+      "Bermudien",
+      "Bermudienne"
+    ]
+  },
+  "BO": {
+    "name": "Bolivia",
+    "point": [
+      -17,
+      -65
+    ],
+    "aliases": [
+      "Bolivia",
+      "Bolivian",
+      "Bolivie",
+      "Bolivien",
+      "Bolivienne",
+      "Plurinational State of Bolivia",
+      "État plurinational de Bolivie"
+    ]
+  },
+  "BQ": {
+    "name": "Caribbean Netherlands",
+    "point": [
+      12.18,
+      -68.25
+    ],
+    "aliases": [
+      "Bonaire, Saint-Eustache et Saba",
+      "Bonaire, Sint Eustatius and Saba",
+      "Caribbean Netherlands",
+      "Dutch",
+      "Néerlandais",
+      "Néerlandaise",
+      "Pays-Bas caribéens"
+    ]
+  },
+  "BR": {
+    "name": "Brazil",
+    "point": [
+      -10,
+      -55
+    ],
+    "aliases": [
+      "Brazil",
+      "Brazilian",
+      "Brésil",
+      "Brésilien",
+      "Brésilienne",
+      "Federative Republic of Brazil",
+      "République fédérative du Brésil"
+    ]
+  },
+  "BB": {
+    "name": "Barbados",
+    "point": [
+      13.16666666,
+      -59.53333333
+    ],
+    "aliases": [
+      "Barbade",
+      "Barbadian",
+      "Barbadien",
+      "Barbadienne",
+      "Barbados"
+    ]
+  },
+  "BN": {
+    "name": "Brunei",
+    "point": [
+      4.5,
+      114.66666666
+    ],
+    "aliases": [
+      "Brunei",
+      "Bruneian",
+      "Brunéien",
+      "Brunéienne",
+      "Nation of Brunei, Abode of Peace",
+      "État de Brunei Darussalam"
+    ]
+  },
+  "BT": {
+    "name": "Bhutan",
+    "point": [
+      27.5,
+      90.5
+    ],
+    "aliases": [
+      "Bhoutan",
+      "Bhoutanais",
+      "Bhoutanaise",
+      "Bhutan",
+      "Bhutanese",
+      "Kingdom of Bhutan",
+      "Royaume du Bhoutan"
+    ]
+  },
+  "BV": {
+    "name": "Bouvet Island",
+    "point": [
+      -54.43333333,
+      3.4
+    ],
+    "aliases": [
+      "Bouvet Island",
+      "Île Bouvet"
+    ]
+  },
+  "BW": {
+    "name": "Botswana",
+    "point": [
+      -22,
+      24
+    ],
+    "aliases": [
+      "Botswana",
+      "Botswanais",
+      "Botswanaise",
+      "Motswana",
+      "Republic of Botswana",
+      "République du Botswana"
+    ]
+  },
+  "CF": {
+    "name": "Central African Republic",
+    "point": [
+      7,
+      21
+    ],
+    "aliases": [
+      "Centrafricain",
+      "Centrafricaine",
+      "Central African",
+      "Central African Republic",
+      "République centrafricaine"
+    ]
+  },
+  "CA": {
+    "name": "Canada",
+    "point": [
+      60,
+      -95
+    ],
+    "aliases": [
+      "Canada",
+      "Canadian",
+      "Canadien",
+      "Canadienne"
+    ]
+  },
+  "CC": {
+    "name": "Cocos (Keeling) Islands",
+    "point": [
+      -12.5,
+      96.83333333
+    ],
+    "aliases": [
+      "Cocos (Keeling) Islands",
+      "Cocos Islander",
+      "Territoire des îles Cocos (Keeling)",
+      "Territory of the Cocos (Keeling) Islands",
+      "Îles Cocos"
+    ]
+  },
+  "CH": {
+    "name": "Switzerland",
+    "point": [
+      47,
+      8
+    ],
+    "aliases": [
+      "Confédération suisse",
+      "Suisse",
+      "Swiss",
+      "Swiss Confederation",
+      "Switzerland"
+    ]
+  },
+  "CL": {
+    "name": "Chile",
+    "point": [
+      -30,
+      -71
+    ],
+    "aliases": [
+      "Chile",
+      "Chilean",
+      "Chili",
+      "Chilien",
+      "Chilienne",
+      "Republic of Chile",
+      "République du Chili"
+    ]
+  },
+  "CN": {
+    "name": "China",
+    "point": [
+      35,
+      105
+    ],
+    "aliases": [
+      "China",
+      "Chine",
+      "Chinese",
+      "Chinois",
+      "Chinoise",
+      "People's Republic of China",
+      "République populaire de Chine"
+    ]
+  },
+  "CI": {
+    "name": "Ivory Coast",
+    "point": [
+      8,
+      -5
+    ],
+    "aliases": [
+      "Côte d'Ivoire",
+      "Ivoirien",
+      "Ivoirienne",
+      "Ivorian",
+      "Ivory Coast",
+      "Republic of Côte d'Ivoire",
+      "République de Côte d' Ivoire"
+    ]
+  },
+  "CM": {
+    "name": "Cameroon",
+    "point": [
+      6,
+      12
+    ],
+    "aliases": [
+      "Cameroon",
+      "Cameroonian",
+      "Cameroun",
+      "Camerounais",
+      "Camerounaise",
+      "Republic of Cameroon",
+      "République du Cameroun"
+    ]
+  },
+  "CD": {
+    "name": "DR Congo",
+    "point": [
+      0,
+      25
+    ],
+    "aliases": [
+      "Congo (Rép. dém.)",
+      "Congolais",
+      "Congolaise",
+      "Congolese",
+      "DR Congo",
+      "Democratic Republic of the Congo",
+      "République démocratique du Congo"
+    ]
+  },
+  "CG": {
+    "name": "Republic of the Congo",
+    "point": [
+      -1,
+      15
+    ],
+    "aliases": [
+      "Congo",
+      "Congolais",
+      "Congolaise",
+      "Congolese",
+      "Republic of the Congo",
+      "République du Congo"
+    ]
+  },
+  "CK": {
+    "name": "Cook Islands",
+    "point": [
+      -21.23333333,
+      -159.76666666
+    ],
+    "aliases": [
+      "Cook Islander",
+      "Cook Islands",
+      "Cookien",
+      "Cookienne",
+      "Îles Cook"
+    ]
+  },
+  "CO": {
+    "name": "Colombia",
+    "point": [
+      4,
+      -72
+    ],
+    "aliases": [
+      "Colombia",
+      "Colombian",
+      "Colombie",
+      "Colombien",
+      "Colombienne",
+      "Republic of Colombia",
+      "République de Colombie"
+    ]
+  },
+  "KM": {
+    "name": "Comoros",
+    "point": [
+      -12.16666666,
+      44.25
+    ],
+    "aliases": [
+      "Comoran",
+      "Comores",
+      "Comorien",
+      "Comorienne",
+      "Comoros",
+      "Union des Comores",
+      "Union of the Comoros"
+    ]
+  },
+  "CV": {
+    "name": "Cape Verde",
+    "point": [
+      16,
+      -24
+    ],
+    "aliases": [
+      "Cap-verdien",
+      "Cap-verdienne",
+      "Cape Verde",
+      "Cape Verdian",
+      "Republic of Cabo Verde",
+      "République du Cap-Vert",
+      "Îles du Cap-Vert"
+    ]
+  },
+  "CR": {
+    "name": "Costa Rica",
+    "point": [
+      10,
+      -84
+    ],
+    "aliases": [
+      "Costa Rica",
+      "Costa Rican",
+      "Costaricain",
+      "Costaricaine",
+      "Republic of Costa Rica",
+      "République du Costa Rica"
+    ]
+  },
+  "CU": {
+    "name": "Cuba",
+    "point": [
+      21.5,
+      -80
+    ],
+    "aliases": [
+      "Cuba",
+      "Cubain",
+      "Cubaine",
+      "Cuban",
+      "Republic of Cuba",
+      "République de Cuba"
+    ]
+  },
+  "CW": {
+    "name": "Curaçao",
+    "point": [
+      12.116667,
+      -68.933333
+    ],
+    "aliases": [
+      "Country of Curaçao",
+      "Curacien",
+      "Curacienne",
+      "Curaçao",
+      "Curaçaoan",
+      "Pays de Curaçao"
+    ]
+  },
+  "CX": {
+    "name": "Christmas Island",
+    "point": [
+      -10.5,
+      105.66666666
+    ],
+    "aliases": [
+      "Christmas Island",
+      "Christmas Islander",
+      "Territoire de l'île Christmas",
+      "Territory of Christmas Island",
+      "Île Christmas"
+    ]
+  },
+  "KY": {
+    "name": "Cayman Islands",
+    "point": [
+      19.5,
+      -80.5
+    ],
+    "aliases": [
+      "Cayman Islands",
+      "Caymanian",
+      "Caïmanien",
+      "Caïmanienne",
+      "Îles Caïmans"
+    ]
+  },
+  "CY": {
+    "name": "Cyprus",
+    "point": [
+      35,
+      33
+    ],
+    "aliases": [
+      "Chypre",
+      "Chypriote",
+      "Cypriot",
+      "Cyprus",
+      "Republic of Cyprus",
+      "République de Chypre"
+    ]
+  },
+  "CZ": {
+    "name": "Czechia",
+    "point": [
+      49.75,
+      15.5
+    ],
+    "aliases": [
+      "Czech",
+      "Czech Republic",
+      "Czechia",
+      "République tchèque",
+      "Tchèque",
+      "Tchéquie"
+    ]
+  },
+  "DE": {
+    "name": "Germany",
+    "point": [
+      51,
+      9
+    ],
+    "aliases": [
+      "Allemagne",
+      "Allemand",
+      "Allemande",
+      "Federal Republic of Germany",
+      "German",
+      "Germany",
+      "République fédérale d'Allemagne"
+    ]
+  },
+  "DJ": {
+    "name": "Djibouti",
+    "point": [
+      11.5,
+      43
+    ],
+    "aliases": [
+      "Djibouti",
+      "Djiboutien",
+      "Djiboutienne",
+      "Republic of Djibouti",
+      "République de Djibouti"
+    ]
+  },
+  "DM": {
+    "name": "Dominica",
+    "point": [
+      15.41666666,
+      -61.33333333
+    ],
+    "aliases": [
+      "Commonwealth de la Dominique",
+      "Commonwealth of Dominica",
+      "Dominica",
+      "Dominican",
+      "Dominiquais",
+      "Dominiquaise",
+      "Dominique"
+    ]
+  },
+  "DK": {
+    "name": "Denmark",
+    "point": [
+      56,
+      10
+    ],
+    "aliases": [
+      "Danemark",
+      "Danish",
+      "Danois",
+      "Danoise",
+      "Denmark",
+      "Kingdom of Denmark",
+      "Royaume du Danemark"
+    ]
+  },
+  "DO": {
+    "name": "Dominican Republic",
+    "point": [
+      19,
+      -70.66666666
+    ],
+    "aliases": [
+      "Dominicain",
+      "Dominicaine",
+      "Dominican",
+      "Dominican Republic",
+      "République Dominicaine",
+      "République dominicaine"
+    ]
+  },
+  "DZ": {
+    "name": "Algeria",
+    "point": [
+      28,
+      3
+    ],
+    "aliases": [
+      "Algeria",
+      "Algerian",
+      "Algérie",
+      "Algérien",
+      "Algérienne",
+      "People's Democratic Republic of Algeria",
+      "République démocratique et populaire d'Algérie"
+    ]
+  },
+  "EC": {
+    "name": "Ecuador",
+    "point": [
+      -2,
+      -77.5
+    ],
+    "aliases": [
+      "Ecuador",
+      "Ecuadorean",
+      "Republic of Ecuador",
+      "République de l'Équateur",
+      "Équateur",
+      "Équatorien",
+      "Équatorienne"
+    ]
+  },
+  "EG": {
+    "name": "Egypt",
+    "point": [
+      27,
+      30
+    ],
+    "aliases": [
+      "Arab Republic of Egypt",
+      "Egypt",
+      "Egyptian",
+      "République arabe d'Égypte",
+      "Égypte",
+      "Égyptien",
+      "Égyptienne"
+    ]
+  },
+  "ER": {
+    "name": "Eritrea",
+    "point": [
+      15,
+      39
+    ],
+    "aliases": [
+      "Eritrea",
+      "Eritrean",
+      "State of Eritrea",
+      "Érythrée",
+      "Érythréen",
+      "Érythréenne",
+      "État d'Érythrée"
+    ]
+  },
+  "EH": {
+    "name": "Western Sahara",
+    "point": [
+      24.5,
+      -13
+    ],
+    "aliases": [
+      "République arabe sahraouie démocratique",
+      "Sahara Occidental",
+      "Sahrawi",
+      "Sahrawi Arab Democratic Republic",
+      "Western Sahara"
+    ]
+  },
+  "ES": {
+    "name": "Spain",
+    "point": [
+      40,
+      -4
+    ],
+    "aliases": [
+      "Espagne",
+      "Espagnol",
+      "Espagnole",
+      "Kingdom of Spain",
+      "Royaume d'Espagne",
+      "Spain",
+      "Spanish"
+    ]
+  },
+  "EE": {
+    "name": "Estonia",
+    "point": [
+      59,
+      26
+    ],
+    "aliases": [
+      "Estonia",
+      "Estonian",
+      "Estonie",
+      "Estonien",
+      "Estonienne",
+      "Republic of Estonia",
+      "République d'Estonie"
+    ]
+  },
+  "ET": {
+    "name": "Ethiopia",
+    "point": [
+      8,
+      38
+    ],
+    "aliases": [
+      "Ethiopia",
+      "Ethiopian",
+      "Federal Democratic Republic of Ethiopia",
+      "République fédérale démocratique d'Éthiopie",
+      "Éthiopie",
+      "Éthiopien",
+      "Éthiopienne"
+    ]
+  },
+  "FI": {
+    "name": "Finland",
+    "point": [
+      64,
+      26
+    ],
+    "aliases": [
+      "Finland",
+      "Finlandais",
+      "Finlandaise",
+      "Finlande",
+      "Finnish",
+      "Republic of Finland",
+      "République de Finlande"
+    ]
+  },
+  "FJ": {
+    "name": "Fiji",
+    "point": [
+      -18,
+      175
+    ],
+    "aliases": [
+      "Fidji",
+      "Fidjien",
+      "Fidjienne",
+      "Fiji",
+      "Fijian",
+      "Republic of Fiji",
+      "République des Fidji"
+    ]
+  },
+  "FK": {
+    "name": "Falkland Islands",
+    "point": [
+      -51.75,
+      -59
+    ],
+    "aliases": [
+      "Falkland Islander",
+      "Falkland Islands",
+      "Malouin",
+      "Malouinne",
+      "Îles Malouines"
+    ]
+  },
+  "FR": {
+    "name": "France",
+    "point": [
+      46,
+      2
+    ],
+    "aliases": [
+      "France",
+      "Français",
+      "Française",
+      "French",
+      "French Republic",
+      "République française"
+    ]
+  },
+  "FO": {
+    "name": "Faroe Islands",
+    "point": [
+      62,
+      -7
+    ],
+    "aliases": [
+      "Faroe Islands",
+      "Faroese",
+      "Féroïen",
+      "Féroïenne",
+      "Îles Féroé"
+    ]
+  },
+  "FM": {
+    "name": "Micronesia",
+    "point": [
+      6.91666666,
+      158.25
+    ],
+    "aliases": [
+      "Federated States of Micronesia",
+      "Micronesia",
+      "Micronesian",
+      "Micronésie",
+      "Micronésien",
+      "Micronésienne",
+      "États fédérés de Micronésie"
+    ]
+  },
+  "GA": {
+    "name": "Gabon",
+    "point": [
+      -1,
+      11.75
+    ],
+    "aliases": [
+      "Gabon",
+      "Gabonais",
+      "Gabonaise",
+      "Gabonese",
+      "Gabonese Republic",
+      "République gabonaise"
+    ]
+  },
+  "GB": {
+    "name": "United Kingdom",
+    "point": [
+      54,
+      -2
+    ],
+    "aliases": [
+      "Britannique",
+      "British",
+      "Royaume-Uni",
+      "Royaume-Uni de Grande-Bretagne et d'Irlande du Nord",
+      "United Kingdom",
+      "United Kingdom of Great Britain and Northern Ireland"
+    ]
+  },
+  "GE": {
+    "name": "Georgia",
+    "point": [
+      42,
+      43.5
+    ],
+    "aliases": [
+      "Georgia",
+      "Georgian",
+      "Géorgie",
+      "Géorgien",
+      "Géorgienne",
+      "République de Géorgie"
+    ]
+  },
+  "GG": {
+    "name": "Guernsey",
+    "point": [
+      49.46666666,
+      -2.58333333
+    ],
+    "aliases": [
+      "Bailiwick of Guernsey",
+      "Bailliage de Guernesey",
+      "Channel Islander",
+      "Guernesey",
+      "Guernesiais",
+      "Guernesiaise",
+      "Guernsey"
+    ]
+  },
+  "GH": {
+    "name": "Ghana",
+    "point": [
+      8,
+      -2
+    ],
+    "aliases": [
+      "Ghana",
+      "Ghanaian",
+      "Ghanéen",
+      "Ghanéenne",
+      "Republic of Ghana",
+      "République du Ghana"
+    ]
+  },
+  "GI": {
+    "name": "Gibraltar",
+    "point": [
+      36.13333333,
+      -5.35
+    ],
+    "aliases": [
+      "Gibraltar",
+      "Gibraltarien",
+      "Gibraltarienne"
+    ]
+  },
+  "GN": {
+    "name": "Guinea",
+    "point": [
+      11,
+      -10
+    ],
+    "aliases": [
+      "Guinea",
+      "Guinean",
+      "Guinée",
+      "Guinéen",
+      "Guinéenne",
+      "Republic of Guinea",
+      "République de Guinée"
+    ]
+  },
+  "GP": {
+    "name": "Guadeloupe",
+    "point": [
+      16.25,
+      -61.583333
+    ],
+    "aliases": [
+      "Guadeloupe",
+      "Guadeloupian",
+      "Guadeloupéen",
+      "Guadeloupéenne"
+    ]
+  },
+  "GM": {
+    "name": "Gambia",
+    "point": [
+      13.46666666,
+      -16.56666666
+    ],
+    "aliases": [
+      "Gambia",
+      "Gambian",
+      "Gambie",
+      "Gambien",
+      "Gambienne",
+      "Republic of the Gambia",
+      "République de Gambie"
+    ]
+  },
+  "GW": {
+    "name": "Guinea-Bissau",
+    "point": [
+      12,
+      -15
+    ],
+    "aliases": [
+      "Bissau-Guinéen",
+      "Bissau-Guinéenne",
+      "Guinea-Bissau",
+      "Guinea-Bissauan",
+      "Guinée-Bissau",
+      "Republic of Guinea-Bissau",
+      "République de Guinée-Bissau"
+    ]
+  },
+  "GQ": {
+    "name": "Equatorial Guinea",
+    "point": [
+      2,
+      10
+    ],
+    "aliases": [
+      "Equatorial Guinea",
+      "Equatorial Guinean",
+      "Guinée équatoriale",
+      "Republic of Equatorial Guinea",
+      "République de Guinée équatoriale",
+      "Équato-guinéen",
+      "Équato-guinéenne"
+    ]
+  },
+  "GR": {
+    "name": "Greece",
+    "point": [
+      39,
+      22
+    ],
+    "aliases": [
+      "Grec",
+      "Grecque",
+      "Greece",
+      "Greek",
+      "Grèce",
+      "Hellenic Republic",
+      "République hellénique"
+    ]
+  },
+  "GD": {
+    "name": "Grenada",
+    "point": [
+      12.11666666,
+      -61.66666666
+    ],
+    "aliases": [
+      "Grenada",
+      "Grenade",
+      "Grenadian",
+      "Grenadien",
+      "Grenadienne"
+    ]
+  },
+  "GL": {
+    "name": "Greenland",
+    "point": [
+      72,
+      -40
+    ],
+    "aliases": [
+      "Greenland",
+      "Greenlandic",
+      "Groenland",
+      "Groenlandais",
+      "Groenlandaise"
+    ]
+  },
+  "GT": {
+    "name": "Guatemala",
+    "point": [
+      15.5,
+      -90.25
+    ],
+    "aliases": [
+      "Guatemala",
+      "Guatemalan",
+      "Guatémaltèque",
+      "Republic of Guatemala",
+      "République du Guatemala"
+    ]
+  },
+  "GF": {
+    "name": "French Guiana",
+    "point": [
+      4,
+      -53
+    ],
+    "aliases": [
+      "French Guiana",
+      "Guiana",
+      "Guianan",
+      "Guyanais",
+      "Guyanaise",
+      "Guyane"
+    ]
+  },
+  "GU": {
+    "name": "Guam",
+    "point": [
+      13.46666666,
+      144.78333333
+    ],
+    "aliases": [
+      "Guam",
+      "Guamanian"
+    ]
+  },
+  "GY": {
+    "name": "Guyana",
+    "point": [
+      5,
+      -59
+    ],
+    "aliases": [
+      "Co-operative Republic of Guyana",
+      "Guyana",
+      "Guyanese",
+      "Guyanien",
+      "Guyanienne",
+      "République coopérative de Guyana"
+    ]
+  },
+  "HK": {
+    "name": "Hong Kong",
+    "point": [
+      22.267,
+      114.188
+    ],
+    "aliases": [
+      "Hong Kong",
+      "Hong Kong Special Administrative Region of the People's Republic of China",
+      "Hong Konger",
+      "Hongkongais",
+      "Hongkongaise",
+      "Région administrative spéciale de Hong Kong de la République populaire de Chine"
+    ]
+  },
+  "HM": {
+    "name": "Heard Island and McDonald Islands",
+    "point": [
+      -53.1,
+      72.51666666
+    ],
+    "aliases": [
+      "Heard Island and McDonald Islands",
+      "Heard and McDonald Islander",
+      "Îles Heard-et-MacDonald"
+    ]
+  },
+  "HN": {
+    "name": "Honduras",
+    "point": [
+      15,
+      -86.5
+    ],
+    "aliases": [
+      "Honduran",
+      "Honduras",
+      "Hondurien",
+      "Hondurienne",
+      "Republic of Honduras",
+      "République du Honduras"
+    ]
+  },
+  "HR": {
+    "name": "Croatia",
+    "point": [
+      45.16666666,
+      15.5
+    ],
+    "aliases": [
+      "Croate",
+      "Croatia",
+      "Croatian",
+      "Croatie",
+      "Republic of Croatia",
+      "République de Croatie"
+    ]
+  },
+  "HT": {
+    "name": "Haiti",
+    "point": [
+      19,
+      -72.41666666
+    ],
+    "aliases": [
+      "Haiti",
+      "Haitian",
+      "Haïti",
+      "Haïtien",
+      "Haïtienne",
+      "Republic of Haiti",
+      "République d'Haïti"
+    ]
+  },
+  "HU": {
+    "name": "Hungary",
+    "point": [
+      47,
+      20
+    ],
+    "aliases": [
+      "Hongrie",
+      "Hongrois",
+      "Hongroise",
+      "Hungarian",
+      "Hungary"
+    ]
+  },
+  "ID": {
+    "name": "Indonesia",
+    "point": [
+      -5,
+      120
+    ],
+    "aliases": [
+      "Indonesia",
+      "Indonesian",
+      "Indonésie",
+      "Indonésien",
+      "Indonésienne",
+      "Republic of Indonesia",
+      "République d'Indonésie"
+    ]
+  },
+  "IM": {
+    "name": "Isle of Man",
+    "point": [
+      54.25,
+      -4.5
+    ],
+    "aliases": [
+      "Isle of Man",
+      "Manx",
+      "Île de Man"
+    ]
+  },
+  "IN": {
+    "name": "India",
+    "point": [
+      20,
+      77
+    ],
+    "aliases": [
+      "Inde",
+      "India",
+      "Indian",
+      "Indien",
+      "Indienne",
+      "Republic of India",
+      "République de l'Inde"
+    ]
+  },
+  "IO": {
+    "name": "British Indian Ocean Territory",
+    "point": [
+      -6,
+      71.5
+    ],
+    "aliases": [
+      "British Indian Ocean Territory",
+      "Indian",
+      "Territoire britannique de l' océan Indien",
+      "Territoire britannique de l'océan Indien"
+    ]
+  },
+  "IE": {
+    "name": "Ireland",
+    "point": [
+      53,
+      -8
+    ],
+    "aliases": [
+      "Ireland",
+      "Irish",
+      "Irlandais",
+      "Irlandaise",
+      "Irlande",
+      "Republic of Ireland",
+      "République d'Irlande"
+    ]
+  },
+  "IR": {
+    "name": "Iran",
+    "point": [
+      32,
+      53
+    ],
+    "aliases": [
+      "Iran",
+      "Iranian",
+      "Iranien",
+      "Iranienne",
+      "Islamic Republic of Iran",
+      "République islamique d'Iran"
+    ]
+  },
+  "IQ": {
+    "name": "Iraq",
+    "point": [
+      33,
+      44
+    ],
+    "aliases": [
+      "Irak",
+      "Irakien",
+      "Irakienne",
+      "Iraq",
+      "Iraqi",
+      "Republic of Iraq",
+      "République d'Irak"
+    ]
+  },
+  "IS": {
+    "name": "Iceland",
+    "point": [
+      65,
+      -18
+    ],
+    "aliases": [
+      "Iceland",
+      "Icelander",
+      "Islandais",
+      "Islandaise",
+      "Islande",
+      "République d'Islande"
+    ]
+  },
+  "IL": {
+    "name": "Israel",
+    "point": [
+      31.47,
+      35.13
+    ],
+    "aliases": [
+      "Israel",
+      "Israeli",
+      "Israélien",
+      "Israélienne",
+      "Israël",
+      "State of Israel",
+      "État d'Israël"
+    ]
+  },
+  "IT": {
+    "name": "Italy",
+    "point": [
+      42.83333333,
+      12.83333333
+    ],
+    "aliases": [
+      "Italian",
+      "Italian Republic",
+      "Italie",
+      "Italien",
+      "Italienne",
+      "Italy",
+      "République italienne"
+    ]
+  },
+  "JM": {
+    "name": "Jamaica",
+    "point": [
+      18.25,
+      -77.5
+    ],
+    "aliases": [
+      "Jamaica",
+      "Jamaican",
+      "Jamaïcain",
+      "Jamaïcaine",
+      "Jamaïque"
+    ]
+  },
+  "JE": {
+    "name": "Jersey",
+    "point": [
+      49.25,
+      -2.16666666
+    ],
+    "aliases": [
+      "Bailiwick of Jersey",
+      "Bailliage de Jersey",
+      "Channel Islander",
+      "Jersey",
+      "Jersiais",
+      "Jersiaise"
+    ]
+  },
+  "JO": {
+    "name": "Jordan",
+    "point": [
+      31,
+      36
+    ],
+    "aliases": [
+      "Hashemite Kingdom of Jordan",
+      "Jordan",
+      "Jordanian",
+      "Jordanie",
+      "Jordanien",
+      "Jordanienne",
+      "Royaume hachémite de Jordanie"
+    ]
+  },
+  "JP": {
+    "name": "Japan",
+    "point": [
+      36,
+      138
+    ],
+    "aliases": [
+      "Japan",
+      "Japanese",
+      "Japon",
+      "Japonais",
+      "Japonaise"
+    ]
+  },
+  "KZ": {
+    "name": "Kazakhstan",
+    "point": [
+      48,
+      68
+    ],
+    "aliases": [
+      "Kazakhstan",
+      "Kazakhstanais",
+      "Kazakhstanaise",
+      "Kazakhstani",
+      "Republic of Kazakhstan",
+      "République du Kazakhstan"
+    ]
+  },
+  "KE": {
+    "name": "Kenya",
+    "point": [
+      1,
+      38
+    ],
+    "aliases": [
+      "Kenya",
+      "Kenyan",
+      "Kényan",
+      "Kényane",
+      "Republic of Kenya",
+      "République du Kenya"
+    ]
+  },
+  "KG": {
+    "name": "Kyrgyzstan",
+    "point": [
+      41,
+      75
+    ],
+    "aliases": [
+      "Kirghiz",
+      "Kirghize",
+      "Kirghizistan",
+      "Kyrgyz Republic",
+      "Kyrgyzstan",
+      "République kirghize"
+    ]
+  },
+  "KH": {
+    "name": "Cambodia",
+    "point": [
+      13,
+      105
+    ],
+    "aliases": [
+      "Cambodge",
+      "Cambodgien",
+      "Cambodgienne",
+      "Cambodia",
+      "Cambodian",
+      "Kingdom of Cambodia",
+      "Royaume du Cambodge"
+    ]
+  },
+  "KI": {
+    "name": "Kiribati",
+    "point": [
+      1.41666666,
+      173
+    ],
+    "aliases": [
+      "I-Kiribati",
+      "Independent and Sovereign Republic of Kiribati",
+      "Kiribati",
+      "Kiribatien",
+      "Kiribatienne",
+      "République de Kiribati"
+    ]
+  },
+  "KN": {
+    "name": "Saint Kitts and Nevis",
+    "point": [
+      17.33333333,
+      -62.75
+    ],
+    "aliases": [
+      "Federation of Saint Christopher and Nevis",
+      "Fédération de Saint-Christophe-et-Niévès",
+      "Kittitian or Nevisian",
+      "Kittitien-et-nevicien",
+      "Kittitienne-et-nevicienne",
+      "Saint Kitts and Nevis",
+      "Saint-Christophe-et-Niévès"
+    ]
+  },
+  "KR": {
+    "name": "South Korea",
+    "point": [
+      37,
+      127.5
+    ],
+    "aliases": [
+      "Corée du Sud",
+      "Republic of Korea",
+      "République de Corée",
+      "South Korea",
+      "South Korean",
+      "Sud-coréen",
+      "Sud-coréenne"
+    ]
+  },
+  "XK": {
+    "name": "Kosovo",
+    "point": [
+      42.666667,
+      21.166667
+    ],
+    "aliases": [
+      "Kosovar",
+      "Kosovare",
+      "Kosovo",
+      "Republic of Kosovo",
+      "République du Kosovo"
+    ]
+  },
+  "KW": {
+    "name": "Kuwait",
+    "point": [
+      29.5,
+      45.75
+    ],
+    "aliases": [
+      "Koweït",
+      "Koweïtien",
+      "Koweïtienne",
+      "Kuwait",
+      "Kuwaiti",
+      "State of Kuwait",
+      "État du Koweït"
+    ]
+  },
+  "LA": {
+    "name": "Laos",
+    "point": [
+      18,
+      105
+    ],
+    "aliases": [
+      "Lao People's Democratic Republic",
+      "Laos",
+      "Laotian",
+      "Laotien",
+      "Laotienne",
+      "République démocratique populaire lao"
+    ]
+  },
+  "LB": {
+    "name": "Lebanon",
+    "point": [
+      33.83333333,
+      35.83333333
+    ],
+    "aliases": [
+      "Lebanese",
+      "Lebanese Republic",
+      "Lebanon",
+      "Liban",
+      "Libanais",
+      "Libanaise",
+      "République libanaise"
+    ]
+  },
+  "LR": {
+    "name": "Liberia",
+    "point": [
+      6.5,
+      -9.5
+    ],
+    "aliases": [
+      "Liberia",
+      "Liberian",
+      "Libérien",
+      "Libérienne",
+      "Republic of Liberia",
+      "République du Libéria"
+    ]
+  },
+  "LY": {
+    "name": "Libya",
+    "point": [
+      25,
+      17
+    ],
+    "aliases": [
+      "Grande République arabe libyenne populaire et socialiste",
+      "Libya",
+      "Libyan",
+      "Libye",
+      "Libyen",
+      "Libyenne",
+      "State of Libya"
+    ]
+  },
+  "LC": {
+    "name": "Saint Lucia",
+    "point": [
+      13.88333333,
+      -60.96666666
+    ],
+    "aliases": [
+      "Saint Lucia",
+      "Saint Lucian",
+      "Saint-Lucien",
+      "Saint-Lucienne",
+      "Sainte-Lucie"
+    ]
+  },
+  "LI": {
+    "name": "Liechtenstein",
+    "point": [
+      47.26666666,
+      9.53333333
+    ],
+    "aliases": [
+      "Liechtenstein",
+      "Liechtensteiner",
+      "Liechtensteinois",
+      "Liechtensteinoise",
+      "Principality of Liechtenstein",
+      "Principauté du Liechtenstein"
+    ]
+  },
+  "LK": {
+    "name": "Sri Lanka",
+    "point": [
+      7,
+      81
+    ],
+    "aliases": [
+      "Democratic Socialist Republic of Sri Lanka",
+      "République démocratique socialiste du Sri Lanka",
+      "Sri Lanka",
+      "Sri Lankan",
+      "Sri-lankais",
+      "Sri-lankaise"
+    ]
+  },
+  "LS": {
+    "name": "Lesotho",
+    "point": [
+      -29.5,
+      28.5
+    ],
+    "aliases": [
+      "Kingdom of Lesotho",
+      "Lesotho",
+      "Lésothien",
+      "Lésothienne",
+      "Mosotho",
+      "Royaume du Lesotho"
+    ]
+  },
+  "LT": {
+    "name": "Lithuania",
+    "point": [
+      56,
+      24
+    ],
+    "aliases": [
+      "Lithuania",
+      "Lithuanian",
+      "Lituanie",
+      "Lituanien",
+      "Lituanienne",
+      "Republic of Lithuania",
+      "République de Lituanie"
+    ]
+  },
+  "LU": {
+    "name": "Luxembourg",
+    "point": [
+      49.75,
+      6.16666666
+    ],
+    "aliases": [
+      "Grand Duchy of Luxembourg",
+      "Grand-Duché de Luxembourg",
+      "Luxembourg",
+      "Luxembourgeois",
+      "Luxembourgeoise",
+      "Luxembourger"
+    ]
+  },
+  "LV": {
+    "name": "Latvia",
+    "point": [
+      57,
+      25
+    ],
+    "aliases": [
+      "Latvia",
+      "Latvian",
+      "Letton",
+      "Lettone",
+      "Lettonie",
+      "Republic of Latvia",
+      "République de Lettonie"
+    ]
+  },
+  "MO": {
+    "name": "Macau",
+    "point": [
+      22.16666666,
+      113.55
+    ],
+    "aliases": [
+      "Macanais",
+      "Macanaise",
+      "Macanese",
+      "Macao",
+      "Macao Special Administrative Region of the People's Republic of China",
+      "Macau",
+      "Région administrative spéciale de Macao de la République populaire de Chine"
+    ]
+  },
+  "MF": {
+    "name": "Saint Martin",
+    "point": [
+      18.08333333,
+      -63.95
+    ],
+    "aliases": [
+      "Saint Martin",
+      "Saint Martin Islander",
+      "Saint-Martin",
+      "Saint-Martinois",
+      "Saint-Martinoise"
+    ]
+  },
+  "MA": {
+    "name": "Morocco",
+    "point": [
+      32,
+      -5
+    ],
+    "aliases": [
+      "Kingdom of Morocco",
+      "Maroc",
+      "Marocain",
+      "Marocaine",
+      "Moroccan",
+      "Morocco",
+      "Royaume du Maroc"
+    ]
+  },
+  "MC": {
+    "name": "Monaco",
+    "point": [
+      43.73333333,
+      7.4
+    ],
+    "aliases": [
+      "Monaco",
+      "Monegasque",
+      "Monégasque",
+      "Principality of Monaco",
+      "Principauté de Monaco"
+    ]
+  },
+  "MD": {
+    "name": "Moldova",
+    "point": [
+      47,
+      29
+    ],
+    "aliases": [
+      "Moldave",
+      "Moldavie",
+      "Moldova",
+      "Moldovan",
+      "Republic of Moldova",
+      "République de Moldavie"
+    ]
+  },
+  "MG": {
+    "name": "Madagascar",
+    "point": [
+      -20,
+      47
+    ],
+    "aliases": [
+      "Madagascar",
+      "Malagasy",
+      "Malgache",
+      "Republic of Madagascar",
+      "République de Madagascar"
+    ]
+  },
+  "MV": {
+    "name": "Maldives",
+    "point": [
+      3.25,
+      73
+    ],
+    "aliases": [
+      "Maldivan",
+      "Maldives",
+      "Maldivien",
+      "Maldivienne",
+      "Republic of the Maldives",
+      "République des Maldives"
+    ]
+  },
+  "MX": {
+    "name": "Mexico",
+    "point": [
+      23,
+      -102
+    ],
+    "aliases": [
+      "Mexicain",
+      "Mexicaine",
+      "Mexican",
+      "Mexico",
+      "Mexique",
+      "United Mexican States",
+      "États-Unis du Mexique"
+    ]
+  },
+  "MH": {
+    "name": "Marshall Islands",
+    "point": [
+      9,
+      168
+    ],
+    "aliases": [
+      "Marshall Islands",
+      "Marshallais",
+      "Marshallaise",
+      "Marshallese",
+      "Republic of the Marshall Islands",
+      "République des Îles Marshall",
+      "Îles Marshall"
+    ]
+  },
+  "MK": {
+    "name": "North Macedonia",
+    "point": [
+      41.83333333,
+      22
+    ],
+    "aliases": [
+      "Macedonian",
+      "Macédoine du Nord",
+      "Macédonien",
+      "Macédonienne",
+      "North Macedonia",
+      "Republic of North Macedonia",
+      "République de Macédoine du Nord"
+    ]
+  },
+  "ML": {
+    "name": "Mali",
+    "point": [
+      17,
+      -4
+    ],
+    "aliases": [
+      "Mali",
+      "Malian",
+      "Malien",
+      "Malienne",
+      "Republic of Mali",
+      "République du Mali"
+    ]
+  },
+  "MT": {
+    "name": "Malta",
+    "point": [
+      35.83333333,
+      14.58333333
+    ],
+    "aliases": [
+      "Malta",
+      "Maltais",
+      "Maltaise",
+      "Malte",
+      "Maltese",
+      "Republic of Malta",
+      "République de Malte"
+    ]
+  },
+  "MM": {
+    "name": "Myanmar",
+    "point": [
+      22,
+      98
+    ],
+    "aliases": [
+      "Birman",
+      "Birmane",
+      "Birmanie",
+      "Burmese",
+      "Myanmar",
+      "Republic of the Union of Myanmar",
+      "République de l'Union du Myanmar"
+    ]
+  },
+  "ME": {
+    "name": "Montenegro",
+    "point": [
+      42.5,
+      19.3
+    ],
+    "aliases": [
+      "Montenegrin",
+      "Montenegro",
+      "Monténégrin",
+      "Monténégrine",
+      "Monténégro"
+    ]
+  },
+  "MN": {
+    "name": "Mongolia",
+    "point": [
+      46,
+      105
+    ],
+    "aliases": [
+      "Mongol",
+      "Mongole",
+      "Mongolia",
+      "Mongolian",
+      "Mongolie"
+    ]
+  },
+  "MP": {
+    "name": "Northern Mariana Islands",
+    "point": [
+      15.2,
+      145.75
+    ],
+    "aliases": [
+      "American",
+      "Américaine",
+      "Américan",
+      "Commonwealth des îles Mariannes du Nord",
+      "Commonwealth of the Northern Mariana Islands",
+      "Northern Mariana Islands",
+      "Îles Mariannes du Nord"
+    ]
+  },
+  "MZ": {
+    "name": "Mozambique",
+    "point": [
+      -18.25,
+      35
+    ],
+    "aliases": [
+      "Mozambicain",
+      "Mozambicaine",
+      "Mozambican",
+      "Mozambique",
+      "Republic of Mozambique",
+      "République du Mozambique"
+    ]
+  },
+  "MR": {
+    "name": "Mauritania",
+    "point": [
+      20,
+      -12
+    ],
+    "aliases": [
+      "Islamic Republic of Mauritania",
+      "Mauritania",
+      "Mauritanian",
+      "Mauritanie",
+      "Mauritanien",
+      "Mauritanienne",
+      "République islamique de Mauritanie"
+    ]
+  },
+  "MS": {
+    "name": "Montserrat",
+    "point": [
+      16.75,
+      -62.2
+    ],
+    "aliases": [
+      "Montserrat",
+      "Montserratian",
+      "Montserratien",
+      "Montserratienne"
+    ]
+  },
+  "MQ": {
+    "name": "Martinique",
+    "point": [
+      14.666667,
+      -61
+    ],
+    "aliases": [
+      "Martinican",
+      "Martiniquais",
+      "Martiniquaise",
+      "Martinique"
+    ]
+  },
+  "MU": {
+    "name": "Mauritius",
+    "point": [
+      -20.28333333,
+      57.55
+    ],
+    "aliases": [
+      "Mauricien",
+      "Mauricienne",
+      "Mauritian",
+      "Mauritius",
+      "Republic of Mauritius",
+      "République de Maurice",
+      "Île Maurice"
+    ]
+  },
+  "MW": {
+    "name": "Malawi",
+    "point": [
+      -13.5,
+      34
+    ],
+    "aliases": [
+      "Malawi",
+      "Malawian",
+      "Malawien",
+      "Malawienne",
+      "Republic of Malawi",
+      "République du Malawi"
+    ]
+  },
+  "MY": {
+    "name": "Malaysia",
+    "point": [
+      2.5,
+      112.5
+    ],
+    "aliases": [
+      "Fédération de Malaisie",
+      "Malaisie",
+      "Malaisien",
+      "Malaisienne",
+      "Malaysia",
+      "Malaysian"
+    ]
+  },
+  "YT": {
+    "name": "Mayotte",
+    "point": [
+      -12.83333333,
+      45.16666666
+    ],
+    "aliases": [
+      "Department of Mayotte",
+      "Département de Mayotte",
+      "Mahorais",
+      "Mahoraise",
+      "Mahoran",
+      "Mayotte"
+    ]
+  },
+  "NA": {
+    "name": "Namibia",
+    "point": [
+      -22,
+      17
+    ],
+    "aliases": [
+      "Namibia",
+      "Namibian",
+      "Namibie",
+      "Namibien",
+      "Namibienne",
+      "Republic of Namibia",
+      "République de Namibie"
+    ]
+  },
+  "NC": {
+    "name": "New Caledonia",
+    "point": [
+      -21.5,
+      165.5
+    ],
+    "aliases": [
+      "New Caledonia",
+      "New Caledonian",
+      "Nouvelle-Calédonie",
+      "Néo-Calédonien",
+      "Néo-Calédonienne"
+    ]
+  },
+  "NE": {
+    "name": "Niger",
+    "point": [
+      16,
+      8
+    ],
+    "aliases": [
+      "Niger",
+      "Nigerien",
+      "Nigérien",
+      "Nigérienne",
+      "Republic of Niger",
+      "République du Niger"
+    ]
+  },
+  "NF": {
+    "name": "Norfolk Island",
+    "point": [
+      -29.03333333,
+      167.95
+    ],
+    "aliases": [
+      "Norfolk Island",
+      "Norfolk Islander",
+      "Norfolkais",
+      "Norfolkaise",
+      "Territoire de l'île Norfolk",
+      "Territory of Norfolk Island",
+      "Île Norfolk"
+    ]
+  },
+  "NG": {
+    "name": "Nigeria",
+    "point": [
+      10,
+      8
+    ],
+    "aliases": [
+      "Federal Republic of Nigeria",
+      "Nigeria",
+      "Nigerian",
+      "Nigéria",
+      "Nigérian",
+      "Nigériane",
+      "République fédérale du Nigeria"
+    ]
+  },
+  "NI": {
+    "name": "Nicaragua",
+    "point": [
+      13,
+      -85
+    ],
+    "aliases": [
+      "Nicaragua",
+      "Nicaraguan",
+      "Nicaraguayen",
+      "Nicaraguayenne",
+      "Republic of Nicaragua",
+      "République du Nicaragua"
+    ]
+  },
+  "NU": {
+    "name": "Niue",
+    "point": [
+      -19.03333333,
+      -169.86666666
+    ],
+    "aliases": [
+      "Niue",
+      "Niuean",
+      "Niuéen",
+      "Niuéenne"
+    ]
+  },
+  "NL": {
+    "name": "Netherlands",
+    "point": [
+      52.5,
+      5.75
+    ],
+    "aliases": [
+      "Dutch",
+      "Kingdom of the Netherlands",
+      "Netherlands",
+      "Néerlandais",
+      "Néerlandaise",
+      "Pays-Bas"
+    ]
+  },
+  "NO": {
+    "name": "Norway",
+    "point": [
+      62,
+      10
+    ],
+    "aliases": [
+      "Kingdom of Norway",
+      "Norvège",
+      "Norvégien",
+      "Norvégienne",
+      "Norway",
+      "Norwegian",
+      "Royaume de Norvège"
+    ]
+  },
+  "NP": {
+    "name": "Nepal",
+    "point": [
+      28,
+      84
+    ],
+    "aliases": [
+      "Federal Democratic Republic of Nepal",
+      "Nepal",
+      "Nepalese",
+      "Népal",
+      "Népalais",
+      "Népalaise",
+      "République du Népal"
+    ]
+  },
+  "NR": {
+    "name": "Nauru",
+    "point": [
+      -0.53333333,
+      166.91666666
+    ],
+    "aliases": [
+      "Nauru",
+      "Nauruan",
+      "Nauruane",
+      "Republic of Nauru",
+      "République de Nauru"
+    ]
+  },
+  "NZ": {
+    "name": "New Zealand",
+    "point": [
+      -41,
+      174
+    ],
+    "aliases": [
+      "Neo-Zélandais",
+      "Neo-Zélandaise",
+      "New Zealand",
+      "New Zealander",
+      "Nouvelle-Zélande"
+    ]
+  },
+  "OM": {
+    "name": "Oman",
+    "point": [
+      21,
+      57
+    ],
+    "aliases": [
+      "Oman",
+      "Omanais",
+      "Omanaise",
+      "Omani",
+      "Sultanat d'Oman",
+      "Sultanate of Oman"
+    ]
+  },
+  "PK": {
+    "name": "Pakistan",
+    "point": [
+      30,
+      70
+    ],
+    "aliases": [
+      "Islamic Republic of Pakistan",
+      "Pakistan",
+      "Pakistanais",
+      "Pakistanaise",
+      "Pakistani",
+      "République islamique du Pakistan"
+    ]
+  },
+  "PA": {
+    "name": "Panama",
+    "point": [
+      9,
+      -80
+    ],
+    "aliases": [
+      "Panama",
+      "Panamanian",
+      "Panaméen",
+      "Panaméenne",
+      "Republic of Panama",
+      "République du Panama"
+    ]
+  },
+  "PN": {
+    "name": "Pitcairn Islands",
+    "point": [
+      -25.06666666,
+      -130.1
+    ],
+    "aliases": [
+      "Groupe d'îles Pitcairn",
+      "Pitcairn Group of Islands",
+      "Pitcairn Islander",
+      "Pitcairn Islands",
+      "Pitcairnais",
+      "Pitcairnaise",
+      "Îles Pitcairn"
+    ]
+  },
+  "PE": {
+    "name": "Peru",
+    "point": [
+      -10,
+      -76
+    ],
+    "aliases": [
+      "Peru",
+      "Peruvian",
+      "Pérou",
+      "Péruvien",
+      "Péruvienne",
+      "Republic of Peru",
+      "République du Pérou"
+    ]
+  },
+  "PH": {
+    "name": "Philippines",
+    "point": [
+      13,
+      122
+    ],
+    "aliases": [
+      "Filipino",
+      "Philippin",
+      "Philippine",
+      "Philippines",
+      "Republic of the Philippines",
+      "République des Philippines"
+    ]
+  },
+  "PW": {
+    "name": "Palau",
+    "point": [
+      7.5,
+      134.5
+    ],
+    "aliases": [
+      "Palaos (Palau)",
+      "Palau",
+      "Palauan",
+      "Paluan",
+      "Paluane",
+      "Republic of Palau",
+      "République des Palaos (Palau)"
+    ]
+  },
+  "PG": {
+    "name": "Papua New Guinea",
+    "point": [
+      -6,
+      147
+    ],
+    "aliases": [
+      "Independent State of Papua New Guinea",
+      "Papouasie-Nouvelle-Guinée",
+      "Papouasien",
+      "Papouasienne",
+      "Papua New Guinea",
+      "Papua New Guinean",
+      "État indépendant de Papouasie-Nouvelle-Guinée"
+    ]
+  },
+  "PL": {
+    "name": "Poland",
+    "point": [
+      52,
+      20
+    ],
+    "aliases": [
+      "Poland",
+      "Polish",
+      "Pologne",
+      "Polonais",
+      "Polonaise",
+      "Republic of Poland",
+      "République de Pologne"
+    ]
+  },
+  "PR": {
+    "name": "Puerto Rico",
+    "point": [
+      18.25,
+      -66.5
+    ],
+    "aliases": [
+      "Commonwealth of Puerto Rico",
+      "Porto Rico",
+      "Portoricain",
+      "Portoricaine",
+      "Puerto Rican",
+      "Puerto Rico"
+    ]
+  },
+  "KP": {
+    "name": "North Korea",
+    "point": [
+      40,
+      127
+    ],
+    "aliases": [
+      "Corée du Nord",
+      "Democratic People's Republic of Korea",
+      "Nord-coréen",
+      "Nord-coréenne",
+      "North Korea",
+      "North Korean",
+      "République populaire démocratique de Corée"
+    ]
+  },
+  "PT": {
+    "name": "Portugal",
+    "point": [
+      39.5,
+      -8
+    ],
+    "aliases": [
+      "Portugais",
+      "Portugaise",
+      "Portugal",
+      "Portuguese",
+      "Portuguese Republic",
+      "République portugaise"
+    ]
+  },
+  "PY": {
+    "name": "Paraguay",
+    "point": [
+      -23,
+      -58
+    ],
+    "aliases": [
+      "Paraguay",
+      "Paraguayan",
+      "Paraguayen",
+      "Paraguayenne",
+      "Republic of Paraguay",
+      "République du Paraguay"
+    ]
+  },
+  "PS": {
+    "name": "Palestine",
+    "point": [
+      31.9,
+      35.2
+    ],
+    "aliases": [
+      "Palestine",
+      "Palestinian",
+      "Palestinien",
+      "Palestinienne",
+      "State of Palestine",
+      "État de Palestine"
+    ]
+  },
+  "PF": {
+    "name": "French Polynesia",
+    "point": [
+      -15,
+      -140
+    ],
+    "aliases": [
+      "French Polynesia",
+      "French Polynesian",
+      "Polynésie française",
+      "Polynésien",
+      "Polynésienne"
+    ]
+  },
+  "QA": {
+    "name": "Qatar",
+    "point": [
+      25.5,
+      51.25
+    ],
+    "aliases": [
+      "Qatar",
+      "Qatari",
+      "Qatarien",
+      "Qatarienne",
+      "State of Qatar",
+      "État du Qatar"
+    ]
+  },
+  "RE": {
+    "name": "Réunion",
+    "point": [
+      -21.15,
+      55.5
+    ],
+    "aliases": [
+      "Ile de la Réunion",
+      "Réunion",
+      "Réunion Island",
+      "Réunionese",
+      "Réunionnais",
+      "Réunionnaise"
+    ]
+  },
+  "RO": {
+    "name": "Romania",
+    "point": [
+      46,
+      25
+    ],
+    "aliases": [
+      "Romania",
+      "Romanian",
+      "Roumain",
+      "Roumaine",
+      "Roumanie"
+    ]
+  },
+  "RU": {
+    "name": "Russia",
+    "point": [
+      60,
+      100
+    ],
+    "aliases": [
+      "Fédération de Russie",
+      "Russe",
+      "Russia",
+      "Russian",
+      "Russian Federation",
+      "Russie"
+    ]
+  },
+  "RW": {
+    "name": "Rwanda",
+    "point": [
+      -2,
+      30
+    ],
+    "aliases": [
+      "Republic of Rwanda",
+      "Rwanda",
+      "Rwandais",
+      "Rwandaise",
+      "Rwandan",
+      "République rwandaise"
+    ]
+  },
+  "SA": {
+    "name": "Saudi Arabia",
+    "point": [
+      25,
+      45
+    ],
+    "aliases": [
+      "Arabie Saoudite",
+      "Kingdom of Saudi Arabia",
+      "Royaume d'Arabie Saoudite",
+      "Saoudien",
+      "Saoudienne",
+      "Saudi Arabia",
+      "Saudi Arabian"
+    ]
+  },
+  "SD": {
+    "name": "Sudan",
+    "point": [
+      15,
+      30
+    ],
+    "aliases": [
+      "Republic of the Sudan",
+      "République du Soudan",
+      "Soudan",
+      "Soudanais",
+      "Soudanaise",
+      "Sudan",
+      "Sudanese"
+    ]
+  },
+  "SN": {
+    "name": "Senegal",
+    "point": [
+      14,
+      -14
+    ],
+    "aliases": [
+      "Republic of Senegal",
+      "République du Sénégal",
+      "Senegal",
+      "Senegalese",
+      "Sénégal",
+      "Sénégalais",
+      "Sénégalaise"
+    ]
+  },
+  "SG": {
+    "name": "Singapore",
+    "point": [
+      1.36666666,
+      103.8
+    ],
+    "aliases": [
+      "Republic of Singapore",
+      "République de Singapour",
+      "Singapore",
+      "Singaporean",
+      "Singapour",
+      "Singapourien",
+      "Singapourienne"
+    ]
+  },
+  "GS": {
+    "name": "South Georgia",
+    "point": [
+      -54.5,
+      -37
+    ],
+    "aliases": [
+      "Géorgie du Sud et les îles Sandwich du Sud",
+      "Géorgie du Sud-et-les Îles Sandwich du Sud",
+      "South Georgia",
+      "South Georgia and the South Sandwich Islands",
+      "South Georgian South Sandwich Islander"
+    ]
+  },
+  "SJ": {
+    "name": "Svalbard and Jan Mayen",
+    "point": [
+      78,
+      20
+    ],
+    "aliases": [
+      "Jan Mayen Svalbard",
+      "Norwegian",
+      "Svalbard and Jan Mayen",
+      "Svalbard et Jan Mayen",
+      "Svalbard og Jan Mayen"
+    ]
+  },
+  "SB": {
+    "name": "Solomon Islands",
+    "point": [
+      -8,
+      159
+    ],
+    "aliases": [
+      "Salomonien",
+      "Salomonienne",
+      "Solomon Islander",
+      "Solomon Islands",
+      "Îles Salomon"
+    ]
+  },
+  "SL": {
+    "name": "Sierra Leone",
+    "point": [
+      8.5,
+      -11.5
+    ],
+    "aliases": [
+      "Republic of Sierra Leone",
+      "République de Sierra Leone",
+      "Sierra Leone",
+      "Sierra Leonean",
+      "Sierra-leonais",
+      "Sierra-leonaise"
+    ]
+  },
+  "SV": {
+    "name": "El Salvador",
+    "point": [
+      13.83333333,
+      -88.91666666
+    ],
+    "aliases": [
+      "El Salvador",
+      "Republic of El Salvador",
+      "République du Salvador",
+      "Salvador",
+      "Salvadoran",
+      "Salvadorien",
+      "Salvadorienne"
+    ]
+  },
+  "SM": {
+    "name": "San Marino",
+    "point": [
+      43.76666666,
+      12.41666666
+    ],
+    "aliases": [
+      "Most Serene Republic of San Marino",
+      "République de Saint-Marin",
+      "Saint-Marin",
+      "Saint-Marinais",
+      "Saint-Marinaise",
+      "Sammarinese",
+      "San Marino"
+    ]
+  },
+  "SO": {
+    "name": "Somalia",
+    "point": [
+      10,
+      49
+    ],
+    "aliases": [
+      "Federal Republic of Somalia",
+      "République fédérale de Somalie",
+      "Somali",
+      "Somalia",
+      "Somalie",
+      "Somalien",
+      "Somalienne"
+    ]
+  },
+  "PM": {
+    "name": "Saint Pierre and Miquelon",
+    "point": [
+      46.83333333,
+      -56.33333333
+    ],
+    "aliases": [
+      "Saint Pierre and Miquelon",
+      "Saint-Pierrais, Miquelonais",
+      "Saint-Pierrais, Miquelonnais",
+      "Saint-Pierraise, Miquelonaise",
+      "Saint-Pierre-et-Miquelon"
+    ]
+  },
+  "RS": {
+    "name": "Serbia",
+    "point": [
+      44,
+      21
+    ],
+    "aliases": [
+      "Republic of Serbia",
+      "République de Serbie",
+      "Serbe",
+      "Serbia",
+      "Serbian",
+      "Serbie"
+    ]
+  },
+  "SS": {
+    "name": "South Sudan",
+    "point": [
+      7,
+      30
+    ],
+    "aliases": [
+      "Republic of South Sudan",
+      "République du Soudan du Sud",
+      "Soudan du Sud",
+      "South Sudan",
+      "South Sudanese",
+      "Sud-Soudanais",
+      "Sud-Soudanaise"
+    ]
+  },
+  "ST": {
+    "name": "São Tomé and Príncipe",
+    "point": [
+      1,
+      7
+    ],
+    "aliases": [
+      "Democratic Republic of São Tomé and Príncipe",
+      "République démocratique de São Tomé et Príncipe",
+      "Santoméen",
+      "Santoméenne",
+      "Sao Tomean",
+      "São Tomé and Príncipe",
+      "São Tomé et Príncipe"
+    ]
+  },
+  "SR": {
+    "name": "Suriname",
+    "point": [
+      4,
+      -56
+    ],
+    "aliases": [
+      "Republic of Suriname",
+      "République du Suriname",
+      "Surinam",
+      "Surinamais",
+      "Surinamaise",
+      "Suriname",
+      "Surinamer"
+    ]
+  },
+  "SK": {
+    "name": "Slovakia",
+    "point": [
+      48.66666666,
+      19.5
+    ],
+    "aliases": [
+      "République slovaque",
+      "Slovak",
+      "Slovak Republic",
+      "Slovakia",
+      "Slovaque",
+      "Slovaquie"
+    ]
+  },
+  "SI": {
+    "name": "Slovenia",
+    "point": [
+      46.11666666,
+      14.81666666
+    ],
+    "aliases": [
+      "Republic of Slovenia",
+      "République de Slovénie",
+      "Slovene",
+      "Slovenia",
+      "Slovène",
+      "Slovénie"
+    ]
+  },
+  "SE": {
+    "name": "Sweden",
+    "point": [
+      62,
+      15
+    ],
+    "aliases": [
+      "Kingdom of Sweden",
+      "Royaume de Suède",
+      "Suède",
+      "Suédois",
+      "Suédoise",
+      "Sweden",
+      "Swedish"
+    ]
+  },
+  "SZ": {
+    "name": "Eswatini",
+    "point": [
+      -26.5,
+      31.5
+    ],
+    "aliases": [
+      "Eswatini",
+      "Kingdom of Eswatini",
+      "Royaume d’Eswatini",
+      "Swazi",
+      "Swazie",
+      "Swaziland"
+    ]
+  },
+  "SX": {
+    "name": "Sint Maarten",
+    "point": [
+      18.033333,
+      -63.05
+    ],
+    "aliases": [
+      "Saint-Martin",
+      "Saint-Martinois",
+      "Saint-Martinoise",
+      "Sint Maarten",
+      "St. Maartener"
+    ]
+  },
+  "SC": {
+    "name": "Seychelles",
+    "point": [
+      -4.58333333,
+      55.66666666
+    ],
+    "aliases": [
+      "Republic of Seychelles",
+      "République des Seychelles",
+      "Seychelles",
+      "Seychellois",
+      "Seychelloise"
+    ]
+  },
+  "SY": {
+    "name": "Syria",
+    "point": [
+      35,
+      38
+    ],
+    "aliases": [
+      "République arabe syrienne",
+      "Syria",
+      "Syrian",
+      "Syrian Arab Republic",
+      "Syrie",
+      "Syrien",
+      "Syrienne"
+    ]
+  },
+  "TC": {
+    "name": "Turks and Caicos Islands",
+    "point": [
+      21.75,
+      -71.58333333
+    ],
+    "aliases": [
+      "Turks and Caicos Islander",
+      "Turks and Caicos Islands",
+      "Îles Turques et Caïques",
+      "Îles Turques-et-Caïques"
+    ]
+  },
+  "TD": {
+    "name": "Chad",
+    "point": [
+      15,
+      19
+    ],
+    "aliases": [
+      "Chad",
+      "Chadian",
+      "Republic of Chad",
+      "République du Tchad",
+      "Tchad",
+      "Tchadien",
+      "Tchadienne"
+    ]
+  },
+  "TG": {
+    "name": "Togo",
+    "point": [
+      8,
+      1.16666666
+    ],
+    "aliases": [
+      "République togolaise",
+      "Togo",
+      "Togolais",
+      "Togolaise",
+      "Togolese",
+      "Togolese Republic"
+    ]
+  },
+  "TH": {
+    "name": "Thailand",
+    "point": [
+      15,
+      100
+    ],
+    "aliases": [
+      "Kingdom of Thailand",
+      "Royaume de Thaïlande",
+      "Thai",
+      "Thailand",
+      "Thaïlandais",
+      "Thaïlandaise",
+      "Thaïlande"
+    ]
+  },
+  "TJ": {
+    "name": "Tajikistan",
+    "point": [
+      39,
+      71
+    ],
+    "aliases": [
+      "Republic of Tajikistan",
+      "République du Tadjikistan",
+      "Tadjike",
+      "Tadjikistan",
+      "Tadzhik",
+      "Tajikistan"
+    ]
+  },
+  "TK": {
+    "name": "Tokelau",
+    "point": [
+      -9,
+      -172
+    ],
+    "aliases": [
+      "Tokelau",
+      "Tokelauan",
+      "Îles Tokelau"
+    ]
+  },
+  "TM": {
+    "name": "Turkmenistan",
+    "point": [
+      40,
+      60
+    ],
+    "aliases": [
+      "Turkmen",
+      "Turkmenistan",
+      "Turkmène",
+      "Turkménistan"
+    ]
+  },
+  "TL": {
+    "name": "Timor-Leste",
+    "point": [
+      -8.83333333,
+      125.91666666
+    ],
+    "aliases": [
+      "Democratic Republic of Timor-Leste",
+      "East Timorese",
+      "Est-timorais",
+      "Est-timoraise",
+      "République démocratique du Timor oriental",
+      "Timor oriental",
+      "Timor-Leste"
+    ]
+  },
+  "TO": {
+    "name": "Tonga",
+    "point": [
+      -20,
+      -175
+    ],
+    "aliases": [
+      "Kingdom of Tonga",
+      "Royaume des Tonga",
+      "Tonga",
+      "Tongan",
+      "Tonguien",
+      "Tonguienne"
+    ]
+  },
+  "TT": {
+    "name": "Trinidad and Tobago",
+    "point": [
+      11,
+      -61
+    ],
+    "aliases": [
+      "Republic of Trinidad and Tobago",
+      "République de Trinité-et-Tobago",
+      "Trinidad and Tobago",
+      "Trinidadian",
+      "Trinidadien",
+      "Trinidadienne",
+      "Trinité-et-Tobago"
+    ]
+  },
+  "TN": {
+    "name": "Tunisia",
+    "point": [
+      34,
+      9
+    ],
+    "aliases": [
+      "République tunisienne",
+      "Tunisia",
+      "Tunisian",
+      "Tunisian Republic",
+      "Tunisie",
+      "Tunisien",
+      "Tunisienne"
+    ]
+  },
+  "TR": {
+    "name": "Türkiye",
+    "point": [
+      39,
+      35
+    ],
+    "aliases": [
+      "Republic of Türkiye",
+      "République de Turquie",
+      "Turc",
+      "Turkish",
+      "Turque",
+      "Turquie",
+      "Türkiye"
+    ]
+  },
+  "TV": {
+    "name": "Tuvalu",
+    "point": [
+      -8,
+      178
+    ],
+    "aliases": [
+      "Tuvalu",
+      "Tuvaluan",
+      "Tuvaluane"
+    ]
+  },
+  "TW": {
+    "name": "Taiwan",
+    "point": [
+      23.5,
+      121
+    ],
+    "aliases": [
+      "Republic of China (Taiwan)",
+      "République de Chine (Taïwan)",
+      "Taiwan",
+      "Taiwanese",
+      "Taïwan",
+      "Taïwanais",
+      "Taïwanaise"
+    ]
+  },
+  "TZ": {
+    "name": "Tanzania",
+    "point": [
+      -6,
+      35
+    ],
+    "aliases": [
+      "République -Unie de Tanzanie",
+      "Tanzania",
+      "Tanzanian",
+      "Tanzanie",
+      "Tanzanien",
+      "Tanzanienne",
+      "United Republic of Tanzania"
+    ]
+  },
+  "UG": {
+    "name": "Uganda",
+    "point": [
+      1,
+      32
+    ],
+    "aliases": [
+      "Ouganda",
+      "Ougandais",
+      "Ougandaise",
+      "Republic of Uganda",
+      "République de l'Ouganda",
+      "Uganda",
+      "Ugandan"
+    ]
+  },
+  "UA": {
+    "name": "Ukraine",
+    "point": [
+      49,
+      32
+    ],
+    "aliases": [
+      "Ukraine",
+      "Ukrainian",
+      "Ukrainien",
+      "Ukrainienne"
+    ]
+  },
+  "UM": {
+    "name": "United States Minor Outlying Islands",
+    "point": [
+      19.3,
+      166.633333
+    ],
+    "aliases": [
+      "American Islander",
+      "United States Minor Outlying Islands",
+      "Îles mineures éloignées des États-Unis"
+    ]
+  },
+  "UY": {
+    "name": "Uruguay",
+    "point": [
+      -33,
+      -56
+    ],
+    "aliases": [
+      "Oriental Republic of Uruguay",
+      "République orientale de l'Uruguay",
+      "Uruguay",
+      "Uruguayan",
+      "Uruguayen",
+      "Uruguayenne"
+    ]
+  },
+  "US": {
+    "name": "United States",
+    "point": [
+      38,
+      -97
+    ],
+    "aliases": [
+      "American",
+      "Américain",
+      "Américaine",
+      "Les états-unis d'Amérique",
+      "United States",
+      "United States of America",
+      "États-Unis"
+    ]
+  },
+  "UZ": {
+    "name": "Uzbekistan",
+    "point": [
+      41,
+      64
+    ],
+    "aliases": [
+      "Ouzbèke",
+      "Ouzbékistan",
+      "Republic of Uzbekistan",
+      "République d'Ouzbékistan",
+      "Uzbekistan",
+      "Uzbekistani"
+    ]
+  },
+  "VA": {
+    "name": "Vatican City",
+    "point": [
+      41.9,
+      12.45
+    ],
+    "aliases": [
+      "Cité du Vatican",
+      "Vatican",
+      "Vatican City",
+      "Vatican City State",
+      "Vaticane"
+    ]
+  },
+  "VC": {
+    "name": "Saint Vincent and the Grenadines",
+    "point": [
+      13.25,
+      -61.2
+    ],
+    "aliases": [
+      "Saint Vincent and the Grenadines",
+      "Saint Vincentian",
+      "Saint-Vincent-et-les Grenadines",
+      "Saint-Vincent-et-les-Grenadines",
+      "Vincentais",
+      "Vincentaise"
+    ]
+  },
+  "VE": {
+    "name": "Venezuela",
+    "point": [
+      8,
+      -66
+    ],
+    "aliases": [
+      "Bolivarian Republic of Venezuela",
+      "République bolivarienne du Venezuela",
+      "Venezuela",
+      "Venezuelan",
+      "Vénézuélien",
+      "Vénézuélienne"
+    ]
+  },
+  "VG": {
+    "name": "British Virgin Islands",
+    "point": [
+      18.431383,
+      -64.62305
+    ],
+    "aliases": [
+      "British Virgin Islands",
+      "Virgin Islander",
+      "Virgin Islands",
+      "Îles Vierges britanniques",
+      "îles Vierges"
+    ]
+  },
+  "VI": {
+    "name": "United States Virgin Islands",
+    "point": [
+      18.35,
+      -64.933333
+    ],
+    "aliases": [
+      "United States Virgin Islands",
+      "Virgin Islander",
+      "Virgin Islands of the United States",
+      "Îles Vierges des États-Unis"
+    ]
+  },
+  "VN": {
+    "name": "Vietnam",
+    "point": [
+      16.16666666,
+      107.83333333
+    ],
+    "aliases": [
+      "République socialiste du Viêt Nam",
+      "Socialist Republic of Vietnam",
+      "Vietnam",
+      "Vietnamese",
+      "Vietnamien",
+      "Vietnamienne",
+      "Viêt Nam"
+    ]
+  },
+  "VU": {
+    "name": "Vanuatu",
+    "point": [
+      -16,
+      167
+    ],
+    "aliases": [
+      "Ni-Vanuatu",
+      "Republic of Vanuatu",
+      "République de Vanuatu",
+      "Vanuatu",
+      "Vanuatuan",
+      "Vanuatuane"
+    ]
+  },
+  "WF": {
+    "name": "Wallis and Futuna",
+    "point": [
+      -13.3,
+      -176.2
+    ],
+    "aliases": [
+      "Territoire des îles Wallis et Futuna",
+      "Territory of the Wallis and Futuna Islands",
+      "Wallis and Futuna",
+      "Wallis and Futuna Islander",
+      "Wallis-et-Futuna"
+    ]
+  },
+  "WS": {
+    "name": "Samoa",
+    "point": [
+      -13.58333333,
+      -172.33333333
+    ],
+    "aliases": [
+      "Independent State of Samoa",
+      "Samoa",
+      "Samoan",
+      "Samoane"
+    ]
+  },
+  "YE": {
+    "name": "Yemen",
+    "point": [
+      15,
+      48
+    ],
+    "aliases": [
+      "Republic of Yemen",
+      "République du Yémen",
+      "Yemen",
+      "Yemeni",
+      "Yémen",
+      "Yéménite"
+    ]
+  },
+  "ZA": {
+    "name": "South Africa",
+    "point": [
+      -29,
+      24
+    ],
+    "aliases": [
+      "Afrique du Sud",
+      "Republic of South Africa",
+      "République d'Afrique du Sud",
+      "South Africa",
+      "South African",
+      "Sud-africain",
+      "Sud-africaine"
+    ]
+  },
+  "ZM": {
+    "name": "Zambia",
+    "point": [
+      -15,
+      30
+    ],
+    "aliases": [
+      "Republic of Zambia",
+      "République de Zambie",
+      "Zambia",
+      "Zambian",
+      "Zambie",
+      "Zambien",
+      "Zambienne"
+    ]
+  },
+  "ZW": {
+    "name": "Zimbabwe",
+    "point": [
+      -20,
+      30
+    ],
+    "aliases": [
+      "Republic of Zimbabwe",
+      "République du Zimbabwe",
+      "Zimbabwe",
+      "Zimbabwean",
+      "Zimbabwéen",
+      "Zimbabwéenne"
+    ]
+  }
+}

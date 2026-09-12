@@ -10,7 +10,7 @@ import { useExploration } from '../hooks/useExploration';
 import '../exploration.css';
 
 const ExplorationMap = lazy(() => import('../components/ExplorationMap'));
-const FILTERS = ['q', 'category', 'severity', 'source', 'country', 'location'] as const;
+const FILTERS = ['q', 'category', 'severity', 'source', 'country'] as const;
 
 export default function ExplorationPage() {
   const [search, setSearch] = useSearchParams();
@@ -39,13 +39,12 @@ export default function ExplorationPage() {
     return () => { detailRequest.current?.abort(); };
   }, [requestKey]);
   const country = search.get('country') ?? '';
-  const location = search.get('location') ?? 'all';
   const filterCount = FILTERS.filter((key) => search.get(key) && search.get(key) !== 'all').length;
   function change(key: string, value: string) {
     const next = new URLSearchParams(search);
+    next.delete('location');
     if (value && value !== 'all') next.set(key, value); else next.delete(key);
     if (key === 'country' && value) next.delete('location');
-    if (key === 'location' && value === 'unknown') next.delete('country');
     setSelected(null); setSearch(next);
   }
   function reset() { setSearch({ period }); setDraft(''); setSelected(null); }
@@ -87,10 +86,10 @@ export default function ExplorationPage() {
         <label className="ex-search"><Icon name="target" size={16} /><input aria-label="Rechercher dans la veille" placeholder="Rechercher un sujet, un produit, une CVE…" maxLength={160} value={draft} onChange={(e) => setDraft(e.target.value)} /><button type="submit" aria-label="Lancer la recherche"><Icon name="arrowRight" size={16} /></button></label>
 
       </form>
-        <div className="ex-periods" role="group" aria-label="Période">{[['24h','24 heures'],['7d','7 jours'],['30d','30 jours']].map(([value,label]) => <button type="button" aria-pressed={period === value} key={value} onClick={() => change('period', value)}>{label}</button>)}</div>
+
       <div id="exploration-filters" className="ex-filter-panel" hidden={!filtersOpen}>
       <div className="ex-filters">
-        <label>Source<select value={search.get('source') ?? ''} onChange={(e) => change('source', e.target.value)}><option value="">Toutes les sources</option>{Object.entries(SOURCE_META).filter(([key]) => !['bleepingcomputer','hackernews'].includes(key)).map(([key,meta]) => <option key={key} value={key}>{meta.label}</option>)}</select></label>
+        <label>Source<select value={search.get('source') ?? ''} onChange={(e) => change('source', e.target.value)}><option value="">Toutes les sources</option>{Object.entries(SOURCE_META).filter(([key]) => ['gdelt','google_news_fr','certfr'].includes(key)).map(([key,meta]) => <option key={key} value={key}>{meta.label}</option>)}</select></label>
         <label>Catégorie<select value={search.get('category') ?? ''} onChange={(e) => change('category', e.target.value)}><option value="">Toutes les catégories</option>{Object.entries(CATEGORY_LABELS).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>
         <label>Sévérité<select value={search.get('severity') ?? ''} onChange={(e) => change('severity', e.target.value)}><option value="">Tous les niveaux</option>{Object.entries(SEVERITY_LABELS).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>
         <label>Pays cité<select value={country} onChange={(e) => change('country', e.target.value)}><option value="">Tous les pays</option>{[...new Set([...(data?.countryOptions ?? []), ...(country ? [country] : [])])].map((name) => <option key={name}>{name}</option>)}</select></label>
@@ -111,7 +110,7 @@ export default function ExplorationPage() {
         </section>
         <section id="exploration-feed" hidden={!feedOpen} className="ex-feed" aria-label="Flux des publications">
           <div className="ex-panel-head"><div><Icon name="feed" size={15} /><h2>Le flux</h2></div><button className="ex-icon-button" aria-label="Masquer le flux" onClick={() => setFeedOpen(false)}><Icon name="close" size={14} /></button></div>
-          <div className="ex-feed-tabs" role="group" aria-label="Couverture géographique">{[['all','Tout'],['cited','Pays cité'],['unknown','Sans pays cité']].map(([value,label]) => <button key={value} aria-pressed={location === value} onClick={() => { setGroupIds(null); change('location', value); }}>{label}</button>)}</div>
+          <div className="ex-periods" role="group" aria-label="Période">{[['24h','24 heures'],['7d','7 jours'],['30d','30 jours']].map(([value,label]) => <button type="button" aria-pressed={period === value} key={value} onClick={() => change('period', value)}>{label}</button>)}</div>
           {groupItems && <div className="ex-feed-tabs"><span>{groupItems.length} publications du groupe</span><button onClick={() => setGroupIds(null)}>Tout le flux</button></div>}
           <div className="ex-feed-scroll">
             {detailLoading && <p className="ex-empty" role="status">Chargement de la publication…</p>}
@@ -128,7 +127,7 @@ export default function ExplorationPage() {
             </button>)}
             {!groupItems && data?.nextCursor && <button className="ex-load-more" disabled={more} onClick={loadMore}>{more ? 'Chargement…' : 'Afficher les publications suivantes'}</button>}
           </div>
-          <footer className="ex-feed-footer">{groupItems ? `${groupItems.length} publications du groupe` : data ? `${data.items.length} sur ${data.total} publications` : '—'}<span>{data ? `${data.unknown} sans pays cité` : ''}</span></footer>
+          <footer className="ex-feed-footer">{groupItems ? `${groupItems.length} publications du groupe` : data ? `${data.items.length} sur ${data.total} publications` : '—'}</footer>
         </section>
       </div>
     </div>

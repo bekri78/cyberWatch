@@ -1,3 +1,4 @@
+import { DEEPSEEK_MODEL } from '../lib/ai/deepseekClient';
 import type { Pool } from 'pg';
 import { listEvents } from '../database/repositories/cyberEvents';
 import { insertSituationReport } from '../database/repositories/situationReports';
@@ -89,7 +90,7 @@ export async function generateSituationReport(pool: Pool, apiKey: string, log: L
     eventCount: items.length,
     windowStart,
     windowEnd,
-    model: 'deepseek-v4-flash',
+    model: DEEPSEEK_MODEL,
   });
 
   log.info({ eventCount: items.length }, 'Compte rendu de situation (Phase 6) genere');

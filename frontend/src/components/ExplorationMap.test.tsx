@@ -121,6 +121,19 @@ describe('Exploration map interactions', () => {
     expect(map().getZoom()).toBe(3);
   });
 
+  it('places the period controls inside the feed and ignores obsolete location URLs', async () => {
+    fetchExploration.mockResolvedValue({ mapItems: [], countries: [], countryOptions: [], items: [], total: 0, unknown: 0, nextCursor: null });
+    await act(async () => root.render(<MemoryRouter initialEntries={['/exploration?period=24h&location=unknown']}><ExplorationPage /></MemoryRouter>));
+    expect(host.querySelector('#exploration-feed [aria-label="Période"]')).not.toBeNull();
+    expect(host.querySelector('[aria-label="Couverture géographique"]')).toBeNull();
+    expect(fetchExploration.mock.calls[0][0].has('location')).toBe(false);
+  });
+
+  it('uses resolved city coordinates instead of the country centroid', () => {
+    const location = { country: 'France', countryCode: 'FR', place: 'Lyon', precision: 'city' as const, latitude: 45.74906, longitude: 4.84789, evidence: 'Lyon', method: 'title_deepseek', reference: 'geonames:2996944' };
+    expect(publicationPoints([{ ...items[0], locations: [location] }], '')[0].point).toEqual([location.latitude, location.longitude]);
+  });
+
   it('opens only the popup for a map publication without opening the feed or resetting the map', async () => {
     const result = { mapItems: items, countries: [], countryOptions: ['France', 'Germany'], items: [], total: 2, unknown: 0, nextCursor: null } as unknown as ExplorationResult;
     const event = { ...items[0], publications: [{ source: 'GDELT', url: 'https://news.example/article', title: items[0].title, publishedAt: '2026-09-11' }], summary: 'Résumé', description: null, category: 'attack', tags: ['gdelt'], cves: [], sectors: [], organizations: [], publishedAt: '2026-09-11', createdAt: '2026-09-11' } as unknown as CyberEvent;

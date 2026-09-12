@@ -1,3 +1,4 @@
+import { enrichTitleLocations } from '../pipeline/enrichTitleLocations';
 import cron from 'node-cron';
 import type { Pool } from 'pg';
 import { reviewGdeltEvents } from '../pipeline/reviewGdeltEvents';
@@ -17,7 +18,7 @@ interface Logger {
  */
 export function startAiReviewScheduler(pool: Pool, apiKey: string, log: Logger): void {
   cron.schedule('*/15 * * * *', () => {
-    void reviewGdeltEvents(pool, apiKey, log).catch((err) => {
+    void runAiCycle(pool, apiKey, log).catch((err) => {
       log.error({ err }, 'Passage de relecture IA (Phase 5) echoue');
     });
   });
@@ -25,7 +26,17 @@ export function startAiReviewScheduler(pool: Pool, apiKey: string, log: Logger):
 
 /** Premier passage immediat au demarrage, sans attendre le premier tick. */
 export function runInitialAiReview(pool: Pool, apiKey: string, log: Logger): void {
-  void reviewGdeltEvents(pool, apiKey, log).catch((err) => {
+  void runAiCycle(pool, apiKey, log).catch((err) => {
     log.error({ err }, 'Passage initial de relecture IA (Phase 5) echoue');
   });
+}
+
+let running = false;
+async function runAiCycle(pool: Pool, apiKey: string, log: Logger) {
+  if (running) return;
+  running = true;
+  try {
+    try { await reviewGdeltEvents(pool, apiKey, log); }
+    finally { await enrichTitleLocations(pool, apiKey, log); }
+  } finally { running = false; }
 }

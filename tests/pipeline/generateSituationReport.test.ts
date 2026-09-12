@@ -3,6 +3,7 @@ import type { Pool } from 'pg';
 
 vi.mock('../../src/lib/ai/deepseekClient', () => ({
   requestSituationReport: vi.fn(),
+  DEEPSEEK_MODEL: 'deepseek-flash',
 }));
 
 import { requestSituationReport } from '../../src/lib/ai/deepseekClient';
@@ -125,7 +126,7 @@ describe('generateSituationReport', () => {
     expect(eventCount).toBe(1);
     expect(windowStart).toBe('2026-09-05T10:00:00.000Z');
     expect(windowEnd).toBe('2026-09-05T10:00:00.000Z');
-    expect(model).toBe('deepseek-v4-flash');
+    expect(model).toBe('deepseek-flash');
   });
 
   it('transmet a DeepSeek le titre/resume/categorie/severite/source/pays/organisations/secteurs reels de chaque evenement', async () => {

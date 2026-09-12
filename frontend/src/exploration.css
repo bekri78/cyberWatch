@@ -111,7 +111,6 @@
 .ex-immersive .ex-map-canvas { min-height: 0; height: 100%; }
 .ex-immersive .ex-toolbar { position: absolute; z-index: 10; top: 18px; left: 50%; transform: translateX(-50%); width: min(40%, 560px); margin: 0; }
 .ex-immersive .ex-search { padding: 13px 16px; background: #111923ef; box-shadow: 0 6px 25px #0005; }
-.ex-immersive > .ex-periods { position: absolute; right: 18px; top: 18px; z-index: 10; padding: 5px; box-shadow: 0 6px 25px #0005; }
 .ex-floating-actions { position: absolute; left: 18px; top: 18px; z-index: 11; display: flex; gap: 8px; }
 .ex-floating-actions .ex-button { height: 43px; }
 .ex-filter-panel { position: absolute; z-index: 12; top: 76px; left: 18px; width: 290px; padding: 18px; background: #111923f5; border: 1px solid #344153; border-radius: 10px; box-shadow: 0 10px 35px #0005; max-height: calc(100% - 160px); overflow: auto; }
@@ -131,18 +130,17 @@
 .ex-map-help summary { cursor: pointer; padding: 8px 12px; font-size: 10px; color: #a9b7ca; }
 .ex-immersive .ex-map-unresolved, .ex-immersive .ex-map-error { bottom: 140px; right: auto; max-width: 280px; }
 .ex-immersive .ex-error { position: absolute; z-index: 25; top: 76px; left: 50%; transform: translateX(-50%); width: min(500px, calc(100% - 36px)); }
-@media(max-width:1200px) { .ex-immersive .ex-toolbar { width: calc(100% - 440px); left: 160px; transform: none; }.ex-immersive .ex-periods button { padding: 7px 9px; } }
+@media(max-width:1200px) { .ex-immersive .ex-toolbar { width: calc(100% - 190px); left: 160px; transform: none; }.ex-immersive .ex-periods button { padding: 7px 9px; } }
 @media(max-width:760px) {
   .ex-immersive .ex-toolbar { top: 12px; left: 12px; right: 12px; width: auto; }
   .ex-immersive .ex-search { order: initial; padding: 12px; }
   .ex-floating-actions { top: 70px; left: 12px; gap: 5px; }
   .ex-floating-actions .ex-button { height: 36px; padding: 7px; font-size: 11px; }
-  .ex-immersive > .ex-periods { top: 70px; right: 12px; padding: 3px; }
   .ex-immersive .ex-periods button { padding: 6px; font-size: 10px; }
   .ex-immersive .ex-map-controls { top: 123px; left: 12px; }
-  .ex-immersive .ex-feed-toggle { top: 123px; right: 12px; }
+  .ex-immersive .ex-feed-toggle { top: 70px; right: 12px; }
   .ex-filter-panel { top: 116px; left: 12px; width: calc(100% - 24px); max-height: calc(100% - 210px); }
-  .ex-immersive .ex-feed { top: 170px; bottom: 100px; right: 12px; width: calc(100% - 24px); }
+  .ex-immersive .ex-feed { top: 120px; bottom: 100px; right: 12px; width: calc(100% - 24px); }
   .ex-immersive .ex-detail { position: absolute; top: 12px; right: 12px; bottom: 12px; width: calc(100% - 24px); }
   .ex-immersive .ex-stats { left: 12px; right: 12px; bottom: 52px; gap: 12px; justify-content: space-between; padding: 9px 12px; }
   .ex-immersive .ex-stats strong { font-size: 17px; }.ex-immersive .ex-stats span { font-size: 8px; }
@@ -163,3 +161,6 @@
 .ex-publication-popup .leaflet-popup-close-button { color: #9cafc3; }
 
 .ex-map-popup-open .ex-country-label { display: none; }
+
+.ex-feed > .ex-periods { margin: 10px 12px; justify-content: space-between; }
+.ex-feed > .ex-periods button { flex: 1; }

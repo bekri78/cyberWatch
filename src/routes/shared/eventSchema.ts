@@ -25,6 +25,7 @@ export const eventSchema = {
     lastSeenAt: { type: 'string' },
     createdAt: { type: 'string' },
     updatedAt: { type: 'string' },
+    locations: { type: 'array', items: { type: 'object', additionalProperties: true } },
     countries: { type: 'array', items: { type: 'string' } },
     organizations: { type: 'array', items: { type: 'string' } },
     sectors: { type: 'array', items: { type: 'string' } },

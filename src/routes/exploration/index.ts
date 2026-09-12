@@ -1,3 +1,4 @@
+import countryReference from '../../lib/geo/countries.json';
 import type { FastifyPluginAsync } from 'fastify';
 import { eventSchema } from '../shared/eventSchema';
 import { decodeCursor, encodeCursor, InvalidCursorError } from '../../lib/pagination/cursor';
@@ -21,6 +22,7 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
     schema: { response: { 200: { type: 'object', additionalProperties: true, properties: {
       items: { type: 'array', items: eventSchema },
       mapItems: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'title', 'countries', 'severity'], properties: {
+        locations: { type: 'array', items: { type: 'object', additionalProperties: true } },
         id: { type: 'string' }, title: { type: 'string' }, countries: { type: 'array', items: { type: 'string' } }, severity: { type: 'string' },
       } } },
     } }, 400: { type: 'object', properties: { message: { type: 'string' } } } }, querystring: { type: 'object', additionalProperties: false, properties: {
@@ -57,6 +59,8 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
         SELECT ce.*, COALESCE(published_at, created_at) AS event_date
         FROM cyber_events ce
         WHERE qualification_status = 'qualified' AND is_relevant = true
+          AND tags && ARRAY['gdelt', 'google_news_fr', 'certfr']::text[]
+          AND EXISTS (SELECT 1 FROM unnest(countries) c WHERE c = ANY($13::text[]))
           AND COALESCE(published_at, created_at) >= $1::timestamptz
           AND COALESCE(published_at, created_at) <= $2::timestamptz
           AND ($3::text = '' OR strpos(lower(concat_ws(' ', title, summary, description, array_to_string(cves, ' '))), lower($3)) > 0)
@@ -76,7 +80,7 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
         (SELECT count(*)::int FROM filtered WHERE cardinality(countries) = 0) AS unknown,
         (SELECT count(*)::int FROM filtered WHERE severity IN ('high','critical')) AS high,
         COALESCE((SELECT jsonb_agg(jsonb_build_object(
-          'id', id, 'title', title, 'countries', countries, 'severity', severity
+          'id', id, 'title', title, 'countries', countries, 'severity', severity, 'locations', locations
         ) ORDER BY id) FROM filtered WHERE cardinality(countries) > 0), '[]'::jsonb) AS "mapItems",
         COALESCE((SELECT jsonb_agg(c ORDER BY c.count DESC, c.country) FROM (
           SELECT country, count(DISTINCT id)::int AS count,
@@ -93,7 +97,7 @@ export const explorationRoutes: FastifyPluginAsync = async (app) => {
           FROM raw_items ri JOIN sources s ON s.id = ri.source_id WHERE ri.cyber_event_id = p.id
         ), '[]'::jsonb)) ORDER BY p.event_date DESC, p.id DESC) FROM paged p), '[]'::jsonb) AS items
     `, [since.toISOString(), until.toISOString(), query.q?.trim() ?? '', query.category ?? '', query.severity ?? '',
-      query.source ?? '', query.country ?? '', query.location, cursor?.sortValue ?? null, cursor?.id ?? null, duration / 1000, query.limit + 1]);
+      query.source ?? '', query.country ?? '', query.location, cursor?.sortValue ?? null, cursor?.id ?? null, duration / 1000, query.limit + 1, [...Object.values(countryReference).map(c => c.name), 'USA', 'United States of America', 'UK', 'Turkey']]);
     const result = rows[0]!;
     const items = result.items.slice(0, query.limit).map(toApiEvent);
     const last = items.at(-1);

@@ -66,7 +66,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
       zoomAnimation: !reducedMotion, fadeAnimation: !reducedMotion,
     });
     const tiles = L.tileLayer(MAP_TILE_URL, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a> · <a href="https://www.geonames.org/">GeoNames</a>',
       maxZoom: 20, noWrap: true,
     });
     tiles.on('tileerror', () => setMapError(true));
@@ -196,6 +196,13 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
     source.className = 'ex-publication-source';
     source.textContent = href ? new URL(href).hostname.replace(/^www\./, '') : sourceFromTags(popupEvent.tags).label;
     content.append(meta, heading, source);
+    const location = popupEvent.locations?.[0];
+    if (location) {
+      const geo = document.createElement('p');
+      geo.className = 'ex-publication-source';
+      geo.textContent = `${location.place} (${location.precision === 'city' ? 'ville' : 'pays'}) — extrait du titre : « ${location.evidence} »`;
+      content.append(geo);
+    }
     const marker = markers.current.get(popupEvent.id);
     const anchor = marker ? marker.getLatLng() : map.getCenter();
     const popup = L.popup({ maxWidth: 420, minWidth: 240, autoPan: false, className: 'ex-publication-popup' })

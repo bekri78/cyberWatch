@@ -1,3 +1,4 @@
+import type { EventLocation } from '../../lib/geo/resolveLocation';
 import type { Pool } from 'pg';
 import { decodeCursor, encodeCursor, type Cursor } from '../../lib/pagination/cursor';
 
@@ -16,6 +17,7 @@ export interface CyberEventRow {
   last_seen_at: Date;
   created_at: Date;
   updated_at: Date;
+  locations?: EventLocation[];
   countries: string[];
   organizations: string[];
   sectors: string[];
@@ -58,6 +60,7 @@ export interface CyberEvent {
   lastSeenAt: string;
   createdAt: string;
   updatedAt: string;
+  locations?: EventLocation[];
   countries: string[];
   organizations: string[];
   sectors: string[];
@@ -88,6 +91,7 @@ export function toApiEvent(row: CyberEventRow): CyberEvent {
     lastSeenAt: new Date(row.last_seen_at).toISOString(),
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: new Date(row.updated_at).toISOString(),
+    locations: row.locations ?? [],
     countries: row.countries,
     organizations: row.organizations,
     sectors: row.sectors,

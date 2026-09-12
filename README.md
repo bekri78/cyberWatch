@@ -31,3 +31,29 @@ Variables d'environnement : voir `.env.example`. Ne jamais committer `.env`.
 ## Workflow Git
 
 Le developpement se fait sur `develop`, jamais directement sur `main`.
+
+## Localisation des publications
+
+L'exploration affiche uniquement les publications qualifiées et localisables de
+GDELT, Google Actualités et CERT-FR. Les autres données restent conservées en base.
+Le sélecteur de période est dans le flux.
+
+DeepSeek utilise `deepseek-flash` (V4.1 Flash, identifiant officiel vérifié le
+12 septembre 2026, https://api-docs.deepseek.com/). La clé Railway
+`DEEPSEEK_API_KEY` et l'URL API restent identiques. Le scoring et les comptes rendus
+utilisent également cet identifiant.
+
+À chaque cycle IA (démarrage, puis toutes les 15 minutes), jusqu'à 25 titres Google
+et CERT-FR qualifiés, sans pays et datant des 30 derniers jours sont examinés.
+L'IA propose uniquement des lieux de victimes explicitement cités dans le titre,
+avec citation exacte. Le serveur valide les noms contre les référentiels locaux
+GeoNames/world-countries ; il ne demande jamais de coordonnées au modèle.
+Les villes ambiguës/inconnues et les titres sans lieu restent masqués dans
+l'exploration. Le champ `locations` conserve précision, coordonnées de référence,
+citation et provenance. Un lieu de ville est un centre de ville, pas une adresse.
+
+La migration `014_title_locations.sql` s'applique au démarrage. Le rattrapage des
+articles existants est progressif. Une extraction sans lieu n'est pas répétée ;
+les échecs sont réessayés après une heure, trois tentatives maximum. Les positions
+GDELT existantes ne sont pas remplacées. Attribution et licences du référentiel :
+[src/lib/geo/README.md](src/lib/geo/README.md).

@@ -19,6 +19,7 @@ export interface CyberEvent {
   lastSeenAt: string;
   createdAt: string;
   updatedAt: string;
+  locations?: { country: string; countryCode: string; place: string; precision: 'city' | 'country'; latitude: number; longitude: number; evidence: string; method: string; reference: string }[];
   countries: string[];
   organizations: string[];
   sectors: string[];
@@ -47,7 +48,7 @@ export interface EventsPage {
   nextCursor: string | null;
 }
 
-export type MapPublication = Pick<CyberEvent, 'id' | 'title' | 'countries' | 'severity'>;
+export type MapPublication = Pick<CyberEvent, 'id' | 'title' | 'countries' | 'severity' | 'locations'>;
 
 export interface ExplorationResult extends EventsPage {
   mapItems: MapPublication[];
