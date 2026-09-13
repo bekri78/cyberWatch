@@ -252,12 +252,11 @@ button, input, select, textarea { font-family: inherit; }
 
 /* Liste d'evenements */
 .cw-event-row {
-  display: grid; grid-template-columns: 3px 1fr auto; gap: 13px; align-items: center;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 13px; align-items: center;
   padding: 11px 12px; border-radius: 9px; cursor: pointer; transition: background 150ms;
   text-decoration: none; color: inherit;
 }
 .cw-event-row:hover { background: var(--s2); }
-.cw-event-stripe { align-self: stretch; border-radius: 2px; }
 .cw-event-title { font-size: 13px; font-weight: 510; color: var(--text-primary); letter-spacing: -0.01em; line-height: 1.35; }
 .cw-event-meta { font-size: 11.5px; color: var(--text-quaternary); margin-top: 3px; display: flex; gap: 7px; flex-wrap: wrap; }
 .cw-event-side { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
