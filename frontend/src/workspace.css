@@ -141,3 +141,74 @@
 @media (prefers-reduced-motion: reduce) {
   .cw-app *, .cw-app *::before, .cw-app *::after { transition: none !important; animation: none !important; }
 }
+
+/* Graphite reading direction — local design review. */
+:root:root {
+  --bg-marketing: #191a19;
+  --bg-panel: #202220;
+  --bg-surface: #292c29;
+  --text-primary: #eeeee8;
+  --text-secondary: #d1d2c9;
+  --text-tertiary: #b4b7ac;
+  --text-quaternary: #a4a89c;
+  --accent: #c0ccaa;
+  --accent-hover: #e0e8d3;
+  --border-solid: #3a3e37;
+}
+.cw-sidebar { width: 112px; background: #202220; }
+.cw-sidebar > div:first-child > div:first-child { background: transparent; border-color: #59604f; border-radius: 50%; }
+.cw-navigation { padding-top: 28px; gap: 16px; }
+.cw-navigation a[aria-current=page] { background: #33382f; color: #eeeee8; }
+.cw-navigation > a, .cw-navigation > span { font-size: 12px; border-radius: 5px; }
+.cw-header, .ex-immersive::before { background: #202220; }
+.cw-header > span { color: #b4b7ac; }
+.ex-immersive.ex-workspace { --ex-line: #3a3e37; --ex-muted: #b4b7ac; }
+.ex-page-title { font-weight: 500; letter-spacing: -.02em; }
+.ex-immersive .ex-search { background: #191c19; border-color: #44493f; border-radius: 5px; }
+.ex-immersive .ex-search input { color: #eeeee8; font-size: 14px; }
+.ex-immersive .ex-search input::placeholder { color: #a4a89c; }
+.ex-immersive .ex-button { background: #292e27; color: #eeeee8; border-color: #535b4b; border-radius: 5px; }
+.ex-immersive .ex-button:hover, .ex-immersive .ex-button[aria-expanded=true] { background: #3b4334; border-color: #9da98b; }
+.ex-immersive .ex-feed { width: 420px; background: #232622; border: 1px solid #444a3e; border-radius: 5px; box-shadow: 0 15px 45px #0004; }
+.ex-immersive .ex-panel-head { padding: 20px 24px; border-bottom-color: #42473d; }
+.ex-immersive .ex-panel-head h2 { color: #eeeee8; font-weight: 500; font-size: 21px; }
+.ex-immersive .ex-icon-button { border-color: #4a5143; border-radius: 4px; }
+.ex-immersive .ex-feed > .ex-periods { margin: 0; padding: 8px 20px; border: 0; border-bottom: 1px solid #42473d; border-radius: 0; background: transparent; }
+.ex-immersive .ex-periods button { background: transparent; border-radius: 0; color: #b4b7ac; }
+.ex-immersive .ex-periods button[aria-pressed=true] { background: transparent; color: #eeeee8; box-shadow: inset 0 -2px #c0ccaa; }
+.ex-immersive .ex-event { padding: 25px 24px; border-bottom-color: #3a4035; color: #eeeee8; }
+.ex-immersive .ex-event:hover { background: #2e342a; }
+.ex-immersive .ex-event h3 { font-size: 17px; line-height: 1.5; font-weight: 500; margin: 12px 0 16px; }
+.ex-immersive .ex-event-top, .ex-immersive .ex-event-bottom, .ex-immersive .ex-event-countries { color: #b4b7ac; }
+.ex-immersive .ex-severity { border: 0; background: transparent; color: #b4b7ac; padding: 0; font-size: 11px; }
+.ex-immersive .ex-feed-footer { background: #20231e; color: #b4b7ac; padding: 16px 24px; }
+.ex-immersive .ex-filter-panel, .ex-immersive .ex-map-controls, .ex-immersive .ex-map-help { background: #232622; border-color: #444a3e; border-radius: 5px; }
+.ex-immersive .ex-filters select { background: #191c19; color: #eeeee8; }
+.ex-immersive .ex-map-controls button:hover { background: #3b4334; }
+.ex-immersive .ex-map-help summary { color: #d1d2c9; }
+.cw-app .st-workspace { max-width: 1200px; padding: 52px 60px 80px; }
+.cw-app .st-heading { margin-bottom: 48px; align-items: center; }
+.cw-app .st-heading h1 { font-size: 48px; font-weight: 400; letter-spacing: -.045em; }
+.cw-app .st-heading p { color: #b4b7ac; font-size: 16px; }
+.cw-app .st-heading .ex-button { background: #363e2f; border-color: #747f64; border-radius: 4px; color: #eeeee8; }
+.cw-app .st-brief { background: transparent; border: 0; border-top: 1px solid #535b4b; border-radius: 0; padding: 28px 0 36px; }
+.cw-app .st-brief h2 { font-size: 22px; font-weight: 500; }
+.cw-app .st-summary { max-width: 70ch; font-size: 19px; line-height: 1.85; color: #dedfd5; margin: 30px 0 38px; }
+.cw-app .st-highlights { display: block; border-top: 1px solid #42473d; padding: 0; }
+.cw-app .st-highlights .st-report-card { padding: 24px 0; border: 0; border-bottom: 1px solid #42473d; max-width: 900px; }
+.cw-app .st-highlights .st-report-card h3 { font-size: 17px; line-height: 1.5; font-weight: 500; }
+.cw-app .st-highlights .st-report-card p { font-size: 14px; line-height: 1.7; }
+.cw-app .st-brief details { border-color: #42473d; }
+.cw-app .st-brief summary, .cw-app .st-report-card a { color: #c0ccaa; }
+.cw-app .st-priorities button { background: transparent; border-color: #454c3e; border-radius: 4px; }
+.cw-app .st-priorities button[aria-pressed=true] { background: #363e2f; border-color: #a1ae8e; }
+.cw-app .st-publications .cw-event-row { border-color: #42473d; }
+@media (max-width: 760px) {
+  .cw-sidebar { width: 60px; }
+  .ex-immersive .ex-feed { width: calc(100% - 24px); }
+  .ex-immersive .ex-event { padding: 20px 18px; }
+  .ex-immersive .ex-event h3 { font-size: 16px; }
+  .cw-app .st-workspace { padding: 28px 20px; }
+  .cw-app .st-heading h1 { font-size: 34px; }
+  .cw-app .st-summary { font-size: 17px; line-height: 1.75; }
+}
