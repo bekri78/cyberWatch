@@ -1,12 +1,31 @@
 import { useState } from 'react';
 import type { CyberEvent } from '../api/types';
-import { CATEGORY_LABELS, relativeTime, severityClass, sourceFromTags, SEVERITY_LABELS } from '../domain';
+import { severityClass, sourceFromTags, SEVERITY_LABELS } from '../domain';
+import { publicationUrl } from '../qualification';
 import { EventDetailModal } from './EventDetailModal';
 import { Icon } from './Icon';
-import { qualificationLabel } from '../qualification';
+
+/**
+ * Seule CERT-FR fournit assez de contenu structure (description, CVE,
+ * secteurs...) pour justifier la modale de detail. Les autres sources
+ * (GDELT, Google Actualites FR, Microsoft MSRC, CISA KEV, BleepingComputer,
+ * The Hacker News) n'ont rien de plus a montrer que la ligne elle-meme --
+ * on redirige alors directement vers la publication source.
+ */
+const SOURCES_WITH_DETAIL = new Set(['certfr']);
 
 function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: CyberEvent) => void }) {
   const source = sourceFromTags(event.tags);
+  const hasDetail = SOURCES_WITH_DETAIL.has(event.tags[0]);
+  const externalUrl = hasDetail ? null : publicationUrl(event.publications?.[0]?.url ?? '');
+
+  function activate() {
+    if (externalUrl) {
+      window.open(externalUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      onSelect(event);
+    }
+  }
 
   return (
     <div
@@ -14,32 +33,22 @@ function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: Cy
       title={event.summary}
       role="button"
       tabIndex={0}
-      onClick={() => onSelect(event)}
+      onClick={activate}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onSelect(event);
+          activate();
         }
       }}
     >
-      <span
-        className="cw-event-stripe"
-        style={{ background: `var(--crit-${event.severity in SEVERITY_LABELS ? event.severity : 'low'})` }}
-      />
       <div style={{ minWidth: 0 }}>
         <div className="cw-event-title">{event.title}</div>
         <div className="cw-event-meta">
           <span style={{ color: source.color }}>{source.label}</span>
-          <span>· {qualificationLabel(event)}</span>
-          <span>·</span>
-          <span>{event.qualificationStatus === 'pending' || event.qualificationStatus === 'failed'
-            ? 'Catégorie provisoire' : (CATEGORY_LABELS[event.category] ?? event.category)}</span>
-          <span>·</span>
-          <span>{relativeTime(event.publishedAt ?? event.createdAt)}</span>
           {event.countries.length > 0 && (
             <>
               <span>·</span>
-              <span>{event.countries.slice(0, 3).join(', ')}</span>
+              <span>{event.countries.join(', ')}</span>
             </>
           )}
         </div>
@@ -49,7 +58,7 @@ function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: Cy
           <span className="cw-badge-dot" />
           {SEVERITY_LABELS[event.severity] ?? event.severity}
         </span>
-        <Icon name="arrowRight" size={14} color="var(--text-quaternary)" />
+        <Icon name={externalUrl ? 'link' : 'arrowRight'} size={14} color="var(--text-quaternary)" />
       </span>
     </div>
   );
