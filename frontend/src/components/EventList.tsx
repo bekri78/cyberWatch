@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { CyberEvent } from '../api/types';
-import { severityClass, sourceFromTags, SEVERITY_LABELS } from '../domain';
-import { publicationUrl } from '../qualification';
+import { CATEGORY_LABELS, relativeTime, severityClass, sourceFromTags, SEVERITY_LABELS } from '../domain';
+import { publicationUrl, qualificationLabel } from '../qualification';
 import { EventDetailModal } from './EventDetailModal';
 import { Icon } from './Icon';
 
@@ -18,6 +18,7 @@ function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: Cy
   const source = sourceFromTags(event.tags);
   const hasDetail = SOURCES_WITH_DETAIL.has(event.tags[0]);
   const externalUrl = hasDetail ? null : publicationUrl(event.publications?.[0]?.url ?? '');
+  const provisional = event.qualificationStatus === 'pending' || event.qualificationStatus === 'failed';
 
   function activate() {
     if (externalUrl) {
@@ -45,6 +46,11 @@ function EventRow({ event, onSelect }: { event: CyberEvent; onSelect: (event: Cy
         <div className="cw-event-title">{event.title}</div>
         <div className="cw-event-meta">
           <span style={{ color: source.color }}>{source.label}</span>
+          <span>· {qualificationLabel(event)}</span>
+          <span>·</span>
+          <span>{provisional ? 'Catégorie provisoire' : (CATEGORY_LABELS[event.category] ?? event.category)}</span>
+          <span>·</span>
+          <span>{relativeTime(event.publishedAt ?? event.createdAt)}</span>
           {event.countries.length > 0 && (
             <>
               <span>·</span>
