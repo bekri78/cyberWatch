@@ -31,9 +31,10 @@ const BATCH_SIZE = 25;
 // geopolitiques/RH tagges 'attack' a tort ; google_news_fr par construction,
 // une recherche par mots-cles remonte aussi des tribunes/annonces produit/
 // conferences sans rapport avec un incident reel, cf. migration 011).
-// hackernews (media generaliste cyber, cf. collectors/hackerNews) partage
-// le meme besoin pour une raison differente : ce n'est pas un flux
-// institutionnel mais un blog editorial qui publie, a cote des vrais
+// hackernews et bleepingcomputer (medias generalistes cyber, cf.
+// collectors/hackerNews et collectors/bleepingComputer) partagent le meme
+// besoin pour une raison differente : ce ne sont pas des flux
+// institutionnels mais des blogs editoriaux qui publient, a cote des vrais
 // rapports d'incident/vulnerabilite, des tribunes, des recaps de webinar
 // et des annonces produit sponsorisees -- la relecture IA sert ici a
 // ecarter ce contenu non-incident plutot qu'un hors-sujet thematique.
@@ -42,7 +43,7 @@ const BATCH_SIZE = 25;
 // observe -- cette restriction est une decision de perimetre, pas une
 // limitation technique (le meme pipeline fonctionnerait sur n'importe
 // quelle source).
-const REVIEWED_SOURCES = ['gdelt', 'google_news_fr', 'hackernews'] as const;
+const REVIEWED_SOURCES = ['gdelt', 'google_news_fr', 'hackernews', 'bleepingcomputer'] as const;
 
 /**
  * Phase 5 (+ Phase 8, scoring multi-criteres, cf. migration 012) :

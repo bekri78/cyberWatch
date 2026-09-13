@@ -1,5 +1,6 @@
 import cron from 'node-cron';
 import type { Pool } from 'pg';
+import { bleepingComputerCollector } from '../collectors/bleepingComputer';
 import { certfrCollector } from '../collectors/certfr';
 import { cisaKevCollector } from '../collectors/cisaKev';
 import { gdeltCollector } from '../collectors/gdelt';
@@ -20,6 +21,7 @@ const COLLECTORS = [
   gdeltCollector,
   googleNewsFrCollector,
   hackerNewsCollector,
+  bleepingComputerCollector,
 ];
 
 /**

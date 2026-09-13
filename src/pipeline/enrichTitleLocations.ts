@@ -1,7 +1,7 @@
 import type { Pool } from 'pg';
 import { locateTitleWithDeepseek } from '../lib/ai/deepseekClient';
 
-// Also catches up existing qualified Google/CERT-FR/Hacker News articles in the map window.
+// Also catches up existing qualified Google/CERT-FR/Hacker News/BleepingComputer articles in the map window.
 // No modification to relevance, severity, or existing GDELT geography.
 export async function enrichTitleLocations(pool: Pool, apiKey: string, log: { info: (obj: unknown, msg?: string) => void; error: (obj: unknown, msg?: string) => void }) {
   const { rows } = await pool.query<{ id: string; title: string }>(`
@@ -12,7 +12,7 @@ export async function enrichTitleLocations(pool: Pool, apiKey: string, log: { in
       AND (ce.location_attempted_at IS NULL OR ce.location_attempted_at < now() - interval '1 hour')
       AND COALESCE(ce.published_at, ce.created_at) >= now() - interval '30 days'
       AND EXISTS (SELECT 1 FROM raw_items ri JOIN sources s ON s.id = ri.source_id
-        WHERE ri.cyber_event_id = ce.id AND s.name IN ('google_news_fr', 'certfr', 'hackernews'))
+        WHERE ri.cyber_event_id = ce.id AND s.name IN ('google_news_fr', 'certfr', 'hackernews', 'bleepingcomputer'))
     ORDER BY ce.location_attempted_at ASC NULLS FIRST, ce.created_at DESC LIMIT 25`);
   let located = 0;
   for (const row of rows) {
@@ -28,5 +28,5 @@ export async function enrichTitleLocations(pool: Pool, apiKey: string, log: { in
       log.error({ eventId: row.id }, 'Extraction du lieu echouee, nouvel essai dans une heure (3 maximum)');
     }
   }
-  if (rows.length) log.info({ processed: rows.length, located }, 'Localisation des titres Google/CERT-FR/Hacker News terminee');
+  if (rows.length) log.info({ processed: rows.length, located }, 'Localisation des titres Google/CERT-FR/Hacker News/BleepingComputer terminee');
 }
