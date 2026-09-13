@@ -11,6 +11,7 @@ import { publicationUrl } from '../qualification';
 import { publicationPoints } from './explorationPoints';
 
 type PublicationMarker = L.Marker & { category: string; selected: boolean; publicationId: string; sourcePoint: L.LatLngTuple };
+const INITIAL_ZOOM = 3;
 
 function markerIcon(count: number, colors: string[], label: string, clustered: boolean, selected = false) {
   const size = clustered ? 36 : 14;
@@ -71,7 +72,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
     // Same engine and cluster behaviour as OMGA (minitoring-cde).
     // Only this effect owns the map: filters and marker clicks never recreate it.
     const map = L.map(container.current, {
-      center: [20, 12], zoom: 3, minZoom: 0, maxZoom: 20,
+      center: [20, 12], zoom: INITIAL_ZOOM, minZoom: INITIAL_ZOOM, maxZoom: 20,
       zoomControl: false, doubleClickZoom: false, closePopupOnClick: false,
       zoomAnimation: !reducedMotion, fadeAnimation: !reducedMotion,
     });
@@ -230,8 +231,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
     const map = mapRef.current;
     if (!map) return;
     onReset();
-    const zoom = 1 + Math.max(0, Math.min(2, Math.floor(Math.log2(Math.max(256, map.getSize().x) / 256))));
-    map.setView([20, 12], zoom, { animate: false });
+    map.setView([20, 12], INITIAL_ZOOM, { animate: false });
   }
 
   return <div className={`ex-map-canvas ${popupEvent ? 'ex-map-popup-open' : ''}`}>
