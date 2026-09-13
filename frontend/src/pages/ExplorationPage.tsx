@@ -96,7 +96,6 @@ export default function ExplorationPage() {
         <label>Source<select value={search.get('source') ?? ''} onChange={(e) => change('source', e.target.value)}><option value="">Toutes les sources</option>{Object.entries(SOURCE_META).filter(([key]) => ['gdelt','google_news_fr','certfr'].includes(key)).map(([key,meta]) => <option key={key} value={key}>{meta.label}</option>)}</select></label>
         <label>Catégorie<select value={search.get('category') ?? ''} onChange={(e) => change('category', e.target.value)}><option value="">Toutes les catégories</option>{Object.entries(CATEGORY_LABELS).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>
         <label>Sévérité<select value={search.get('severity') ?? ''} onChange={(e) => change('severity', e.target.value)}><option value="">Tous les niveaux</option>{Object.entries(SEVERITY_LABELS).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>
-        <label>Pays cité<select value={country} onChange={(e) => change('country', e.target.value)}><option value="">Tous les pays</option>{[...new Set([...(data?.countryOptions ?? []), ...(country ? [country] : [])])].map((name) => <option key={name}>{name}</option>)}</select></label>
       </div>
         <button type="button" className="ex-reset" disabled={!filterCount} onClick={reset}>Réinitialiser{filterCount > 0 && ` (${filterCount})`}</button>
       </div>
