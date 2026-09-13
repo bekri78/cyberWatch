@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
+import '../workspace.css';
 
 export function Layout({
   title,
@@ -18,7 +19,7 @@ export function Layout({
   immersive?: boolean;
 }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-marketing">
+    <div className="cw-app flex h-screen overflow-hidden bg-marketing">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {!immersive && <Header title={title} subtitle={subtitle} status={status} />}

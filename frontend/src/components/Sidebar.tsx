@@ -15,7 +15,7 @@ export function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="flex w-[208px] shrink-0 flex-col border-r border-border-standard bg-panel max-[900px]:w-14">
+    <aside className="cw-sidebar flex shrink-0 flex-col border-r border-border-standard bg-panel">
       <div className="flex items-center gap-[9px] border-b border-border-subtle px-4 pt-4 pb-3.5 no-underline">
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] border border-[rgba(113,112,255,0.35)] bg-[linear-gradient(135deg,rgba(113,112,255,0.3),rgba(94,106,210,0.1))]">
           <Icon name="shield" size={16} color="var(--accent-hover)" />
@@ -26,7 +26,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-px p-2">
+      <nav className="cw-navigation flex flex-1 flex-col gap-px p-2" aria-label="Navigation principale">
         {NAV.map((item) => {
           const active = location.pathname === item.path;
           const className = cn(
@@ -39,7 +39,7 @@ export function Sidebar() {
           const content = (
             <>
               <Icon name={item.icon} size={15} color={active ? 'var(--accent)' : 'currentColor'} />
-              <span className="max-[900px]:hidden">{item.label}</span>
+              <span className="cw-nav-label">{item.label}</span>
               {!item.enabled && (
                 <span className="ml-auto rounded-[4px] border border-border-standard bg-[var(--s2)] px-[5px] py-px text-[9px] font-semibold tracking-[0.06em] text-quaternary uppercase max-[900px]:hidden">
                   Bientot

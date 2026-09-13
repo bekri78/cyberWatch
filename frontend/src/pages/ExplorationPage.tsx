@@ -8,7 +8,6 @@ import type { CyberEvent } from '../api/types';
 import { fetchEvent } from '../api/client';
 import { CLUSTER_FEED_LIMIT } from '../components/explorationClusters';
 import { useExploration } from '../hooks/useExploration';
-import '../exploration.css';
 
 const ExplorationMap = lazy(() => import('../components/ExplorationMap'));
 const FILTERS = ['q', 'category', 'severity', 'source', 'country'] as const;
@@ -83,7 +82,7 @@ export default function ExplorationPage() {
   const selectedVisible = selected && (mapItems.some(item => item.id === selected.id) || data?.items.some(item => item.id === selected.id)) ? selected : null;
   return <Layout title="Exploration" subtitle="Carte et publications qualifiées" wide immersive>
     <div className="ex-workspace ex-immersive">
-      <h1 className="sr-only">Exploration de la veille cyber</h1>
+      <h1 className="ex-page-title">Exploration</h1>
       <div className="ex-floating-actions"><button className="ex-button" aria-expanded={filtersOpen} aria-controls="exploration-filters" onClick={() => { setFiltersOpen(!filtersOpen); if (window.innerWidth <= 760) setFeedOpen(false); }}>Filtres{filterCount > 0 && ` (${filterCount})`}</button></div>
       <form className="ex-toolbar" onSubmit={(e) => { e.preventDefault(); change('q', draft.trim()); }}>
 
@@ -92,6 +91,7 @@ export default function ExplorationPage() {
       </form>
 
       <div id="exploration-filters" className="ex-filter-panel" hidden={!filtersOpen}>
+      <div className="ex-filter-heading"><h2>Filtrer les publications</h2><button className="ex-icon-button" aria-label="Fermer les filtres" onClick={() => setFiltersOpen(false)}><Icon name="close" size={16} /></button></div>
       <div className="ex-filters">
         <label>Source<select value={search.get('source') ?? ''} onChange={(e) => change('source', e.target.value)}><option value="">Toutes les sources</option>{Object.entries(SOURCE_META).filter(([key]) => ['gdelt','google_news_fr','certfr'].includes(key)).map(([key,meta]) => <option key={key} value={key}>{meta.label}</option>)}</select></label>
         <label>Catégorie<select value={search.get('category') ?? ''} onChange={(e) => change('category', e.target.value)}><option value="">Toutes les catégories</option>{Object.entries(CATEGORY_LABELS).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>
@@ -121,7 +121,7 @@ export default function ExplorationPage() {
             {loading && <div className="ex-empty" role="status"><Icon name="refresh" size={24} /><h3>Chargement de la veille…</h3></div>}
             {!loading && data?.total === 0 && <div className="ex-empty"><Icon name="eye" size={24} /><h3>Aucune publication sur ce périmètre</h3><p>Élargissez la période ou retirez un filtre. L’absence de publication ne signifie pas une absence de risque.</p><button className="ex-button" onClick={reset}>Effacer les filtres</button></div>}
             {groupItems?.map(event => <a href={articleHref(event)} target="_blank" rel="noopener noreferrer" className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }}>
-              <h3>{event.title}</h3><span style={{ color: categoryColor(event.category) }}>{CATEGORY_LABELS[event.category ?? 'other']}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span><p className="ex-event-countries">{event.countries.join(' · ')}</p>
+              <div className="ex-event-top"><span style={{ color: categoryColor(event.category) }}>{CATEGORY_LABELS[event.category ?? 'other']}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span></div><h3>{event.title}</h3><div className="ex-event-bottom"><p className="ex-event-countries">{event.countries.join(' · ')}</p><Icon name="arrowRight" size={14} /></div>
             </a>)}
             {!groupItems && data?.items.map((event) => <a href={articleHref(event)} target="_blank" rel="noopener noreferrer" className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }}>
               <div className="ex-event-top"><span>{sourceFromTags(event.tags).label}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span></div>

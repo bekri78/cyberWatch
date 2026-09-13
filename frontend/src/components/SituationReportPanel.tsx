@@ -226,7 +226,7 @@ export function SituationReportPanel({ loading, report }: { loading: boolean; re
         {' '}{report.qualifiedInputs ? 'Corpus qualifié · synthèse automatique.'
           : 'Rapport antérieur au filtre de qualification : il peut inclure des informations non relues.'}
       </p>
-      <p className="st-summary">{report.summary}</p>
+      <p className="st-summary">{report.summary.replace(/^Selection des dernieres 24 heures : \d+ publications analysees(?:, plafond de 60 atteint ; selection non exhaustive)?\. Titres et extraits disponibles, articles complets non consultes\.\s*/, '')}</p>
       {sections.aRetenir.length > 0 && <div className="st-highlights">{sections.aRetenir.slice(0, 3).map((item, i) => <ARetenirCard key={i} item={item} />)}</div>}
 
       <details className="mt-4">

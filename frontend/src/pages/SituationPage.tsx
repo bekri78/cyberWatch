@@ -11,8 +11,6 @@ import { useDiversifiedEvents } from '../hooks/useDiversifiedEvents';
 import { EventDetailPanel } from '../components/EventDetailPanel';
 import type { CyberEvent } from '../api/types';
 import { Link } from 'react-router-dom';
-import '../exploration.css';
-import '../situation.css';
 import { useSituationReport } from '../hooks/useSituationReport';
 
 export function SituationPage() {
@@ -44,7 +42,7 @@ export function SituationPage() {
   return (
     <Layout title="Situation" subtitle="Comprendre l’essentiel, approfondir les faits" wide>
       <div className="ex-workspace st-workspace">
-        <header className="st-heading"><div><div className="ex-eyebrow">LE POINT CYBER</div><h1>Votre veille, mise en perspective.</h1><p>Les faits à comprendre aujourd’hui et les publications pour aller plus loin.</p></div><Link className="ex-button" to="/exploration">Explorer la carte <Icon name="arrowRight" size={14} /></Link></header>
+        <header className="st-heading"><div><h1>Le point cyber.</h1><p>Les faits à retenir, les sources pour approfondir.</p></div><Link className="ex-button" to="/exploration">Explorer la carte <Icon name="arrowRight" size={14} /></Link></header>
           {situationReport.error
             ? <ErrorState message={situationReport.error} onRetry={situationReport.reload} />
             : <SituationReportPanel loading={situationReport.loading} report={situationReport.report} />}
@@ -52,10 +50,6 @@ export function SituationPage() {
           <section className="st-publications">
             <div className="cw-section-head">
               <div>
-                <div className="cw-section-eyebrow">
-                  <Icon name="activity" size={13} color="var(--accent)" />
-                  APPROFONDIR
-                </div>
                 <h2 className="cw-section-title">Les publications à lire</h2>
                 <p className="cw-section-desc">
                   Publications qualifiées les plus récentes par source, toutes dates confondues
