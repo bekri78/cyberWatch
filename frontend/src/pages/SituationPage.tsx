@@ -5,7 +5,6 @@ import { Layout } from '../components/Layout';
 import { ErrorState, LoadingState } from '../components/RequestState';
 import { SourceBreakdown } from '../components/SourceBreakdown';
 import { SituationReportPanel } from '../components/SituationReportPanel';
-import { QualityOverview } from '../components/QualityOverview';
 import { SOURCE_META } from '../domain';
 import { useDiversifiedEvents } from '../hooks/useDiversifiedEvents';
 import { EventDetailPanel } from '../components/EventDetailPanel';
@@ -46,7 +45,6 @@ export function SituationPage() {
           {situationReport.error
             ? <ErrorState message={situationReport.error} onRetry={situationReport.reload} />
             : <SituationReportPanel loading={situationReport.loading} report={situationReport.report} />}
-          <div className="st-metrics"><QualityOverview mode="metrics" /></div>
           <section className="st-publications">
             <div className="cw-section-head">
               <div>
@@ -54,7 +52,6 @@ export function SituationPage() {
                 <p className="cw-section-desc">
                   Publications qualifiées les plus récentes par source, toutes dates confondues
                   {' '}({activeSourceCount} source{activeSourceCount > 1 ? 's représentées' : ' représentée'} sur {Object.keys(SOURCE_META).length} enregistrées).
-                  {' '}Les compteurs portent sur cet échantillon, distinct des indicateurs sur 24 heures.
                 </p>
               </div>
             </div>
@@ -77,7 +74,6 @@ export function SituationPage() {
                   onFilterChange={setSourceFilter}
                 />
                 <EventList events={filteredEvents} limit={sourceFilter ? 20 : 8} onSelect={select} />
-                <Link className="st-more" to="/exploration">Consulter tout le flux et ses filtres <Icon name="arrowRight" size={14} /></Link>
               </div>
             )}
           </section>
