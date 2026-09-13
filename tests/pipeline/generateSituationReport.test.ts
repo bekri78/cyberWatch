@@ -14,6 +14,7 @@ const mockedRequest = requestSituationReport as unknown as ReturnType<typeof vi.
 function makeEventRow(overrides: Record<string, unknown> = {}) {
   return {
     id: 'e1',
+    publications: [{ url: 'https://example.test/article' }],
     title: 'Fuite de donnees chez un operateur telecom francais',
     summary: 'Fuite de donnees chez un operateur telecom francais',
     description: 'Des donnees clients ont ete exposees suite a une intrusion.',
@@ -45,6 +46,7 @@ function makeEventRow(overrides: Record<string, unknown> = {}) {
 function makeFakePool(eventRows: ReturnType<typeof makeEventRow>[]) {
   const inserts: unknown[][] = [];
   const query = vi.fn(async (sql: string, params: unknown[] = []) => {
+    if (sql.includes('RETURNING id')) return { rows: [{ id: 1 }] };
     if (sql.includes('FROM cyber_events')) {
       return { rows: eventRows };
     }
@@ -99,7 +101,7 @@ describe('generateSituationReport', () => {
             concerne: 'Orange',
             situation: 'x',
             evaluation: 'x',
-            sources: ['certfr'],
+            sources: ['E1'],
           },
         ],
       }),
@@ -110,7 +112,7 @@ describe('generateSituationReport', () => {
     expect(result).toEqual({ generated: true, eventCount: 1 });
     expect(inserts).toHaveLength(1);
     const [summary, keyPointsJson, sectionsJson, eventCount, windowStart, windowEnd, model] = inserts[0]!;
-    expect(summary).toBe('Une fuite de donnees a ete signalee chez un operateur telecom francais.');
+    expect(summary).toContain('Une fuite de donnees a ete signalee chez un operateur telecom francais.');
     expect(JSON.parse(keyPointsJson as string)).toEqual([]);
     const sections = JSON.parse(sectionsJson as string);
     expect(sections.aRetenir).toEqual([
@@ -120,7 +122,7 @@ describe('generateSituationReport', () => {
         concerne: 'Orange',
         situation: 'x',
         evaluation: 'x',
-        sources: ['certfr'],
+        sources: ['https://example.test/article'],
       },
     ]);
     expect(eventCount).toBe(1);
@@ -160,6 +162,7 @@ describe('generateSituationReport', () => {
         }),
       ],
       'fake-key',
+      expect.any(Function),
     );
   });
 
@@ -184,6 +187,7 @@ describe('generateSituationReport', () => {
         expect.objectContaining({ title: 'Fraude bancaire en ligne signalee', scoreTotal: 15, reviewTier: 'veille' }),
       ],
       'fake-key',
+      expect.any(Function),
     );
   });
 
@@ -196,6 +200,7 @@ describe('generateSituationReport', () => {
     expect(mockedRequest).toHaveBeenCalledWith(
       [expect.objectContaining({ summary: 'Resume de secours' })],
       'fake-key',
+      expect.any(Function),
     );
   });
 

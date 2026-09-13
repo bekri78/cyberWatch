@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { DEEPSEEK_MODEL } from '../lib/ai/deepseekClient';
 import type { Pool } from 'pg';
 import { listEvents } from '../database/repositories/cyberEvents';
@@ -14,47 +15,27 @@ export interface GenerateReportResult {
   eventCount: number;
 }
 
-// Nombre d'evenements les plus recents pris en compte pour l'analyse --
-// assez large pour couvrir plusieurs heures d'activite meme aux periodes
-// creuses, mais borne pour garder un prompt DeepSeek de taille raisonnable
-// (cout/latence). Reutilise listEvents (meme filtre is_relevant=true que
-// le catalogue public) plutot qu'une requete dediee : l'analyse ne doit
-// jamais porter sur un evenement que le catalogue lui-meme ne montrerait
-// pas (cf. Phase 5).
 const REPORT_EVENT_LIMIT = 60;
 
-/**
- * Phase 6 : compte rendu de situation "analyste" redige par DeepSeek, a
- * partir des evenements REELS deja collectes et filtres (is_relevant=true)
- * -- jamais d'evenement invente, jamais de source qui n'existe pas
- * reellement dans le catalogue. window_start/window_end sont calcules a
- * partir des dates reelles des evenements effectivement utilises, pas
- * d'une fenetre fixe arbitraire.
- *
- * Transmet a DeepSeek bien plus que le seul titre (cf. Phase 6.0, jugee
- * "tres plate") : resume/description, pays, organisations, secteurs, CVE,
- * acteurs de menace et techniques MITRE deja associes reellement a chaque
- * evenement -- toute matiere premiere structuree deja en base, rien
- * d'ajoute.
- *
- * N'ecrit rien si aucun evenement n'est disponible (pas de rapport vide
- * fabrique de toutes pieces). Ne fait aucune retry interne : un echec
- * DeepSeek remonte tel quel a l'appelant (situationReportScheduler.ts),
- * qui retentera au prochain passage planifie plutot que de bloquer ou
- * d'inventer un contenu de secours -- meme philosophie que
- * reviewGdeltEvents.ts.
- */
+// A bounded 24-hour selection; persistent admission control counts failed calls too.
 export async function generateSituationReport(pool: Pool, apiKey: string, log: Logger): Promise<GenerateReportResult> {
-  const { items } = await listEvents(pool, { limit: REPORT_EVENT_LIMIT });
+  const until = new Date().toISOString();
+  const since = new Date(Date.parse(until) - 24 * 60 * 60 * 1000).toISOString();
+  const page = await listEvents(pool, { limit: REPORT_EVENT_LIMIT + 1, since, until });
+  const items = page.items.slice(0, REPORT_EVENT_LIMIT);
 
   if (items.length === 0) {
     log.info({}, 'Aucun evenement reel disponible, compte rendu de situation non genere pour ce passage');
     return { generated: false, eventCount: 0 };
   }
 
-  const reportInputs: ReportEventInput[] = items.map((event) => ({
+  const reportInputs: ReportEventInput[] = items.map((event, index) => ({
+    reference: `E${index + 1}`,
+    material: event.tags[0] === 'gdelt' ? 'titre et metadonnees, aucun corps d article'
+      : event.tags[0] === 'google_news_fr' ? 'titre seul, aucun corps d article'
+      : event.description ? 'titre et extrait tronque' : 'titre seul',
     title: event.title,
-    summary: event.description ?? event.summary,
+    summary: event.tags[0] === 'google_news_fr' ? '' : event.description ?? event.summary,
     category: event.category,
     severity: event.severity,
     confidence: event.confidence,
@@ -74,10 +55,33 @@ export async function generateSituationReport(pool: Pool, apiKey: string, log: L
   const windowStart = new Date(Math.min(...timestamps)).toISOString();
   const windowEnd = new Date(Math.max(...timestamps)).toISOString();
 
-  const report = await requestSituationReport(reportInputs, apiKey);
+  const hash = createHash('sha256').update(JSON.stringify({ version: 2, model: DEEPSEEK_MODEL, reportInputs,
+    links: items.map(event => event.publications), truncated: page.items.length > REPORT_EVENT_LIMIT })).digest('hex');
+  const admitted = await pool.query(`UPDATE situation_report_budget SET
+      attempts = CASE WHEN budget_day = (now() AT TIME ZONE 'UTC')::date THEN attempts + 1 ELSE 1 END,
+      budget_day = (now() AT TIME ZONE 'UTC')::date, next_allowed_at = now() + interval '2 hours'
+    WHERE id = 1 AND next_allowed_at <= now() AND last_hash IS DISTINCT FROM $1
+      AND (budget_day <> (now() AT TIME ZONE 'UTC')::date OR attempts < 12)
+    RETURNING id`, [hash]);
+  if (!admitted.rows.length) {
+    log.info({}, 'Compte rendu ignore : donnees identiques ou budget atteint');
+    return { generated: false, eventCount: items.length };
+  }
+  const report = await requestSituationReport(reportInputs, apiKey, async usage => {
+    await pool.query('UPDATE situation_report_budget SET usage = $1::jsonb WHERE id = 1', [JSON.stringify(usage)]);
+    await pool.query('INSERT INTO situation_report_usage (model, usage) VALUES ($1, $2::jsonb)', [DEEPSEEK_MODEL, JSON.stringify(usage)]);
+    log.info({ usage, model: DEEPSEEK_MODEL }, 'Consommation DeepSeek du compte rendu');
+  });
+  const sourceLinks = new Map(items.map((event, index) => [`E${index + 1}`, (event.publications ?? [])
+    .map(publication => publication.url).filter(url => { try { return ['http:', 'https:'].includes(new URL(url).protocol); } catch { return false; } })]));
+  report.aRetenir = report.aRetenir.slice(0, 3).map(fact => ({ ...fact,
+    sources: [...new Set(fact.sources.flatMap(ref => sourceLinks.get(ref) ?? []))],
+  }));
+  if (report.aRetenir.some(fact => !fact.sources.length)) throw new Error('Compte rendu sans source verifiable');
+  const scope = `Selection des dernieres 24 heures : ${items.length} publications analysees${page.items.length > REPORT_EVENT_LIMIT ? ', plafond de 60 atteint ; selection non exhaustive' : ''}. Titres et extraits disponibles, articles complets non consultes.`;
 
   await insertSituationReport(pool, {
-    summary: report.syntheseExecutive,
+    summary: `${scope}\n\n${report.syntheseExecutive}`,
     sections: {
       aRetenir: report.aRetenir,
       vulnerabilitesImportantes: report.vulnerabilitesImportantes,
@@ -92,6 +96,8 @@ export async function generateSituationReport(pool: Pool, apiKey: string, log: L
     windowEnd,
     model: DEEPSEEK_MODEL,
   });
+
+  await pool.query('UPDATE situation_report_budget SET last_hash = $1 WHERE id = 1', [hash]);
 
   log.info({ eventCount: items.length }, 'Compte rendu de situation (Phase 6) genere');
   return { generated: true, eventCount: items.length };

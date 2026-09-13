@@ -106,6 +106,8 @@ export function toApiEvent(row: CyberEventRow): CyberEvent {
 }
 
 export interface ListEventsOptions {
+  since?: string;
+  until?: string;
   qualification?: 'qualified' | 'pending' | 'failed';
   limit: number;
   cursor?: Cursor;
@@ -137,6 +139,15 @@ export async function listEvents(pool: Pool, options: ListEventsOptions): Promis
   if (!['qualified', 'pending', 'failed'].includes(qualification)) throw new Error('Qualification invalide');
   const conditions: string[] = ['is_relevant = true', `qualification_status = '${qualification}'`];
   const params: unknown[] = [];
+
+  if (options.since) {
+    params.push(options.since);
+    conditions.push(`COALESCE(published_at, created_at) >= $${params.length}::timestamptz`);
+  }
+  if (options.until) {
+    params.push(options.until);
+    conditions.push(`COALESCE(published_at, created_at) <= $${params.length}::timestamptz`);
+  }
 
   if (options.category) {
     params.push(options.category);

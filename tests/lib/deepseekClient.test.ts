@@ -196,6 +196,21 @@ describe('requestSituationReport', () => {
     },
   ];
 
+  it('records provider usage even when generated JSON is invalid', async () => {
+    mockFetchOnce(200, { ...deepseekBody('invalid JSON'), usage: { prompt_tokens: 100, completion_tokens: 20 } });
+    const record = vi.fn().mockResolvedValue(undefined);
+    await expect(requestSituationReport(sampleEvents, 'key', record)).rejects.toThrow(/JSON/);
+    expect(record).toHaveBeenCalledWith({ prompt_tokens: 100, completion_tokens: 20 });
+  });
+
+  it('bounds oversized inputs without sending extra publications', async () => {
+    mockFetchOnce(200, deepseekBody(JSON.stringify(fullReportBody())));
+    await requestSituationReport(Array.from({ length: 80 }, () => ({ ...sampleEvents[0], title: 'x'.repeat(10000) })), 'key');
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string);
+    expect(body.messages[1].content.length).toBeLessThan(73000);
+    expect(body.messages[1].content).toContain('(60)');
+  });
+
   function fullReportBody(overrides: Record<string, unknown> = {}) {
     return {
       synthese_executive: 'x',
@@ -260,10 +275,9 @@ describe('requestSituationReport', () => {
     expect(parsedBody.messages[1].content).toContain('France');
     expect(parsedBody.messages[1].content).toContain('Orange');
     expect(parsedBody.messages[1].content).toContain('Telecommunications');
-    // Contrairement a reviewEventWithDeepseek, le thinking n'est PAS
-    // desactive ici (cf. commentaire deepseekClient.ts) -- aucun champ
-    // "thinking" dans le corps envoye.
-    expect(parsedBody.thinking).toBeUndefined();
+    expect(parsedBody.thinking).toEqual({ type: 'disabled' });
+    expect(parsedBody.max_tokens).toBe(2200);
+    expect(parsedBody.messages[1].content.length).toBeLessThan(73000);
   });
 
   it('ajoute la ligne "Score IA (Phase 5)" uniquement pour un evenement gdelt/google_news_fr reellement note (Phase 8)', async () => {
