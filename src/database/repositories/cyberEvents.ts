@@ -109,7 +109,7 @@ export interface ListEventsOptions {
   since?: string;
   until?: string;
   qualification?: 'qualified' | 'pending' | 'failed';
-  limit: number;
+  limit?: number;
   cursor?: Cursor;
   category?: string;
   severity?: string;
@@ -172,20 +172,21 @@ export async function listEvents(pool: Pool, options: ListEventsOptions): Promis
   }
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-  params.push(options.limit);
+  const limitClause = options.limit ? `LIMIT $${params.length + 1}` : '';
+  if (options.limit) params.push(options.limit);
 
   const { rows } = await pool.query<CyberEventRow>(
     `${SELECT_EVENTS}
      ${where}
      ORDER BY COALESCE(published_at, created_at) DESC, id DESC
-     LIMIT $${params.length}`,
+     ${limitClause}`,
     params,
   );
 
   const items = rows.map(toApiEvent);
   const last = rows.at(-1);
   const nextCursor =
-    rows.length === options.limit && last
+    options.limit !== undefined && rows.length === options.limit && last
       ? encodeCursor({ sortValue: (last.published_at ?? last.created_at).toISOString(), id: last.id })
       : null;
 

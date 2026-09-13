@@ -203,14 +203,6 @@ describe('requestSituationReport', () => {
     expect(record).toHaveBeenCalledWith({ prompt_tokens: 100, completion_tokens: 20 });
   });
 
-  it('bounds oversized inputs without sending extra publications', async () => {
-    mockFetchOnce(200, deepseekBody(JSON.stringify(fullReportBody())));
-    await requestSituationReport(Array.from({ length: 80 }, () => ({ ...sampleEvents[0], title: 'x'.repeat(10000) })), 'key');
-    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string);
-    expect(body.messages[1].content.length).toBeLessThan(73000);
-    expect(body.messages[1].content).toContain('(60)');
-  });
-
   function fullReportBody(overrides: Record<string, unknown> = {}) {
     return {
       synthese_executive: 'x',

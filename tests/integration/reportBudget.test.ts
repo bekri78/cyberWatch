@@ -46,10 +46,29 @@ it('admits only one concurrent call and counts failures against the persistent b
   expect((await generateSituationReport(pool, 'test', log)).generated).toBe(false);
   expect(request).toHaveBeenCalledTimes(1);
 });
-it('caps a large selection at 60 and announces its incomplete coverage', async () => {
+it('analyses more than 60 short publications without polluting the summary with technical coverage text', async () => {
   await db.exec(`INSERT INTO cyber_events(title, summary, category, severity, confidence, qualification_status, published_at)
     SELECT 'Article ' || n, 'Excerpt', 'other', 'low', 'low', 'qualified', now() FROM generate_series(1, 65) n`);
   await generateSituationReport(pool, 'test', log);
-  expect(request.mock.calls[0][0]).toHaveLength(60);
-  expect((await db.query<{ summary: string }>('SELECT summary FROM situation_reports')).rows[0].summary).toContain('selection non exhaustive');
+  expect(request.mock.calls[0][0].length).toBeGreaterThan(60);
+  expect((await db.query<{ summary: string }>('SELECT summary FROM situation_reports')).rows[0].summary).toBe('Informations insuffisantes.');
+});
+
+it('deduplicates equivalent titles before the AI call', async () => {
+  await db.exec(`INSERT INTO cyber_events(title, summary, description, category, severity, confidence, qualification_status, published_at)
+    VALUES ('Même actualité !', 'x', repeat('x', 10000), 'other', 'low', 'low', 'qualified', now()),
+           ('Meme actualite', 'x', repeat('x', 10000), 'other', 'low', 'low', 'qualified', now())`);
+  await generateSituationReport(pool, 'test', log);
+  const sent = request.mock.calls[0][0];
+  expect(sent.filter(event => event.title.toLowerCase().includes('actualit'))).toHaveLength(1);
+});
+
+it('bounds input text rather than applying an arbitrary publication count', async () => {
+  await db.exec(`INSERT INTO cyber_events(title, summary, description, category, severity, confidence, qualification_status, published_at)
+    SELECT 'Long article ' || n, 'x', repeat('x', 10000), 'other', 'low', 'low', 'qualified', now()
+    FROM generate_series(1, 80) n`);
+  await generateSituationReport(pool, 'test', log);
+  const sent = request.mock.calls[0][0];
+  expect(sent.length).toBeGreaterThan(60);
+  expect(JSON.stringify(sent).length).toBeLessThanOrEqual(48_000);
 });
