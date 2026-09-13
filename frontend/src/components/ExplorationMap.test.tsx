@@ -106,7 +106,7 @@ describe('Exploration map interactions', () => {
   });
 
   it('opens all group publications in the right feed even outside the loaded page', async () => {
-    const publications = [items[0], { ...items[0], id: 'fr2', title: 'Second article' }];
+    const publications = [{ ...items[0], url: 'https://news.example/first' }, { ...items[0], id: 'fr2', title: 'Second article', url: 'https://news.example/second' }];
     fetchExploration.mockResolvedValue({ mapItems: publications, countries: [], countryOptions: [], items: [], total: 2, unknown: 0, nextCursor: 'next' });
     await act(async () => root.render(<MemoryRouter initialEntries={['/exploration']}><ExplorationPage /></MemoryRouter>));
     await act(async () => { await import('./ExplorationMap'); });
@@ -115,6 +115,13 @@ describe('Exploration map interactions', () => {
     expect(feed.hidden).toBe(false);
     expect(feed.querySelectorAll('.ex-event')).toHaveLength(2);
     expect(feed.textContent).toContain('Second article');
+    const article = feed.querySelector<HTMLAnchorElement>('a.ex-event')!;
+    expect(article.href).toBe('https://news.example/first');
+    expect(article.target).toBe('_blank');
+    expect(article.rel).toBe('noopener noreferrer');
+    article.addEventListener('click', e => e.preventDefault());
+    await act(async () => article.click());
+    expect(fetchEvent).not.toHaveBeenCalled();
     expect(feed.querySelector('.ex-load-more')).toBeNull();
     expect(host.querySelector('.leaflet-popup')).toBeNull();
     expect(fetchExploration).toHaveBeenCalledTimes(1);

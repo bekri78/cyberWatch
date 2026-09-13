@@ -1,3 +1,4 @@
+import { publicationUrl } from '../qualification';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
@@ -25,7 +26,6 @@ export default function ExplorationPage() {
   const [draft, setDraft] = useState(search.get('q') ?? '');
   const searchText = search.get('q') ?? '';
   useEffect(() => { setDraft(searchText); }, [searchText]);
-  const selectedButton = useRef<HTMLButtonElement | null>(null);
   const period = ['24h', '7d', '30d'].includes(search.get('period') ?? '') ? search.get('period')! : '7d';
   const params = useMemo(() => {
     const p = new URLSearchParams({ period, until: anchor });
@@ -48,7 +48,7 @@ export default function ExplorationPage() {
     setSelected(null); setSearch(next);
   }
   function reset() { setSearch({ period }); setDraft(''); setSelected(null); }
-  function closeDetail() { detailRequest.current?.abort(); setDetailLoading(false); setSelected(null); selectedButton.current?.focus(); }
+  function closeDetail() { detailRequest.current?.abort(); setDetailLoading(false); setSelected(null); }
   async function openPublication(id: string) {
     if (loading) return;
     detailRequest.current?.abort();
@@ -76,6 +76,10 @@ export default function ExplorationPage() {
     if (window.innerWidth <= 760) setFiltersOpen(false);
   }
   const groupItems = groupIds ? mapItems.filter(item => groupIds.includes(item.id)) : null;
+  function articleHref(event: { url?: string | null; publications?: CyberEvent['publications'] }) {
+    if (event.url) return publicationUrl(event.url) ?? undefined;
+    return event.publications?.map(item => publicationUrl(item.url)).find(Boolean) ?? undefined;
+  }
   const selectedVisible = selected && (mapItems.some(item => item.id === selected.id) || data?.items.some(item => item.id === selected.id)) ? selected : null;
   return <Layout title="Exploration" subtitle="Carte et publications qualifiées" wide immersive>
     <div className="ex-workspace ex-immersive">
@@ -117,14 +121,14 @@ export default function ExplorationPage() {
             {detailError && <p className="ex-empty" role="alert">{detailError}</p>}
             {loading && <div className="ex-empty" role="status"><Icon name="refresh" size={24} /><h3>Chargement de la veille…</h3></div>}
             {!loading && data?.total === 0 && <div className="ex-empty"><Icon name="eye" size={24} /><h3>Aucune publication sur ce périmètre</h3><p>Élargissez la période ou retirez un filtre. L’absence de publication ne signifie pas une absence de risque.</p><button className="ex-button" onClick={reset}>Effacer les filtres</button></div>}
-            {groupItems?.map(event => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }} onClick={(e) => { selectedButton.current = e.currentTarget; void openPublication(event.id); }}>
+            {groupItems?.map(event => <a href={articleHref(event)} target="_blank" rel="noopener noreferrer" className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }}>
               <h3>{event.title}</h3><span style={{ color: categoryColor(event.category) }}>{CATEGORY_LABELS[event.category ?? 'other']}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span><p className="ex-event-countries">{event.countries.join(' · ')}</p>
-            </button>)}
-            {!groupItems && data?.items.map((event) => <button className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }} aria-pressed={selectedVisible?.id === event.id} onClick={(e) => { selectedButton.current = e.currentTarget; void openPublication(event.id); }}>
+            </a>)}
+            {!groupItems && data?.items.map((event) => <a href={articleHref(event)} target="_blank" rel="noopener noreferrer" className={`ex-event ${selectedVisible?.id === event.id ? 'is-selected' : ''}`} key={event.id} style={{ borderLeft: `3px solid ${categoryColor(event.category)}` }}>
               <div className="ex-event-top"><span>{sourceFromTags(event.tags).label}</span><span className={`ex-severity ex-severity--${event.severity}`}>{SEVERITY_LABELS[event.severity] ?? event.severity}</span></div>
               <h3>{event.title}</h3><div className="ex-event-bottom"><span>{new Date(event.publishedAt ?? event.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} · {CATEGORY_LABELS[event.category] ?? event.category}</span><Icon name="arrowRight" size={14} /></div>
               <p className="ex-event-countries"><Icon name="mapPin" size={11} />{event.countries.length ? event.countries.slice(0,3).join(' · ') + (event.countries.length > 3 ? ` +${event.countries.length - 3}` : '') : 'Pays non documenté'}</p>
-            </button>)}
+            </a>)}
             {!groupItems && data?.nextCursor && <button className="ex-load-more" disabled={more} onClick={loadMore}>{more ? 'Chargement…' : 'Afficher les publications suivantes'}</button>}
           </div>
           <footer className="ex-feed-footer">{groupItems ? `${groupItems.length} publications du groupe` : data ? `${data.items.length} sur ${data.total} publications` : '—'}</footer>
