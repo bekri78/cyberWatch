@@ -31,12 +31,18 @@ const BATCH_SIZE = 25;
 // geopolitiques/RH tagges 'attack' a tort ; google_news_fr par construction,
 // une recherche par mots-cles remonte aussi des tribunes/annonces produit/
 // conferences sans rapport avec un incident reel, cf. migration 011).
+// hackernews (media generaliste cyber, cf. collectors/hackerNews) partage
+// le meme besoin pour une raison differente : ce n'est pas un flux
+// institutionnel mais un blog editorial qui publie, a cote des vrais
+// rapports d'incident/vulnerabilite, des tribunes, des recaps de webinar
+// et des annonces produit sponsorisees -- la relecture IA sert ici a
+// ecarter ce contenu non-incident plutot qu'un hors-sujet thematique.
 // CERT-FR/CISA KEV/MSRC restent hors scope : flux institutionnels dedies a
 // la cybersecurite, aucun faux positif de ce type n'y a jamais ete
 // observe -- cette restriction est une decision de perimetre, pas une
 // limitation technique (le meme pipeline fonctionnerait sur n'importe
 // quelle source).
-const REVIEWED_SOURCES = ['gdelt', 'google_news_fr'] as const;
+const REVIEWED_SOURCES = ['gdelt', 'google_news_fr', 'hackernews'] as const;
 
 /**
  * Phase 5 (+ Phase 8, scoring multi-criteres, cf. migration 012) :

@@ -7,7 +7,7 @@ export async function enrichCategories(pool: Pool, apiKey: string, log: { info: 
     WITH pending AS (
       SELECT id FROM cyber_events
       WHERE qualification_status = 'qualified' AND is_relevant = true
-        AND tags && ARRAY['gdelt','google_news_fr','certfr']::text[]
+        AND tags && ARRAY['gdelt','google_news_fr','certfr','hackernews']::text[]
         AND category_checked_at IS NULL AND category_attempts < 3
         AND (category_attempted_at IS NULL OR category_attempted_at < now() - interval '1 hour')
         AND COALESCE(published_at, created_at) >= now() - interval '30 days'
