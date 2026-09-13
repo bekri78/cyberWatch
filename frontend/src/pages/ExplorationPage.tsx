@@ -80,7 +80,7 @@ export default function ExplorationPage() {
   return <Layout title="Exploration" subtitle="Carte et publications qualifiées" wide immersive>
     <div className="ex-workspace ex-immersive">
       <h1 className="sr-only">Exploration de la veille cyber</h1>
-      <div className="ex-floating-actions"><button className="ex-button" aria-expanded={filtersOpen} aria-controls="exploration-filters" onClick={() => { setFiltersOpen(!filtersOpen); if (window.innerWidth <= 760) setFeedOpen(false); }}>Filtres{filterCount > 0 && ` (${filterCount})`}</button><button className="ex-button" disabled={loading} aria-label="Actualiser la carte et le flux" onClick={() => { setSelected(null); setAnchor(new Date().toISOString()); }}><Icon name="refresh" size={14} /></button></div>
+      <div className="ex-floating-actions"><button className="ex-button" aria-expanded={filtersOpen} aria-controls="exploration-filters" onClick={() => { setFiltersOpen(!filtersOpen); if (window.innerWidth <= 760) setFeedOpen(false); }}>Filtres{filterCount > 0 && ` (${filterCount})`}</button></div>
       <form className="ex-toolbar" onSubmit={(e) => { e.preventDefault(); change('q', draft.trim()); }}>
 
         <label className="ex-search"><Icon name="target" size={16} /><input aria-label="Rechercher dans la veille" placeholder="Rechercher un sujet, un produit, une CVE…" maxLength={160} value={draft} onChange={(e) => setDraft(e.target.value)} /><button type="submit" aria-label="Lancer la recherche"><Icon name="arrowRight" size={16} /></button></label>

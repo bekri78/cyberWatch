@@ -75,6 +75,7 @@ export default function ExplorationMap({ items, country, selected, onSelect, onG
       zoomControl: false, doubleClickZoom: false, closePopupOnClick: false,
       zoomAnimation: !reducedMotion, fadeAnimation: !reducedMotion,
     });
+    map.attributionControl.setPrefix(false);
     const tiles = L.tileLayer(MAP_TILE_URL, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a> · <a href="https://www.geonames.org/">GeoNames</a>',
       maxZoom: 20, noWrap: true,
