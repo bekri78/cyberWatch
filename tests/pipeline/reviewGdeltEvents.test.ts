@@ -155,13 +155,13 @@ describe('reviewGdeltEvents', () => {
     );
   });
 
-  it('ne relit que les evenements gdelt/google_news_fr non encore relus (filtre delegue a la requete SQL)', async () => {
+  it('ne relit que les evenements des sources a fort taux de faux positifs non encore relus (filtre delegue a la requete SQL)', async () => {
     const { pool } = makeFakePool([]);
     await reviewGdeltEvents(pool, 'fake-key', log);
 
     const selectCall = (pool.query as unknown as ReturnType<typeof vi.fn>).mock.calls[0]!;
     expect(selectCall[0]).toMatch(/s\.name = ANY\(\$2::text\[\]\)/);
     expect(selectCall[0]).toMatch(/ce\.ai_generated = false/);
-    expect(selectCall[1][1]).toEqual(['gdelt', 'google_news_fr']);
+    expect(selectCall[1][1]).toEqual(['gdelt', 'google_news_fr', 'hackernews', 'bleepingcomputer']);
   });
 });
